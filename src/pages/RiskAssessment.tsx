@@ -159,10 +159,10 @@ export default function RiskAssessment() {
                   formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
                 />
                 <Bar dataKey="completed" fill="hsl(145, 63%, 62%)" name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
-                  <LabelList dataKey="completed" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number, entry: any) => { if (v === 0) return ''; const t = entry?.total || items.length; return `${Math.round((v / t) * 100)}%`; }} />
+                  <LabelList dataKey="completedPct" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${v}%`} />
                 </Bar>
                 <Bar dataKey="nonCompliant" fill="hsl(350, 80%, 72%)" name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
-                  <LabelList dataKey="nonCompliant" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number, entry: any) => { if (v === 0) return ''; const t = entry?.total || items.length; return `${Math.round((v / t) * 100)}%`; }} />
+                  <LabelList dataKey="nonCompliantPct" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${v}%`} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
