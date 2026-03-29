@@ -11,6 +11,7 @@ import { categories } from '@/data/complianceData';
 import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useState } from 'react';
+import { MaterialEventsSection } from '@/components/MaterialEventsSection';
 
 const CHART_COLORS = {
   Completed: 'hsl(145, 63%, 62%)',
