@@ -8,10 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge, RiskBadge, NatureBadge } from '@/components/StatusBadges';
 import { categories } from '@/data/complianceData';
-import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, RotateCcw, ChevronLeft, ChevronRight, FileSpreadsheet, Presentation } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useState } from 'react';
 import { MaterialEventsSection } from '@/components/MaterialEventsSection';
+import { exportCategoryToXlsx, exportCategoryToPptx } from '@/lib/categoryExportUtils';
+import { toast } from 'sonner';
 
 const CHART_COLORS = {
   Completed: 'hsl(145, 63%, 62%)',
@@ -332,9 +334,37 @@ export default function Dashboard() {
                 <div className="animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xs font-semibold text-primary">{toTitleCaseLabel(expandedCategory)} — {catItems.length} Compliance Items</h3>
-                    <Button variant="ghost" size="sm" className="text-[10px] h-6 px-2" onClick={() => setExpandedCategory(null)}>
-                      Close
-                    </Button>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-[10px] h-7 px-2.5 gap-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          exportCategoryToXlsx(expandedCategory, catItems);
+                          toast.success(`Exported ${toTitleCaseLabel(expandedCategory)} to Excel`);
+                        }}
+                      >
+                        <FileSpreadsheet className="h-3 w-3 flex-shrink-0" />
+                        Export .xlsx
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-[10px] h-7 px-2.5 gap-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          exportCategoryToPptx(expandedCategory, catItems);
+                          toast.success(`Exported ${toTitleCaseLabel(expandedCategory)} to PowerPoint`);
+                        }}
+                      >
+                        <Presentation className="h-3 w-3 flex-shrink-0" />
+                        Export .pptx
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-[10px] h-7 px-2" onClick={() => setExpandedCategory(null)}>
+                        Close
+                      </Button>
+                    </div>
                   </div>
                   <div className="rounded-md border max-h-[320px] overflow-auto">
                     <Table>
