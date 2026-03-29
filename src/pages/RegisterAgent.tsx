@@ -50,7 +50,7 @@ const agentLogs = [
 ];
 
 export default function RegisterAgent() {
-  const { agent, startAgent, stopAgent, addAgentLog, setAgentSchedule, setAgentStatus, setAgentCompleted } = useComplianceStore();
+  const { items, agent, startAgent, stopAgent, addAgentLog, setAgentSchedule, setAgentStatus, setAgentCompleted } = useComplianceStore();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const logIndexRef = useRef(0);
   const logEndRef = useRef<HTMLDivElement>(null);
