@@ -146,7 +146,7 @@ export default function Dashboard() {
           {/* Status Breakdown Donut */}
           <Card className="overflow-hidden">
             <CardHeader className="pb-1 pt-4 px-5">
-              <CardTitle className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">Status Breakdown</CardTitle>
+              <CardTitle className="text-xs font-semibold tracking-wide text-muted-foreground">Status Breakdown</CardTitle>
             </CardHeader>
             <CardContent className="px-2 pb-4">
               <ResponsiveContainer width="100%" height={230}>
