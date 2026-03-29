@@ -36,13 +36,18 @@ export default function RiskAssessment() {
   const [tab, setTab] = useState('all');
   const perPage = 12;
 
+  // Overdue items automatically become High Risk
+  const overdueRisks = useMemo(() =>
+    items.filter(i => i.status === 'Overdue'),
+  [items]);
+
   const summaryStats = useMemo(() => ({
     approved: items.filter(i => i.approvalStatus === 'Approved').length,
     pending: items.filter(i => i.approvalStatus === 'Pending').length,
     docMissing: items.filter(i => i.approvalStatus === 'Doc Missing').length,
-    overdue: items.filter(i => i.status === 'Overdue').length,
+    overdue: overdueRisks.length,
     notStarted: items.filter(i => i.approvalStatus === 'Not Started').length,
-  }), [items]);
+  }), [items, overdueRisks]);
 
   const tabFiltered = useMemo(() => {
     if (tab === 'my-queue') return filtered.filter(i => i.owner.includes('Priya') || i.owner.includes('Rajesh'));
@@ -61,10 +66,12 @@ export default function RiskAssessment() {
       else if (i.status === 'Overdue' || i.approvalStatus === 'Doc Missing') catMap[i.category].nonCompliant++;
     });
     return Object.entries(catMap)
-      .map(([name, d]) => ({ name: name.length > 15 ? name.slice(0, 13) + '…' : name, ...d }))
+      .map(([name, d]) => ({ name: name.length > 18 ? name.slice(0, 16) + '…' : name, ...d }))
       .filter(d => d.completed + d.nonCompliant > 0)
       .slice(0, 10);
   }, [items]);
+
+  const totalItemsCount = items.length;
 
   return (
     <AppLayout title="Risk Assessment" subtitle="Module 3 — Compliance Risk Monitoring & Workflow">
@@ -74,14 +81,14 @@ export default function RiskAssessment() {
           <SummaryCard icon={<ShieldCheck className="h-4 w-4" />} label="Approved" value={summaryStats.approved} color="text-success" />
           <SummaryCard icon={<Clock className="h-4 w-4" />} label="Pending" value={summaryStats.pending} color="text-warning" />
           <SummaryCard icon={<FileWarning className="h-4 w-4" />} label="Doc Missing" value={summaryStats.docMissing} color="text-destructive" />
-          <SummaryCard icon={<ShieldAlert className="h-4 w-4" />} label="Overdue" value={summaryStats.overdue} color="text-destructive" />
+          <SummaryCard icon={<ShieldAlert className="h-4 w-4" />} label="Overdue / High Risk" value={summaryStats.overdue} color="text-destructive" />
           <SummaryCard icon={<CircleDot className="h-4 w-4" />} label="Not Started" value={summaryStats.notStarted} color="text-muted-foreground" />
         </div>
 
         {/* Executive Summary Chart */}
         <Card className="overflow-hidden">
           <CardHeader className="pb-1 pt-4 px-5">
-            <CardTitle className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">Executive Summary</CardTitle>
+            <CardTitle className="text-xs font-semibold tracking-wide text-muted-foreground">Executive Summary</CardTitle>
             <p className="text-[10px] text-muted-foreground/70">Completed vs Non-Compliant by Category</p>
           </CardHeader>
           <CardContent className="px-3 pb-4">
@@ -111,15 +118,60 @@ export default function RiskAssessment() {
                   formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
                 />
                 <Bar dataKey="completed" fill="hsl(145, 63%, 62%)" name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
-                  <LabelList dataKey="completed" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { if (v === 0) return ''; return `${Math.round((v / items.length) * 100)}%`; }} />
+                  <LabelList dataKey="completed" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${Math.round((v / totalItemsCount) * 100)}%`} />
                 </Bar>
                 <Bar dataKey="nonCompliant" fill="hsl(350, 80%, 72%)" name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
-                  <LabelList dataKey="nonCompliant" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { if (v === 0) return ''; return `${Math.round((v / items.length) * 100)}%`; }} />
+                  <LabelList dataKey="nonCompliant" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${Math.round((v / totalItemsCount) * 100)}%`} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
+
+        {/* Overdue Risks — Real-time from Dashboard */}
+        {overdueRisks.length > 0 && (
+          <Card className="border-destructive/30">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="h-4 w-4 text-destructive" />
+                <CardTitle className="text-sm font-semibold text-destructive">
+                  Open High Risks — Overdue Compliances ({overdueRisks.length})
+                </CardTitle>
+              </div>
+              <p className="text-[10px] text-muted-foreground">All overdue compliance items are automatically flagged as High Risk</p>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border border-destructive/20 max-h-[280px] overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-[10px] w-10">#</TableHead>
+                      <TableHead className="text-[10px]">Filing Name</TableHead>
+                      <TableHead className="text-[10px] hidden md:table-cell">Category</TableHead>
+                      <TableHead className="text-[10px]">Risk</TableHead>
+                      <TableHead className="text-[10px]">Due Date</TableHead>
+                      <TableHead className="text-[10px] hidden md:table-cell">Owner</TableHead>
+                      <TableHead className="text-[10px] hidden md:table-cell">Approval</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {overdueRisks.map(item => (
+                      <TableRow key={item.id} className="cursor-pointer hover:bg-destructive/5" onClick={() => selectItem(item.id)}>
+                        <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
+                        <TableCell className="text-xs font-medium max-w-[200px] truncate">{item.filingName}</TableCell>
+                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{item.category}</TableCell>
+                        <TableCell><RiskBadge level="High" /></TableCell>
+                        <TableCell className="text-xs text-destructive font-semibold">{item.dueDate}</TableCell>
+                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell truncate">{item.owner}</TableCell>
+                        <TableCell className="hidden md:table-cell"><ApprovalBadge status={item.approvalStatus} /></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Filters */}
         <Card>
@@ -193,7 +245,7 @@ export default function RiskAssessment() {
                           <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
                           <TableCell className="text-xs font-medium max-w-[180px] truncate">{item.filingName}</TableCell>
                           <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[100px] truncate">{item.category}</TableCell>
-                          <TableCell><RiskBadge level={item.riskLevel} /></TableCell>
+                          <TableCell><RiskBadge level={item.status === 'Overdue' ? 'High' : item.riskLevel} /></TableCell>
                           <TableCell><StatusBadge status={item.status} /></TableCell>
                           <TableCell className="hidden md:table-cell"><ApprovalBadge status={item.approvalStatus} /></TableCell>
                           <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell max-w-[100px] truncate">{item.owner}</TableCell>
@@ -260,7 +312,7 @@ function SummaryCard({ icon, label, value, color }: { icon: React.ReactNode; lab
         <div className={color}>{icon}</div>
         <div>
           <p className={`text-xl font-bold ${color}`}>{value}</p>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
+          <p className="text-[10px] text-muted-foreground tracking-wider">{label}</p>
         </div>
       </CardContent>
     </Card>
