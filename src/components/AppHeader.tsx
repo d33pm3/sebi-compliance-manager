@@ -1,4 +1,5 @@
-import { Bell, Building2, User } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
+import ecxoLogo from '@/assets/ecxo-logo.png';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,9 +27,9 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Building2 className="h-3.5 w-3.5" />
-          <span>Exco Compliance Solutions</span>
+        <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground">
+          <img src={ecxoLogo} alt="Exco logo" className="h-6 w-6 rounded-full" />
+          <span className="font-medium">Exco Compliance Solutions</span>
         </div>
 
         <Button variant="ghost" size="icon" className="relative">
