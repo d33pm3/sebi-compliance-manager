@@ -169,6 +169,9 @@ export default function RiskAssessment() {
                 <CardTitle className="text-sm font-semibold text-destructive">
                   Open High Risks — Overdue Compliances ({overdueRisks.length})
                 </CardTitle>
+                <Button variant="outline" size="sm" className="ml-auto text-[10px] h-7 px-2.5 gap-1" onClick={() => exportRiskItemsToXlsx('Overdue_High_Risks', overdueRisks, 'Overdue')}>
+                  <FileSpreadsheet className="h-3 w-3" /> Export .xlsx
+                </Button>
               </div>
               <p className="text-[10px] text-muted-foreground">All overdue compliance items are automatically flagged as High Risk</p>
             </CardHeader>
