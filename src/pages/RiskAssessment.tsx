@@ -41,6 +41,10 @@ export default function RiskAssessment() {
     items.filter(i => i.status === 'Overdue'),
   [items]);
 
+  const docMissingRisks = useMemo(() =>
+    items.filter(i => i.approvalStatus === 'Doc Missing'),
+  [items]);
+
   const summaryStats = useMemo(() => ({
     approved: items.filter(i => i.approvalStatus === 'Approved').length,
     pending: items.filter(i => i.approvalStatus === 'Pending').length,
