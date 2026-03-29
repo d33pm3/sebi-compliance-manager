@@ -79,20 +79,39 @@ export default function RiskAssessment() {
         </div>
 
         {/* Executive Summary Chart */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold">Executive Summary — Completed vs Non-Compliant by Category</CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-1 pt-4 px-5">
+            <CardTitle className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">Executive Summary</CardTitle>
+            <p className="text-[10px] text-muted-foreground/70">Completed vs Non-Compliant by Category</p>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={execSummary}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(210,20%,90%)" />
-                <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-20} textAnchor="end" height={50} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: '10px' }} />
-                <Bar dataKey="completed" fill="#166534" name="Completed" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="nonCompliant" fill="#dc2626" name="Non-Compliant" radius={[3, 3, 0, 0]} />
+          <CardContent className="px-3 pb-4">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={execSummary} barCategoryGap="18%">
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                  angle={-25}
+                  textAnchor="end"
+                  height={55}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={30}
+                />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
+                <Legend
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: '11px', paddingTop: '4px' }}
+                  formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
+                />
+                <Bar dataKey="completed" fill="hsl(152, 60%, 32%)" name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                <Bar dataKey="nonCompliant" fill="hsl(0, 72%, 51%)" name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
