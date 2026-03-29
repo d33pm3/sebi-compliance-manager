@@ -86,6 +86,8 @@ export default function RiskAssessment() {
   const paged = tabFiltered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.ceil(tabFiltered.length / perPage);
 
+  const toTitleCase = (s: string) => s.toLowerCase().replace(/(?:^|\s|\/)\w/g, c => c.toUpperCase());
+
   const execSummary = useMemo(() => {
     const catMap: Record<string, { total: number; completed: number; nonCompliant: number }> = {};
     items.forEach(i => {
@@ -94,15 +96,22 @@ export default function RiskAssessment() {
       if (i.status === 'Completed') catMap[i.category].completed++;
       if (i.status === 'Overdue' || i.approvalStatus === 'Doc Missing') catMap[i.category].nonCompliant++;
     });
+    const totalItems = items.length;
     return Object.entries(catMap)
-      .map(([name, d]) => ({
-        name: name.length > 18 ? name.slice(0, 16) + '…' : name,
-        completed: d.completed,
-        nonCompliant: d.nonCompliant,
-        total: d.total,
-      }))
+      .map(([name, d]) => {
+        const label = toTitleCase(name);
+        return {
+          name: label.length > 20 ? label.slice(0, 18) + '…' : label,
+          completed: d.completed,
+          nonCompliant: d.nonCompliant,
+          total: d.total,
+          completedPct: totalItems > 0 ? Math.round((d.completed / totalItems) * 100) : 0,
+          nonCompliantPct: totalItems > 0 ? Math.round((d.nonCompliant / totalItems) * 100) : 0,
+        };
+      })
       .filter(d => d.completed + d.nonCompliant > 0)
-      .slice(0, 10);
+      .sort((a, b) => (b.completed + b.nonCompliant) - (a.completed + a.nonCompliant))
+      .slice(0, 12);
   }, [items]);
 
   return (
