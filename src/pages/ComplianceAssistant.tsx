@@ -195,13 +195,55 @@ Company Secretary
           </CardHeader>
 
           <ScrollArea className="flex-1 p-4">
-            {!workspaceContent && (
-              <div className="flex flex-col items-center justify-center h-full text-center py-20">
-                <Zap className="h-12 w-12 text-muted-foreground/30 mb-4" />
-                <h3 className="text-sm font-semibold text-muted-foreground">Select a quick action or type below</h3>
-                <p className="text-xs text-muted-foreground/70 mt-1 max-w-md">The Compliance Assistant can draft notice responses, pull documents, run compliance queries, and send emails.</p>
+            {!workspaceContent && !selectedModule && (
+              <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                <Zap className="h-10 w-10 text-muted-foreground/30 mb-3" />
+                <h3 className="text-sm font-semibold text-muted-foreground">Select a module or quick action to get started</h3>
+                <p className="text-xs text-muted-foreground/70 mt-1 max-w-md mb-6">The Compliance Assistant can query across all modules, draft responses, pull documents, and send emails.</p>
+
+                {/* Module Category Boxes */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 w-full max-w-2xl">
+                  {moduleCategories.map(mod => (
+                    <button
+                      key={mod.id}
+                      onClick={() => { setSelectedModule(mod.id); setWorkspaceContent(null); }}
+                      className="flex items-center gap-2.5 p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/5 transition-all text-left"
+                    >
+                      <mod.icon className={`h-5 w-5 flex-shrink-0 ${mod.color}`} />
+                      <span className="text-xs font-medium">{mod.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
+
+            {selectedModule && !workspaceContent && (() => {
+              const mod = moduleCategories.find(m => m.id === selectedModule);
+              if (!mod) return null;
+              return (
+                <div className="space-y-4 max-w-3xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <mod.icon className={`h-5 w-5 ${mod.color}`} />
+                    <h3 className="text-sm font-semibold">{mod.label} — Suggested Queries</h3>
+                    <Button variant="ghost" size="sm" className="ml-auto text-[10px] h-7" onClick={() => setSelectedModule(null)}>← Back</Button>
+                  </div>
+                  <div className="space-y-2">
+                    {mod.questions.map((q, i) => (
+                      <button
+                        key={i}
+                        onClick={() => { setInput(q); setSelectedModule(null); setWorkspaceContent('query'); }}
+                        className="w-full text-left p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/5 transition-all"
+                      >
+                        <div className="flex items-start gap-2">
+                          <Search className="h-3.5 w-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                          <span className="text-xs">{q}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {workspaceContent === 'draft' && (
               <div className="space-y-4 max-w-3xl">
