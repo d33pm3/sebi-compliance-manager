@@ -13,6 +13,22 @@ import { Search, RotateCcw, CheckCircle2, XCircle, RotateCw, Upload, ChevronLeft
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useMemo, useState } from 'react';
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
+      {label && <p className="text-xs font-medium text-foreground mb-1">{label}</p>}
+      {payload.map((p: any, i: number) => (
+        <div key={i} className="flex items-center gap-2 text-xs">
+          <div className="h-2.5 w-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: p.color || p.fill }} />
+          <span className="text-muted-foreground">{p.name}:</span>
+          <span className="font-semibold text-foreground">{p.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export default function RiskAssessment() {
   const { items, filters, setFilter, resetFilters, selectItem, filteredItems, updateApprovalStatus, toggleEvidence } = useComplianceStore();
   const filtered = filteredItems();
