@@ -110,8 +110,8 @@ export default function RiskAssessment() {
                   wrapperStyle={{ fontSize: '11px', paddingTop: '4px' }}
                   formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
                 />
-                <Bar dataKey="completed" fill="hsl(152, 60%, 32%)" name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                <Bar dataKey="nonCompliant" fill="hsl(0, 72%, 51%)" name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                <Bar dataKey="completed" fill="hsl(145, 63%, 62%)" name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                <Bar dataKey="nonCompliant" fill="hsl(350, 80%, 72%)" name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

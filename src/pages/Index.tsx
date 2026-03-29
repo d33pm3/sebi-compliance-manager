@@ -13,19 +13,19 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { useMemo, useState } from 'react';
 
 const CHART_COLORS = {
-  Completed: 'hsl(152, 60%, 32%)',
+  Completed: 'hsl(145, 63%, 62%)',
   'Due Soon': 'hsl(38, 80%, 52%)',
-  Overdue: 'hsl(0, 72%, 51%)',
+  Overdue: 'hsl(350, 80%, 72%)',
   'Not Due': 'hsl(220, 8%, 46%)',
   'In Progress': 'hsl(197, 78%, 54%)',
   'Not Started': 'hsl(220, 8%, 64%)',
 };
 
 const RISK_COLORS = {
-  Critical: 'hsl(0, 72%, 51%)',
+  Critical: 'hsl(350, 80%, 72%)',
   High: 'hsl(38, 80%, 52%)',
   Medium: 'hsl(197, 78%, 54%)',
-  Low: 'hsl(152, 60%, 32%)',
+  Low: 'hsl(145, 63%, 62%)',
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
