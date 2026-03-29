@@ -214,7 +214,7 @@ export default function Dashboard() {
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
                   <Bar dataKey="count" fill="hsl(var(--primary))" name="Filings" radius={[4, 4, 0, 0]} maxBarSize={40}>
-                    <LabelList dataKey="count" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { const total = monthData.reduce((s, d) => s + d.count, 0); return total > 0 ? `${((v / total) * 100).toFixed(0)}%` : ''; }} />
+                    <LabelList dataKey="count" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { if (v === 0) return ''; const total = monthData.reduce((s, d) => s + d.count, 0); return total > 0 ? `${Math.round((v / total) * 100)}%` : ''; }} />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
