@@ -247,7 +247,7 @@ export default function Dashboard() {
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
                   <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={22}>
-                    <LabelList dataKey="value" position="right" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { const total = items.length; return total > 0 ? `${((v / total) * 100).toFixed(0)}%` : ''; }} />
+                    <LabelList dataKey="value" position="right" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { if (v === 0) return ''; const total = items.length; return total > 0 ? `${Math.round((v / total) * 100)}%` : ''; }} />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
