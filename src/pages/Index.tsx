@@ -238,7 +238,9 @@ export default function Dashboard() {
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
-                  <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={22} />
+                  <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={22}>
+                    <LabelList dataKey="value" position="right" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { const total = items.length; return total > 0 ? `${((v / total) * 100).toFixed(0)}%` : ''; }} />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
