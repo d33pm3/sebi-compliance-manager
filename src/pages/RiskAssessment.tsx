@@ -298,7 +298,7 @@ export default function RiskAssessment() {
                           <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
                           <TableCell className="text-xs font-medium max-w-[180px] truncate">{item.filingName}</TableCell>
                           <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[100px] truncate">{item.category}</TableCell>
-                          <TableCell><RiskBadge level={item.status === 'Overdue' ? 'High' : item.riskLevel} /></TableCell>
+                          <TableCell><RiskBadge level={(item.status === 'Overdue' || item.approvalStatus === 'Doc Missing') ? 'High' : item.riskLevel} /></TableCell>
                           <TableCell><StatusBadge status={item.status} /></TableCell>
                           <TableCell className="hidden md:table-cell"><ApprovalBadge status={item.approvalStatus} /></TableCell>
                           <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell max-w-[100px] truncate">{item.owner}</TableCell>
