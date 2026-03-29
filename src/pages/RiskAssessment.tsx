@@ -63,19 +63,23 @@ export default function RiskAssessment() {
   const totalPages = Math.ceil(tabFiltered.length / perPage);
 
   const execSummary = useMemo(() => {
-    const catMap: Record<string, { completed: number; nonCompliant: number }> = {};
+    const catMap: Record<string, { total: number; completed: number; nonCompliant: number }> = {};
     items.forEach(i => {
-      if (!catMap[i.category]) catMap[i.category] = { completed: 0, nonCompliant: 0 };
+      if (!catMap[i.category]) catMap[i.category] = { total: 0, completed: 0, nonCompliant: 0 };
+      catMap[i.category].total++;
       if (i.status === 'Completed') catMap[i.category].completed++;
-      else if (i.status === 'Overdue' || i.approvalStatus === 'Doc Missing') catMap[i.category].nonCompliant++;
+      if (i.status === 'Overdue' || i.approvalStatus === 'Doc Missing') catMap[i.category].nonCompliant++;
     });
     return Object.entries(catMap)
-      .map(([name, d]) => ({ name: name.length > 18 ? name.slice(0, 16) + '…' : name, ...d }))
+      .map(([name, d]) => ({
+        name: name.length > 18 ? name.slice(0, 16) + '…' : name,
+        completed: d.completed,
+        nonCompliant: d.nonCompliant,
+        total: d.total,
+      }))
       .filter(d => d.completed + d.nonCompliant > 0)
       .slice(0, 10);
   }, [items]);
-
-  const totalItemsCount = items.length;
 
   return (
     <AppLayout title="Risk Assessment" subtitle="Module 3 — Compliance Risk Monitoring & Workflow">
@@ -122,10 +126,10 @@ export default function RiskAssessment() {
                   formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
                 />
                 <Bar dataKey="completed" fill="hsl(145, 63%, 62%)" name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
-                  <LabelList dataKey="completed" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${Math.round((v / totalItemsCount) * 100)}%`} />
+                  <LabelList dataKey="completed" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number, entry: any) => { if (v === 0) return ''; const t = entry?.total || items.length; return `${Math.round((v / t) * 100)}%`; }} />
                 </Bar>
                 <Bar dataKey="nonCompliant" fill="hsl(350, 80%, 72%)" name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
-                  <LabelList dataKey="nonCompliant" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${Math.round((v / totalItemsCount) * 100)}%`} />
+                  <LabelList dataKey="nonCompliant" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number, entry: any) => { if (v === 0) return ''; const t = entry?.total || items.length; return `${Math.round((v / t) * 100)}%`; }} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
