@@ -346,6 +346,7 @@ function generateMockResponse(query: string, model: AIModel): string {
 function generateMockSources(query: string, model: AIModel): ChatSource[] {
   const baseSources: ChatSource[] = [
     { type: 'regulation', label: 'SEBI LODR 2015', reference: 'Relevant Regulation', url: 'https://www.sebi.gov.in' },
+    { type: 'regulation', label: 'SEBI LODR Amendment (20 Jan 2026)', reference: 'SEBI/HO/CFD/CFD-PoD-2/P/CIR/2026/07', url: 'https://www.sebi.gov.in' },
     { type: 'register', label: 'Compliance Register', reference: 'Related Items' },
   ];
 
