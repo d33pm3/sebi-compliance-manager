@@ -217,6 +217,9 @@ export default function RiskAssessment() {
                 <CardTitle className="text-sm font-semibold text-warning">
                   Open High Risks — Documents Missing ({docMissingRisks.length})
                 </CardTitle>
+                <Button variant="outline" size="sm" className="ml-auto text-[10px] h-7 px-2.5 gap-1" onClick={() => exportRiskItemsToXlsx('DocMissing_High_Risks', docMissingRisks, 'Doc Missing')}>
+                  <FileSpreadsheet className="h-3 w-3" /> Export .xlsx
+                </Button>
               </div>
               <p className="text-[10px] text-muted-foreground">All compliance items with missing documents are automatically flagged as High Risk</p>
             </CardHeader>
