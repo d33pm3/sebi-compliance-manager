@@ -13,19 +13,49 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { useMemo, useState } from 'react';
 
 const CHART_COLORS = {
-  Completed: '#166534',
-  'Due Soon': '#d97706',
-  Overdue: '#dc2626',
-  'Not Due': '#6b7280',
-  'In Progress': '#29ABE2',
-  'Not Started': '#9ca3af',
+  Completed: 'hsl(152, 60%, 32%)',
+  'Due Soon': 'hsl(38, 80%, 52%)',
+  Overdue: 'hsl(0, 72%, 51%)',
+  'Not Due': 'hsl(220, 8%, 46%)',
+  'In Progress': 'hsl(197, 78%, 54%)',
+  'Not Started': 'hsl(220, 8%, 64%)',
 };
 
 const RISK_COLORS = {
-  Critical: '#dc2626',
-  High: '#d97706',
-  Medium: '#29ABE2',
-  Low: '#166534',
+  Critical: 'hsl(0, 72%, 51%)',
+  High: 'hsl(38, 80%, 52%)',
+  Medium: 'hsl(197, 78%, 54%)',
+  Low: 'hsl(152, 60%, 32%)',
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
+      {label && <p className="text-xs font-medium text-foreground mb-1">{label}</p>}
+      {payload.map((p: any, i: number) => (
+        <div key={i} className="flex items-center gap-2 text-xs">
+          <div className="h-2.5 w-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: p.color || p.fill }} />
+          <span className="text-muted-foreground">{p.name}:</span>
+          <span className="font-semibold text-foreground">{p.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const PieTooltip = ({ active, payload }: any) => {
+  if (!active || !payload?.length) return null;
+  const d = payload[0];
+  return (
+    <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
+      <div className="flex items-center gap-2 text-xs">
+        <div className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: d.payload.fill }} />
+        <span className="text-muted-foreground">{d.name}:</span>
+        <span className="font-semibold text-foreground">{d.value}</span>
+      </div>
+    </div>
+  );
 };
 
 export default function Dashboard() {
