@@ -24,17 +24,14 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 
-const activeModules = [
+const modules = [
   { title: 'Compliance Agent', url: '/register-agent', icon: Bot, module: 'M1' },
   { title: 'Dashboard', url: '/', icon: LayoutDashboard, module: 'M2' },
   { title: 'Risk Assessment', url: '/risk-assessment', icon: ShieldAlert, module: 'M3' },
-];
-
-const comingSoon = [
-  { title: 'Doc Vault', icon: FolderArchive, module: 'M4' },
-  { title: 'AI Chatbot', icon: MessageSquare, module: 'M5' },
-  { title: 'Analytics', icon: BarChart3, module: 'M6' },
-  { title: 'Admin', icon: Settings, module: 'M7' },
+  { title: 'Doc Vault', url: '/doc-vault', icon: FolderArchive, module: 'M4' },
+  { title: 'AI Chatbot', url: '/chatbot', icon: MessageSquare, module: 'M5' },
+  { title: 'Assistant', url: '/assistant', icon: BarChart3, module: 'M6' },
+  { title: 'Admin', url: '/admin', icon: Settings, module: 'M7' },
 ];
 
 export function AppSidebar() {
@@ -59,11 +56,11 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] uppercase tracking-wider">
-            Active Modules
+            Modules
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {activeModules.map((item) => (
+              {modules.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
@@ -80,29 +77,6 @@ export function AppSidebar() {
                         </span>
                       )}
                     </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] uppercase tracking-wider">
-            Coming Soon
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {comingSoon.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton disabled className="opacity-40 cursor-not-allowed">
-                    <item.icon className="h-4 w-4 mr-2 flex-shrink-0" />
-                    {!collapsed && (
-                      <span className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono opacity-50">{item.module}</span>
-                        {item.title}
-                      </span>
-                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
