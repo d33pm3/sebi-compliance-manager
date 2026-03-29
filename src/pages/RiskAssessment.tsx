@@ -9,9 +9,33 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatusBadge, RiskBadge, ApprovalBadge } from '@/components/StatusBadges';
 import { categories, ComplianceItem, RiskLevel, ApprovalStatus } from '@/data/complianceData';
-import { Search, RotateCcw, CheckCircle2, XCircle, RotateCw, Upload, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, FileWarning, Clock, CircleDot } from 'lucide-react';
+import { Search, RotateCcw, CheckCircle2, XCircle, RotateCw, Upload, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, FileWarning, Clock, CircleDot, FileSpreadsheet } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
+
+function exportRiskItemsToXlsx(title: string, riskItems: ComplianceItem[], flag: string) {
+  import('xlsx').then((XLSX) => {
+    const wsData = [
+      ['#', 'Filing Name', 'Category', 'Risk Level', 'Flag', 'Status', 'Due Date', 'Owner', 'Approval Status', 'Regulation', 'Frequency'],
+      ...riskItems.map(item => [
+        item.sNo, item.filingName, item.category, 'High', flag,
+        item.status, item.dueDate, item.owner, item.approvalStatus,
+        item.regReference, item.frequency,
+      ]),
+    ];
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = [
+      { wch: 5 }, { wch: 45 }, { wch: 25 }, { wch: 10 }, { wch: 15 },
+      { wch: 12 }, { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 30 }, { wch: 15 },
+    ];
+    XLSX.utils.book_append_sheet(wb, ws, title.slice(0, 31));
+    const fileName = `${title.replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    toast.success(`Downloaded ${fileName}`);
+  });
+}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -145,6 +169,9 @@ export default function RiskAssessment() {
                 <CardTitle className="text-sm font-semibold text-destructive">
                   Open High Risks — Overdue Compliances ({overdueRisks.length})
                 </CardTitle>
+                <Button variant="outline" size="sm" className="ml-auto text-[10px] h-7 px-2.5 gap-1" onClick={() => exportRiskItemsToXlsx('Overdue_High_Risks', overdueRisks, 'Overdue')}>
+                  <FileSpreadsheet className="h-3 w-3" /> Export .xlsx
+                </Button>
               </div>
               <p className="text-[10px] text-muted-foreground">All overdue compliance items are automatically flagged as High Risk</p>
             </CardHeader>
@@ -190,6 +217,9 @@ export default function RiskAssessment() {
                 <CardTitle className="text-sm font-semibold text-warning">
                   Open High Risks — Documents Missing ({docMissingRisks.length})
                 </CardTitle>
+                <Button variant="outline" size="sm" className="ml-auto text-[10px] h-7 px-2.5 gap-1" onClick={() => exportRiskItemsToXlsx('DocMissing_High_Risks', docMissingRisks, 'Doc Missing')}>
+                  <FileSpreadsheet className="h-3 w-3" /> Export .xlsx
+                </Button>
               </div>
               <p className="text-[10px] text-muted-foreground">All compliance items with missing documents are automatically flagged as High Risk</p>
             </CardHeader>
