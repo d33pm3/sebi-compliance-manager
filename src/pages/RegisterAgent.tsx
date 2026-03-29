@@ -7,6 +7,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Play, Square, Upload, Download, Clock, CheckCircle2, AlertCircle, Terminal } from 'lucide-react';
 import { useCallback, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
+import { downloadMasterRegister, downloadFilingCalendar, downloadEventTriggerMap, downloadAmendmentTracker, downloadOtherItems } from '@/lib/downloadUtils';
 
 const agentLogs = [
   'Initialising SEBI Compliance Agent v2.0...',
