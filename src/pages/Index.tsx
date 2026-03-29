@@ -11,6 +11,7 @@ import { categories } from '@/data/complianceData';
 import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useState } from 'react';
+import { MaterialEventsSection } from '@/components/MaterialEventsSection';
 
 const CHART_COLORS = {
   Completed: 'hsl(145, 63%, 62%)',
@@ -138,8 +139,8 @@ export default function Dashboard() {
           <StatCard icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming} color="text-muted-foreground" />
         </div>
 
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Charts Row — Status + Filings */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Status Breakdown Donut */}
           <Card className="overflow-hidden">
             <CardHeader className="pb-1 pt-4 px-5">
@@ -175,7 +176,6 @@ export default function Dashboard() {
                       <Cell key={entry.name} fill={CHART_COLORS[entry.name as keyof typeof CHART_COLORS] || 'hsl(220,8%,46%)'} />
                     ))}
                   </Pie>
-                  {/* Center total label */}
                   <text x="50%" y="46%" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '20px', fontWeight: 700, fill: 'hsl(var(--foreground))' }}>
                     {stats.total}
                   </text>
@@ -224,40 +224,43 @@ export default function Dashboard() {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-
-          {/* By Category */}
-          <Card className="overflow-hidden">
-            <CardHeader className="pb-1 pt-4 px-5">
-              <CardTitle className="text-xs font-semibold tracking-wide text-muted-foreground">By Category</CardTitle>
-              <p className="text-[10px] text-muted-foreground/70">Top 8 categories</p>
-            </CardHeader>
-            <CardContent className="px-2 pb-4">
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={categoryData.slice(0, 8)} layout="vertical" barCategoryGap="18%" margin={{ left: 4, right: 40, top: 4, bottom: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
-                  <XAxis
-                    type="number"
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
-                    width={120}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
-                  <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={20}>
-                    <LabelList dataKey="value" position="right" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { if (v === 0) return ''; const total = items.length; return total > 0 ? `${Math.round((v / total) * 100)}%` : ''; }} />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
         </div>
+
+        {/* Material Events & Compliance Obligations */}
+        <MaterialEventsSection />
+
+        {/* By Category */}
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-1 pt-4 px-5">
+            <CardTitle className="text-xs font-semibold tracking-wide text-muted-foreground">By Category</CardTitle>
+            <p className="text-[10px] text-muted-foreground/70">Top 8 categories</p>
+          </CardHeader>
+          <CardContent className="px-2 pb-4">
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={categoryData.slice(0, 8)} layout="vertical" barCategoryGap="18%" margin={{ left: 4, right: 40, top: 4, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
+                  width={120}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
+                <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={20}>
+                  <LabelList dataKey="value" position="right" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { if (v === 0) return ''; const total = items.length; return total > 0 ? `${Math.round((v / total) * 100)}%` : ''; }} />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
 
         {/* Event Trigger Map + Filing Calendar */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
