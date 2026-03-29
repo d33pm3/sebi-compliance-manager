@@ -32,9 +32,11 @@ const natureColors: Record<ComplianceNature, string> = {
   '[A]': 'bg-muted text-muted-foreground border border-border',
 };
 
+const badgeBase = 'inline-flex items-center justify-center rounded-full text-[10px] font-semibold whitespace-nowrap min-w-[70px] h-5 px-2.5 leading-none';
+
 export function StatusBadge({ status }: { status: ComplianceStatus }) {
   return (
-    <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold', statusColors[status])}>
+    <span className={cn(badgeBase, statusColors[status])}>
       {status}
     </span>
   );
@@ -42,7 +44,7 @@ export function StatusBadge({ status }: { status: ComplianceStatus }) {
 
 export function RiskBadge({ level }: { level: RiskLevel }) {
   return (
-    <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold', riskColors[level])}>
+    <span className={cn(badgeBase, 'min-w-[56px]', riskColors[level])}>
       {level}
     </span>
   );
@@ -50,7 +52,7 @@ export function RiskBadge({ level }: { level: RiskLevel }) {
 
 export function ApprovalBadge({ status }: { status: ApprovalStatus }) {
   return (
-    <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold', approvalColors[status])}>
+    <span className={cn(badgeBase, approvalColors[status])}>
       {status}
     </span>
   );
@@ -64,7 +66,7 @@ export function NatureBadge({ nature }: { nature: ComplianceNature }) {
     '[A]': 'Admin',
   };
   return (
-    <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium', natureColors[nature])}>
+    <span className={cn(badgeBase, 'min-w-[52px] font-medium', natureColors[nature])}>
       {labels[nature]}
     </span>
   );
