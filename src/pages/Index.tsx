@@ -79,9 +79,13 @@ export default function Dashboard() {
   }, [items]);
 
   const categoryData = useMemo(() => {
+    const toTitleCase = (s: string) => s.toLowerCase().replace(/(?:^|\s|\/)\w/g, c => c.toUpperCase());
     const counts: Record<string, number> = {};
     items.forEach(i => { counts[i.category] = (counts[i.category] || 0) + 1; });
-    return Object.entries(counts).map(([name, value]) => ({ name: name.length > 20 ? name.slice(0, 18) + '…' : name, value, fullName: name })).sort((a, b) => b.value - a.value);
+    return Object.entries(counts).map(([name, value]) => {
+      const titled = toTitleCase(name);
+      return { name: titled.length > 22 ? titled.slice(0, 20) + '…' : titled, value, fullName: titled };
+    }).sort((a, b) => b.value - a.value);
   }, [items]);
 
   const monthData = useMemo(() => {
