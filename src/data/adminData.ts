@@ -78,7 +78,7 @@ export const last24hStats = {
 };
 
 export const companySettings = {
-  companyName: 'Exco Compliance Solutions Pvt. Ltd.',
+  companyName: 'e-cxo Compliance Solutions Pvt. Ltd.',
   companyPAN: 'AABCE1234F',
   companyISIN: 'INE123A01016',
   listedNSE: true,
