@@ -63,19 +63,23 @@ export default function RiskAssessment() {
   const totalPages = Math.ceil(tabFiltered.length / perPage);
 
   const execSummary = useMemo(() => {
-    const catMap: Record<string, { completed: number; nonCompliant: number }> = {};
+    const catMap: Record<string, { total: number; completed: number; nonCompliant: number }> = {};
     items.forEach(i => {
-      if (!catMap[i.category]) catMap[i.category] = { completed: 0, nonCompliant: 0 };
+      if (!catMap[i.category]) catMap[i.category] = { total: 0, completed: 0, nonCompliant: 0 };
+      catMap[i.category].total++;
       if (i.status === 'Completed') catMap[i.category].completed++;
-      else if (i.status === 'Overdue' || i.approvalStatus === 'Doc Missing') catMap[i.category].nonCompliant++;
+      if (i.status === 'Overdue' || i.approvalStatus === 'Doc Missing') catMap[i.category].nonCompliant++;
     });
     return Object.entries(catMap)
-      .map(([name, d]) => ({ name: name.length > 18 ? name.slice(0, 16) + '…' : name, ...d }))
+      .map(([name, d]) => ({
+        name: name.length > 18 ? name.slice(0, 16) + '…' : name,
+        completed: d.completed,
+        nonCompliant: d.nonCompliant,
+        total: d.total,
+      }))
       .filter(d => d.completed + d.nonCompliant > 0)
       .slice(0, 10);
   }, [items]);
-
-  const totalItemsCount = items.length;
 
   return (
     <AppLayout title="Risk Assessment" subtitle="Module 3 — Compliance Risk Monitoring & Workflow">
