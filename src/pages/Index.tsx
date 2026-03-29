@@ -199,7 +199,7 @@ export default function Dashboard() {
           {/* Filings by Month */}
           <Card className="overflow-hidden">
             <CardHeader className="pb-1 pt-4 px-5">
-              <CardTitle className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">Filings by Month</CardTitle>
+              <CardTitle className="text-xs font-semibold tracking-wide text-muted-foreground">Filings by Month</CardTitle>
               <p className="text-[10px] text-muted-foreground/70">Next 6 months outlook</p>
             </CardHeader>
             <CardContent className="px-3 pb-4">
