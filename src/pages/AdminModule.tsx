@@ -61,7 +61,14 @@ export default function AdminModule() {
                     <Input placeholder="Search users..." value={searchUsers} onChange={e => setSearchUsers(e.target.value)} className="h-8 text-xs pl-8 w-44" />
                   </div>
                   <Button size="sm" className="h-8 text-xs" onClick={() => toast.info('Add User modal — simulation only')}><Plus className="h-3.5 w-3.5 mr-1" /> Add User</Button>
-                  <Button variant="outline" size="sm" className="h-8 text-xs"><Download className="h-3.5 w-3.5 mr-1" /> Export</Button>
+                  <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => {
+                    downloadGenericCsv(
+                      ['Name', 'Email', 'Role', 'Department', 'Last Login', 'Status'],
+                      filteredUsers.map(u => [u.name, u.email, u.role, u.department, u.lastLogin, u.status]),
+                      `Users_Export_${new Date().toISOString().slice(0, 10)}.csv`
+                    );
+                    toast.success('Users exported');
+                  }}><Download className="h-3.5 w-3.5 mr-1" /> Export</Button>
                 </div>
               </div>
             </CardHeader>

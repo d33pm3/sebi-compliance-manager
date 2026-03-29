@@ -61,7 +61,12 @@ export default function DocumentVault() {
   }), []);
 
   const handleAction = (action: string, doc: VaultDocument) => {
-    toast.success(`${action}: ${doc.title}`, { description: `Vault ID: ${doc.vaultId}` });
+    if (action === 'Download') {
+      downloadDocumentPlaceholder(doc.title, doc.vaultId);
+      toast.success(`Downloaded: ${doc.title}`);
+    } else {
+      toast.success(`${action}: ${doc.title}`, { description: `Vault ID: ${doc.vaultId}` });
+    }
   };
 
   return (
