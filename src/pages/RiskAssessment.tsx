@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatusBadge, RiskBadge, ApprovalBadge } from '@/components/StatusBadges';
 import { categories, ComplianceItem, RiskLevel, ApprovalStatus } from '@/data/complianceData';
 import { Search, RotateCcw, CheckCircle2, XCircle, RotateCw, Upload, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, FileWarning, Clock, CircleDot } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useState } from 'react';
 
 const CustomTooltip = ({ active, payload, label }: any) => {

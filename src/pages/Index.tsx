@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StatusBadge, RiskBadge, NatureBadge } from '@/components/StatusBadges';
 import { categories } from '@/data/complianceData';
 import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useState } from 'react';
 
 const CHART_COLORS = {
