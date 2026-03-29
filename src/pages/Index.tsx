@@ -445,6 +445,18 @@ export default function Dashboard() {
                     <SelectItem value="[A]">Admin</SelectItem>
                   </SelectContent>
                 </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs gap-1.5 px-3"
+                  onClick={() => {
+                    exportCategoryToXlsx('Master_Compliance_Register', items);
+                    toast.success('Downloaded Master Compliance Register (.xlsx)');
+                  }}
+                >
+                  <FileSpreadsheet className="h-3.5 w-3.5 flex-shrink-0" />
+                  Download .xlsx
+                </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={resetFilters}>
                   <RotateCcw className="h-3.5 w-3.5" />
                 </Button>
