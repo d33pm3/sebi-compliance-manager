@@ -228,12 +228,12 @@ export default function Dashboard() {
           {/* By Category */}
           <Card className="overflow-hidden">
             <CardHeader className="pb-1 pt-4 px-5">
-              <CardTitle className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">By Category</CardTitle>
+              <CardTitle className="text-xs font-semibold tracking-wide text-muted-foreground">By Category</CardTitle>
               <p className="text-[10px] text-muted-foreground/70">Top 8 categories</p>
             </CardHeader>
-            <CardContent className="px-1 pb-4">
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={categoryData.slice(0, 8)} layout="vertical" barCategoryGap="16%">
+            <CardContent className="px-2 pb-4">
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={categoryData.slice(0, 8)} layout="vertical" barCategoryGap="18%" margin={{ left: 4, right: 40, top: 4, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
                   <XAxis
                     type="number"
@@ -244,13 +244,13 @@ export default function Dashboard() {
                   <YAxis
                     type="category"
                     dataKey="name"
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                    width={110}
+                    tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
+                    width={120}
                     axisLine={false}
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
-                  <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={22}>
+                  <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={20}>
                     <LabelList dataKey="value" position="right" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { if (v === 0) return ''; const total = items.length; return total > 0 ? `${Math.round((v / total) * 100)}%` : ''; }} />
                   </Bar>
                 </BarChart>
