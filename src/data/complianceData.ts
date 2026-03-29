@@ -183,6 +183,3 @@ export const complianceItems: ComplianceItem[] = rawItems.map((item, i) => ({
 }));
 
 export const categories = [...new Set(complianceItems.map(i => i.category))];
-}));
-
-export const categories = [...new Set(complianceItems.map(i => i.category))];
