@@ -343,8 +343,8 @@ function generateMockResponse(query: string, model: AIModel): string {
   return `${prefix}That's a great question about SEBI compliance. Based on my analysis${model === 'perplexity' ? ' of the latest web sources and' : ''} of the regulatory framework and your company's compliance register:\n\n**Key Points:**\n- The relevant regulation covers this requirement under the LODR/PIT/SAST framework\n- Your company's current compliance status shows this area needs attention\n- I recommend reviewing the specific regulation reference and associated documents in the vault\n\n**Recommended Actions:**\n- Check the Master Compliance Register for related items\n- Review any pending approvals in Module 3\n- Consult the Documentation Vault for supporting evidence\n\n${model === 'claude' ? '**Strategic Recommendation:**\nConsidering the regulatory trend analysis, I suggest proactively updating your compliance framework to align with the anticipated Q2 2026 SEBI amendments.\n\n' : ''}Would you like me to provide more specific details on any of these points?`;
 }
 
-function generateMockSources(query: string, model: AIModel) {
-  const baseSources = [
+function generateMockSources(query: string, model: AIModel): ChatSource[] {
+  const baseSources: ChatSource[] = [
     { type: 'regulation', label: 'SEBI LODR 2015', reference: 'Relevant Regulation', url: 'https://www.sebi.gov.in' },
     { type: 'register', label: 'Compliance Register', reference: 'Related Items' },
   ];
