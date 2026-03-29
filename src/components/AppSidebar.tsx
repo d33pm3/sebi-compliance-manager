@@ -24,17 +24,14 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 
-const activeModules = [
+const modules = [
   { title: 'Compliance Agent', url: '/register-agent', icon: Bot, module: 'M1' },
   { title: 'Dashboard', url: '/', icon: LayoutDashboard, module: 'M2' },
   { title: 'Risk Assessment', url: '/risk-assessment', icon: ShieldAlert, module: 'M3' },
-];
-
-const comingSoon = [
-  { title: 'Doc Vault', icon: FolderArchive, module: 'M4' },
-  { title: 'AI Chatbot', icon: MessageSquare, module: 'M5' },
-  { title: 'Analytics', icon: BarChart3, module: 'M6' },
-  { title: 'Admin', icon: Settings, module: 'M7' },
+  { title: 'Doc Vault', url: '/doc-vault', icon: FolderArchive, module: 'M4' },
+  { title: 'AI Chatbot', url: '/chatbot', icon: MessageSquare, module: 'M5' },
+  { title: 'Assistant', url: '/assistant', icon: BarChart3, module: 'M6' },
+  { title: 'Admin', url: '/admin', icon: Settings, module: 'M7' },
 ];
 
 export function AppSidebar() {
