@@ -88,7 +88,7 @@ We assure complete cooperation in this matter and request the withdrawal of the 
 
 Thanking you,
 
-For Exco Compliance Solutions Pvt. Ltd.
+For e-cxo Compliance Solutions Pvt. Ltd.
 
 ___________________________
 Company Secretary
