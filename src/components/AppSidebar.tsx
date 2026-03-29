@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/sidebar';
 
 const activeModules = [
-  { title: 'Register Agent', url: '/register-agent', icon: Bot, module: 'M1' },
+  { title: 'Compliance Agent', url: '/register-agent', icon: Bot, module: 'M1' },
   { title: 'Dashboard', url: '/', icon: LayoutDashboard, module: 'M2' },
   { title: 'Risk Assessment', url: '/risk-assessment', icon: ShieldAlert, module: 'M3' },
 ];
