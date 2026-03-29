@@ -31,9 +31,43 @@ const recentActions: AssistantAction[] = [
   { id: '4', type: 'Email', title: 'CG Report Q3 to Board Members', timestamp: '2026-03-26 17:45', status: 'completed' },
 ];
 
+const moduleCategories = [
+  { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', color: 'text-primary', questions: [
+    'How many compliances are overdue this month?',
+    'Show me the status breakdown by category',
+    'What are the upcoming filings in the next 15 days?',
+  ]},
+  { id: 'compliance', icon: FileText, label: 'Compliance Register', color: 'text-success', questions: [
+    'List all LODR Reg 33 filings and their status',
+    'Which insider trading compliances are pending?',
+    'Show me compliances due for Corporate Governance',
+  ]},
+  { id: 'risk', icon: ShieldAlert, label: 'Risk Assessment', color: 'text-destructive', questions: [
+    'What are the current high risk items?',
+    'How many compliances have documents missing?',
+    'Show me all overdue items flagged as high risk',
+  ]},
+  { id: 'vault', icon: FolderArchive, label: 'Document Vault', color: 'text-warning', questions: [
+    'Pull all Q3 FY26 compliance filings',
+    'Are there any SEBI notices with pending responses?',
+    'List all documents uploaded this month',
+  ]},
+  { id: 'chatbot', icon: Bot, label: 'AI Chatbot', color: 'text-secondary', questions: [
+    'What are the latest SEBI regulatory changes?',
+    'Explain the LODR Amendment dated 20 Jan 2026',
+    'What is the penalty for late filing under Reg 33?',
+  ]},
+  { id: 'notices', icon: AlertTriangle, label: 'SEBI Notices', color: 'text-destructive', questions: [
+    'Draft a response to the latest show cause notice',
+    'What SEBI inquiries are pending response?',
+    'Show the timeline for notice SEBI/CFD/2026/0341',
+  ]},
+];
+
 export default function ComplianceAssistant() {
   const [input, setInput] = useState('');
   const [activeAction, setActiveAction] = useState<string | null>(null);
+  const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [draftContent, setDraftContent] = useState('');
   const [workspaceContent, setWorkspaceContent] = useState<string | null>(null);
 
