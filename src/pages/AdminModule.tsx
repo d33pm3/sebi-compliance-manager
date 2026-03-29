@@ -12,6 +12,7 @@ import { mockUsers, mockAuditLogs, systemHealthItems, queueStats, last24hStats, 
 import { Users, Settings, Mail, Bot, Database, Shield, Activity, Search, Plus, Download, UserCog, Eye, RotateCcw, CheckCircle2, AlertTriangle, XCircle, Server } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { downloadGenericCsv } from '@/lib/downloadUtils';
 
 export default function AdminModule() {
   const [activeTab, setActiveTab] = useState('users');
