@@ -438,7 +438,7 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
         <div className={`${color}`}>{icon}</div>
         <div>
           <p className={`text-xl font-bold ${color}`}>{value}</p>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
+          <p className="text-[10px] text-muted-foreground tracking-wider">{label}</p>
         </div>
       </CardContent>
     </Card>
