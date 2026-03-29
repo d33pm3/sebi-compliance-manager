@@ -12,6 +12,8 @@ import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, Rot
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useState } from 'react';
 import { MaterialEventsSection } from '@/components/MaterialEventsSection';
+import { exportCategoryToXlsx, exportCategoryToPptx } from '@/lib/categoryExportUtils';
+import { toast } from 'sonner';
 
 const CHART_COLORS = {
   Completed: 'hsl(145, 63%, 62%)',
