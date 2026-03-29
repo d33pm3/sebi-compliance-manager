@@ -155,6 +155,16 @@ export default function Dashboard() {
                     paddingAngle={3}
                     strokeWidth={2}
                     stroke="hsl(var(--card))"
+                    label={({ name, value, cx, cy, midAngle, outerRadius: oR }) => {
+                      const total = statusData.reduce((s, d) => s + d.value, 0);
+                      const pct = ((value / total) * 100).toFixed(0);
+                      const RADIAN = Math.PI / 180;
+                      const radius = oR + 16;
+                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                      return <text x={x} y={y} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" style={{ fontSize: '10px', fontWeight: 600, fill: 'hsl(var(--foreground))' }}>{pct}%</text>;
+                    }}
+                    labelLine={false}
                   >
                     {statusData.map((entry) => (
                       <Cell key={entry.name} fill={CHART_COLORS[entry.name as keyof typeof CHART_COLORS] || 'hsl(220,8%,46%)'} />
