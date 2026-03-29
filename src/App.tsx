@@ -6,6 +6,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import RegisterAgent from "./pages/RegisterAgent.tsx";
 import RiskAssessment from "./pages/RiskAssessment.tsx";
+import DocumentVault from "./pages/DocumentVault.tsx";
+import ComplianceChatbot from "./pages/ComplianceChatbot.tsx";
+import ComplianceAssistant from "./pages/ComplianceAssistant.tsx";
+import AdminModule from "./pages/AdminModule.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -20,6 +24,10 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/register-agent" element={<RegisterAgent />} />
           <Route path="/risk-assessment" element={<RiskAssessment />} />
+          <Route path="/doc-vault" element={<DocumentVault />} />
+          <Route path="/chatbot" element={<ComplianceChatbot />} />
+          <Route path="/assistant" element={<ComplianceAssistant />} />
+          <Route path="/admin" element={<AdminModule />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
