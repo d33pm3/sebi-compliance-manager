@@ -167,7 +167,9 @@ const rawItems: Array<Omit<ComplianceItem, 'id' | 'dueDate' | 'status' | 'riskLe
   { sNo: 91, category: 'SEBI / MCA FILINGS', filingName: 'Large Corporate (LC) Disclosure — Annual Borrowing Compliance', regReference: 'SEBI LC Circular 2018; Reg 62 LODR', applicableTo: 'Large Corporates (≥₹100 cr borrowings + ≥AA-)', filingAuthority: 'NSE / BSE', frequency: 'Annual + Event-based', trigger: 'Identification as LC; each debt issuance', timeline: 'By April 15 each year; within 2 WD of each issuance', format: 'Prescribed LC disclosure format', penalty: '0.25% shortfall penalty; Reg 91', sourceUrl: 'https://www.sebi.gov.in', complianceNature: '[P+E]', obligorTier: 'LARGE-CORPORATE' },
   { sNo: 92, category: 'SEBI / MCA FILINGS', filingName: 'HVDLE Reclassification — Revised ₹5,000 Crore Threshold', regReference: 'LODR Reg 15(1A) + Reg 62C(1) (Jan 2026)', applicableTo: 'Entities with NCS <₹5,000 cr or ≥₹5,000 cr', filingAuthority: 'NSE / BSE', frequency: 'One-time + Annual', trigger: 'SEBI notification Jan 20, 2026', timeline: 'Immediate cessation; annual by April 15', format: 'Disclosure confirming HVDLE status change', penalty: 'Reg 91 for incorrect exemption claim', sourceUrl: 'https://www.sebi.gov.in', complianceNature: '[E]', obligorTier: 'HVDLE' },
   { sNo: 93, category: 'POST-LISTING FILINGS', filingName: 'Dematerialisation Mandatory for Transfer / Transmission / Transposition', regReference: 'LODR Reg 40(2)/40(3) (Jan 2026)', applicableTo: 'All listed entities', filingAuthority: 'NSE / BSE (via RTA)', frequency: 'Event-based', trigger: 'Investor request for transfer/transmission', timeline: 'Processing in demat form only', format: 'All transfers in demat only; physical requests rejected', penalty: 'Reg 91; investor Ombudsman/SCORES', sourceUrl: 'https://www.sebi.gov.in', complianceNature: '[E]', obligorTier: 'ALL' },
-].map((item, i) => ({
+];
+
+export const complianceItems: ComplianceItem[] = rawItems.map((item, i) => ({
   ...item,
   id: item.sNo,
   dueDate: mockDueDate(i),
@@ -176,8 +178,11 @@ const rawItems: Array<Omit<ComplianceItem, 'id' | 'dueDate' | 'status' | 'riskLe
   owner: owners[i % owners.length],
   approver: approvers[i % approvers.length],
   approvalStatus: mockApprovalStatus(mockStatus(i), i),
-  comments: [],
+  comments: [] as Comment[],
   evidenceUploaded: mockStatus(i) === 'Completed',
+}));
+
+export const categories = [...new Set(complianceItems.map(i => i.category))];
 }));
 
 export const categories = [...new Set(complianceItems.map(i => i.category))];
