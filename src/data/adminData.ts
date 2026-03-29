@@ -85,6 +85,6 @@ export const companySettings = {
   listedBSE: true,
   marketCapCategory: 'Top 500',
   fiscalYearStart: 'April',
-  complianceEmail: 'compliance@exco.com',
+  complianceEmail: 'compliance@e-cxo.com',
   cin: 'L12345MH2020PLC123456',
 };
