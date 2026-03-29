@@ -1,4 +1,5 @@
-import { Bell, Building2, User } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
+import ecxoLogo from '@/assets/ecxo-logo.png';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
