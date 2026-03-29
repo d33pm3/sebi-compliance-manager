@@ -305,24 +305,72 @@ export default function Dashboard() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold">Categories ({categories.length})</CardTitle>
+            <p className="text-[10px] text-muted-foreground">Click a category to view its compliance items</p>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
               {categories.map(cat => {
                 const count = items.filter(i => i.category === cat).length;
-                const isActive = filters.category === cat;
+                const isActive = expandedCategory === cat;
                 return (
                   <button
                     key={cat}
-                    onClick={() => setFilter('category', isActive ? '' : cat)}
-                    className={`text-left p-2.5 rounded-md border text-xs transition-all ${isActive ? 'border-primary bg-primary/10 text-primary font-medium' : 'border-border hover:border-primary/30 hover:bg-muted/50'}`}
+                    onClick={() => setExpandedCategory(isActive ? null : cat)}
+                    className={`text-left p-2.5 rounded-md border text-xs transition-all ${isActive ? 'border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary/20' : 'border-border hover:border-primary/30 hover:bg-muted/50'}`}
                   >
-                    <div className="font-medium truncate">{cat}</div>
+                    <div className="font-medium truncate">{toTitleCaseLabel(cat)}</div>
                     <div className="text-muted-foreground text-[10px] mt-0.5">{count} items</div>
                   </button>
                 );
               })}
             </div>
+
+            {/* Expanded Category Table */}
+            {expandedCategory && (() => {
+              const catItems = items.filter(i => i.category === expandedCategory);
+              return (
+                <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-xs font-semibold text-primary">{toTitleCaseLabel(expandedCategory)} — {catItems.length} Compliance Items</h3>
+                    <Button variant="ghost" size="sm" className="text-[10px] h-6 px-2" onClick={() => setExpandedCategory(null)}>
+                      Close
+                    </Button>
+                  </div>
+                  <div className="rounded-md border max-h-[320px] overflow-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-[10px] w-10">#</TableHead>
+                          <TableHead className="text-[10px]">Filing Name</TableHead>
+                          <TableHead className="text-[10px] hidden md:table-cell">Nature</TableHead>
+                          <TableHead className="text-[10px]">Status</TableHead>
+                          <TableHead className="text-[10px] hidden md:table-cell">Risk</TableHead>
+                          <TableHead className="text-[10px] hidden lg:table-cell">Due Date</TableHead>
+                          <TableHead className="text-[10px] hidden lg:table-cell">Regulation</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {catItems.map(item => (
+                          <TableRow
+                            key={item.id}
+                            className="cursor-pointer hover:bg-muted/50"
+                            onClick={() => selectItem(item.id)}
+                          >
+                            <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
+                            <TableCell className="text-xs font-medium max-w-[220px] truncate">{item.filingName}</TableCell>
+                            <TableCell className="hidden md:table-cell"><NatureBadge nature={item.complianceNature} /></TableCell>
+                            <TableCell><StatusBadge status={item.status} /></TableCell>
+                            <TableCell className="hidden md:table-cell"><RiskBadge level={item.riskLevel} /></TableCell>
+                            <TableCell className="text-xs text-muted-foreground hidden lg:table-cell">{item.dueDate}</TableCell>
+                            <TableCell className="text-[10px] text-muted-foreground hidden lg:table-cell">{item.regReference}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
 
