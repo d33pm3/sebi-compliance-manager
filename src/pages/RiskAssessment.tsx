@@ -1,0 +1,229 @@
+import { AppLayout } from '@/components/AppLayout';
+import { useComplianceStore } from '@/store/complianceStore';
+import { ComplianceDetailDrawer } from '@/components/ComplianceDetailDrawer';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StatusBadge, RiskBadge, ApprovalBadge } from '@/components/StatusBadges';
+import { categories, ComplianceItem, RiskLevel, ApprovalStatus } from '@/data/complianceData';
+import { Search, RotateCcw, CheckCircle2, XCircle, RotateCw, Upload, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, FileWarning, Clock, CircleDot } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useMemo, useState } from 'react';
+
+export default function RiskAssessment() {
+  const { items, filters, setFilter, resetFilters, selectItem, filteredItems, updateApprovalStatus, toggleEvidence } = useComplianceStore();
+  const filtered = filteredItems();
+  const [page, setPage] = useState(0);
+  const [tab, setTab] = useState('all');
+  const perPage = 12;
+
+  const summaryStats = useMemo(() => ({
+    approved: items.filter(i => i.approvalStatus === 'Approved').length,
+    pending: items.filter(i => i.approvalStatus === 'Pending').length,
+    docMissing: items.filter(i => i.approvalStatus === 'Doc Missing').length,
+    overdue: items.filter(i => i.status === 'Overdue').length,
+    notStarted: items.filter(i => i.approvalStatus === 'Not Started').length,
+  }), [items]);
+
+  const tabFiltered = useMemo(() => {
+    if (tab === 'my-queue') return filtered.filter(i => i.owner.includes('Priya') || i.owner.includes('Rajesh'));
+    if (tab === 'pending-approval') return filtered.filter(i => i.approvalStatus === 'Pending');
+    return filtered;
+  }, [filtered, tab]);
+
+  const paged = tabFiltered.slice(page * perPage, (page + 1) * perPage);
+  const totalPages = Math.ceil(tabFiltered.length / perPage);
+
+  const execSummary = useMemo(() => {
+    const catMap: Record<string, { completed: number; nonCompliant: number }> = {};
+    items.forEach(i => {
+      if (!catMap[i.category]) catMap[i.category] = { completed: 0, nonCompliant: 0 };
+      if (i.status === 'Completed') catMap[i.category].completed++;
+      else if (i.status === 'Overdue' || i.approvalStatus === 'Doc Missing') catMap[i.category].nonCompliant++;
+    });
+    return Object.entries(catMap)
+      .map(([name, d]) => ({ name: name.length > 15 ? name.slice(0, 13) + '…' : name, ...d }))
+      .filter(d => d.completed + d.nonCompliant > 0)
+      .slice(0, 10);
+  }, [items]);
+
+  return (
+    <AppLayout title="Risk Assessment" subtitle="Module 3 — Compliance Risk Monitoring & Workflow">
+      <div className="space-y-4">
+        {/* Summary Status Bar */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <SummaryCard icon={<ShieldCheck className="h-4 w-4" />} label="Approved" value={summaryStats.approved} color="text-success" />
+          <SummaryCard icon={<Clock className="h-4 w-4" />} label="Pending" value={summaryStats.pending} color="text-warning" />
+          <SummaryCard icon={<FileWarning className="h-4 w-4" />} label="Doc Missing" value={summaryStats.docMissing} color="text-destructive" />
+          <SummaryCard icon={<ShieldAlert className="h-4 w-4" />} label="Overdue" value={summaryStats.overdue} color="text-destructive" />
+          <SummaryCard icon={<CircleDot className="h-4 w-4" />} label="Not Started" value={summaryStats.notStarted} color="text-muted-foreground" />
+        </div>
+
+        {/* Executive Summary Chart */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-semibold">Executive Summary — Completed vs Non-Compliant by Category</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={execSummary}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(210,20%,90%)" />
+                <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-20} textAnchor="end" height={50} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: '10px' }} />
+                <Bar dataKey="completed" fill="#166534" name="Completed" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="nonCompliant" fill="#dc2626" name="Non-Compliant" radius={[3, 3, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Filters */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <CardTitle className="text-sm font-semibold">Risk Register</CardTitle>
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input
+                    placeholder="Search..."
+                    value={filters.search}
+                    onChange={e => setFilter('search', e.target.value)}
+                    className="h-8 text-xs pl-8 w-40"
+                  />
+                </div>
+                <Select value={filters.category || 'all'} onValueChange={v => setFilter('category', v === 'all' ? '' : v)}>
+                  <SelectTrigger className="h-8 text-xs w-36">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={filters.riskLevel || 'all'} onValueChange={v => setFilter('riskLevel', v === 'all' ? '' : v)}>
+                  <SelectTrigger className="h-8 text-xs w-28">
+                    <SelectValue placeholder="Risk" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Risk</SelectItem>
+                    <SelectItem value="Critical">Critical</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="Low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={resetFilters}>
+                  <RotateCcw className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={tab} onValueChange={v => { setTab(v); setPage(0); }}>
+              <TabsList className="mb-3">
+                <TabsTrigger value="all" className="text-xs">All Items ({filtered.length})</TabsTrigger>
+                <TabsTrigger value="my-queue" className="text-xs">My Queue</TabsTrigger>
+                <TabsTrigger value="pending-approval" className="text-xs">Pending Approval</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value={tab}>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-10 text-[10px]">#</TableHead>
+                        <TableHead className="text-[10px]">Filing Name</TableHead>
+                        <TableHead className="text-[10px] hidden md:table-cell">Category</TableHead>
+                        <TableHead className="text-[10px]">Risk</TableHead>
+                        <TableHead className="text-[10px]">Status</TableHead>
+                        <TableHead className="text-[10px] hidden md:table-cell">Approval</TableHead>
+                        <TableHead className="text-[10px] hidden lg:table-cell">Owner</TableHead>
+                        <TableHead className="text-[10px] hidden lg:table-cell">Evidence</TableHead>
+                        <TableHead className="text-[10px]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paged.map(item => (
+                        <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50" onClick={() => selectItem(item.id)}>
+                          <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
+                          <TableCell className="text-xs font-medium max-w-[180px] truncate">{item.filingName}</TableCell>
+                          <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[100px] truncate">{item.category}</TableCell>
+                          <TableCell><RiskBadge level={item.riskLevel} /></TableCell>
+                          <TableCell><StatusBadge status={item.status} /></TableCell>
+                          <TableCell className="hidden md:table-cell"><ApprovalBadge status={item.approvalStatus} /></TableCell>
+                          <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell max-w-[100px] truncate">{item.owner}</TableCell>
+                          <TableCell className="hidden lg:table-cell">
+                            <span className={`text-[11px] ${item.evidenceUploaded ? 'text-success' : 'text-destructive'}`}>
+                              {item.evidenceUploaded ? '✓' : '✗'}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1" onClick={e => e.stopPropagation()}>
+                              {item.approvalStatus === 'Pending' && (
+                                <>
+                                  <Button variant="ghost" size="icon" className="h-6 w-6" title="Approve" onClick={() => updateApprovalStatus(item.id, 'Approved')}>
+                                    <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-6 w-6" title="Reject" onClick={() => updateApprovalStatus(item.id, 'Rejected')}>
+                                    <XCircle className="h-3.5 w-3.5 text-destructive" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-6 w-6" title="Send Back" onClick={() => updateApprovalStatus(item.id, 'Doc Missing')}>
+                                    <RotateCw className="h-3.5 w-3.5 text-warning" />
+                                  </Button>
+                                </>
+                              )}
+                              {!item.evidenceUploaded && (
+                                <Button variant="ghost" size="icon" className="h-6 w-6" title="Upload Evidence" onClick={() => toggleEvidence(item.id)}>
+                                  <Upload className="h-3.5 w-3.5" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between mt-3">
+                    <p className="text-[11px] text-muted-foreground">Page {page + 1} of {totalPages}</p>
+                    <div className="flex gap-1">
+                      <Button variant="outline" size="icon" className="h-7 w-7" disabled={page === 0} onClick={() => setPage(p => p - 1)}>
+                        <ChevronLeft className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button variant="outline" size="icon" className="h-7 w-7" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <ComplianceDetailDrawer />
+      </div>
+    </AppLayout>
+  );
+}
+
+function SummaryCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+  return (
+    <Card>
+      <CardContent className="p-3 flex items-center gap-3">
+        <div className={color}>{icon}</div>
+        <div>
+          <p className={`text-xl font-bold ${color}`}>{value}</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
