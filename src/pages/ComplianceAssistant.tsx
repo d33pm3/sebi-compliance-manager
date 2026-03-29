@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { FileText, Search, BarChart3, Mail, Paperclip, Send, Download, Clock, CheckCircle2, Zap, Upload } from 'lucide-react';
+import { FileText, Search, BarChart3, Mail, Paperclip, Send, Download, Clock, CheckCircle2, Zap, Upload, ShieldAlert, FolderArchive, Bot, LayoutDashboard, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
