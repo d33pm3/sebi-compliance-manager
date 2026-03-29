@@ -9,7 +9,7 @@ import { Play, Square, Upload, Download, Clock, CheckCircle2, AlertCircle, Termi
 import { useCallback, useRef, useEffect } from 'react';
 
 const agentLogs = [
-  'Initialising SEBI Register Agent v2.0...',
+  'Initialising SEBI Compliance Agent v2.0...',
   'Loading LODR 2015 (last amended Jan 22, 2026)...',
   'Loading PIT Regulations 2015...',
   'Loading SAST Regulations 2011...',
@@ -83,7 +83,7 @@ export default function RegisterAgent() {
   const statusColor = agent.status === 'Running' ? 'text-success' : agent.status === 'Completed' ? 'text-secondary' : agent.status === 'Error' ? 'text-destructive' : 'text-muted-foreground';
 
   return (
-    <AppLayout title="Register Agent" subtitle="Module 1 — Automated SEBI Compliance Extraction">
+    <AppLayout title="Compliance Agent" subtitle="Module 1 — Automated SEBI Compliance Extraction">
       <div className="space-y-4 max-w-6xl">
         {/* Control Panel */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
