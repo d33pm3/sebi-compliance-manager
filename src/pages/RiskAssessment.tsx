@@ -177,6 +177,55 @@ export default function RiskAssessment() {
           </Card>
         )}
 
+        {/* Doc Missing Risks */}
+        {docMissingRisks.length > 0 && (
+          <Card className="border-warning/30">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-2">
+                <FileWarning className="h-4 w-4 text-warning" />
+                <CardTitle className="text-sm font-semibold text-warning">
+                  Open High Risks — Documents Missing ({docMissingRisks.length})
+                </CardTitle>
+              </div>
+              <p className="text-[10px] text-muted-foreground">All compliance items with missing documents are automatically flagged as High Risk</p>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border border-warning/20 max-h-[280px] overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-[10px] w-10">#</TableHead>
+                      <TableHead className="text-[10px]">Filing Name</TableHead>
+                      <TableHead className="text-[10px] hidden md:table-cell">Category</TableHead>
+                      <TableHead className="text-[10px]">Risk</TableHead>
+                      <TableHead className="text-[10px]">Flag</TableHead>
+                      <TableHead className="text-[10px]">Due Date</TableHead>
+                      <TableHead className="text-[10px] hidden md:table-cell">Owner</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {docMissingRisks.map(item => (
+                      <TableRow key={item.id} className="cursor-pointer hover:bg-warning/5" onClick={() => selectItem(item.id)}>
+                        <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
+                        <TableCell className="text-xs font-medium max-w-[200px] truncate">{item.filingName}</TableCell>
+                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{item.category}</TableCell>
+                        <TableCell><RiskBadge level="High" /></TableCell>
+                        <TableCell>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-warning/15 text-warning border border-warning/30 text-[10px] font-semibold px-2 py-0.5 whitespace-nowrap">
+                            <FileWarning className="h-2.5 w-2.5" /> Doc Missing
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-xs font-medium">{item.dueDate}</TableCell>
+                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell truncate">{item.owner}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Filters */}
         <Card>
           <CardHeader className="pb-3">
