@@ -8,7 +8,7 @@ export interface ChatMessage {
 }
 
 export interface ChatSource {
-  type: 'regulation' | 'vault' | 'register';
+  type: 'regulation' | 'vault' | 'register' | 'web';
   label: string;
   reference: string;
   url?: string;
