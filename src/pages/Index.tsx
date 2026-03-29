@@ -63,6 +63,8 @@ export default function Dashboard() {
   const { items, filters, setFilter, resetFilters, selectItem, filteredItems } = useComplianceStore();
   const filtered = filteredItems();
   const [page, setPage] = useState(0);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const toTitleCaseLabel = (s: string) => s.toLowerCase().replace(/(?:^|\s|\/)\w/g, c => c.toUpperCase());
   const perPage = 15;
 
   const stats = useMemo(() => ({
