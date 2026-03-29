@@ -226,7 +226,7 @@ export default function Dashboard() {
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
-                  <Bar dataKey="value" fill="hsl(var(--accent-cyan))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={22} />
+                  <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={22} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
