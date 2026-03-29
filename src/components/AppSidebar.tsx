@@ -56,11 +56,11 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] uppercase tracking-wider">
-            Active Modules
+            Modules
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {activeModules.map((item) => (
+              {modules.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
@@ -77,29 +77,6 @@ export function AppSidebar() {
                         </span>
                       )}
                     </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] uppercase tracking-wider">
-            Coming Soon
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {comingSoon.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton disabled className="opacity-40 cursor-not-allowed">
-                    <item.icon className="h-4 w-4 mr-2 flex-shrink-0" />
-                    {!collapsed && (
-                      <span className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono opacity-50">{item.module}</span>
-                        {item.title}
-                      </span>
-                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
