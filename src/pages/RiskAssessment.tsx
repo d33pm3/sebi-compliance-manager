@@ -1,5 +1,6 @@
 import { AppLayout } from '@/components/AppLayout';
 import { useComplianceStore } from '@/store/complianceStore';
+import { vaultDocuments } from '@/data/vaultData';
 import { ComplianceDetailDrawer } from '@/components/ComplianceDetailDrawer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
