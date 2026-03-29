@@ -181,9 +181,16 @@ export default function RegisterAgent() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-              {['Master Register', 'Filing Calendar', 'Event Trigger Map', 'Amendment Tracker', 'Other Items'].map(name => (
-                <Button key={name} variant="outline" size="sm" className="text-xs h-9">
-                  <Download className="h-3 w-3 mr-1" /> {name}
+              {[
+                { name: 'Master Register', fn: downloadMasterRegister },
+                { name: 'Filing Calendar', fn: downloadFilingCalendar },
+                { name: 'Event Trigger Map', fn: downloadEventTriggerMap },
+                { name: 'Amendment Tracker', fn: downloadAmendmentTracker },
+                { name: 'All Items', fn: downloadOtherItems },
+              ].map(({ name, fn }) => (
+                <Button key={name} variant="outline" size="sm" className="text-xs h-9 gap-1.5" onClick={() => { fn(items); toast.success(`Downloaded ${name}`); }}>
+                  <Download className="h-3 w-3 flex-shrink-0" />
+                  <span className="truncate">{name}</span>
                 </Button>
               ))}
             </div>
