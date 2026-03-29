@@ -10,6 +10,7 @@ import { vaultDocuments, vaultCategories, VaultDocument } from '@/data/vaultData
 import { Search, Download, Mail, FileText, AlertTriangle, BookOpen, Bot, Upload, Eye, ChevronLeft, ChevronRight, FolderArchive } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
+import { downloadDocumentPlaceholder } from '@/lib/downloadUtils';
 
 export default function DocumentVault() {
   const [search, setSearch] = useState('');
@@ -60,7 +61,12 @@ export default function DocumentVault() {
   }), []);
 
   const handleAction = (action: string, doc: VaultDocument) => {
-    toast.success(`${action}: ${doc.title}`, { description: `Vault ID: ${doc.vaultId}` });
+    if (action === 'Download') {
+      downloadDocumentPlaceholder(doc.title, doc.vaultId);
+      toast.success(`Downloaded: ${doc.title}`);
+    } else {
+      toast.success(`${action}: ${doc.title}`, { description: `Vault ID: ${doc.vaultId}` });
+    }
   };
 
   return (
