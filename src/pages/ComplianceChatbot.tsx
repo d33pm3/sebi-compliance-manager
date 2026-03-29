@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { sampleSessions, suggestedQuestions, ChatMessage, ChatSession } from '@/data/chatData';
+import { sampleSessions, suggestedQuestions, ChatMessage, ChatSession, ChatSource } from '@/data/chatData';
 import { Send, Plus, Paperclip, FileText, Database, BookOpen, MessageSquare, Zap, ExternalLink, Globe, Search, Bot, Sparkles } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
