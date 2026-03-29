@@ -158,10 +158,10 @@ export default function AdminModule() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5"><Label className="text-xs">SMTP Host</Label><Input defaultValue="smtp.gmail.com" className="h-8 text-xs" /></div>
                 <div className="space-y-1.5"><Label className="text-xs">SMTP Port</Label><Input defaultValue="587" className="h-8 text-xs" /></div>
-                <div className="space-y-1.5"><Label className="text-xs">Username</Label><Input defaultValue="compliance@exco.com" className="h-8 text-xs" /></div>
+                <div className="space-y-1.5"><Label className="text-xs">Username</Label><Input defaultValue="compliance@e-cxo.com" className="h-8 text-xs" /></div>
                 <div className="space-y-1.5"><Label className="text-xs">Password</Label><Input type="password" defaultValue="••••••••" className="h-8 text-xs" /></div>
-                <div className="space-y-1.5"><Label className="text-xs">From Name</Label><Input defaultValue="Exco Compliance" className="h-8 text-xs" /></div>
-                <div className="space-y-1.5"><Label className="text-xs">From Email</Label><Input defaultValue="compliance@exco.com" className="h-8 text-xs" /></div>
+                <div className="space-y-1.5"><Label className="text-xs">From Name</Label><Input defaultValue="e-cxo Compliance" className="h-8 text-xs" /></div>
+                <div className="space-y-1.5"><Label className="text-xs">From Email</Label><Input defaultValue="compliance@e-cxo.com" className="h-8 text-xs" /></div>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="text-xs" onClick={() => toast.success('Connection successful')}>Test Connection</Button>
