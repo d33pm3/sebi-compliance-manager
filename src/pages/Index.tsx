@@ -155,14 +155,15 @@ export default function Dashboard() {
                     paddingAngle={3}
                     strokeWidth={2}
                     stroke="hsl(var(--card))"
-                    label={({ name, value, cx, cy, midAngle, outerRadius: oR }) => {
+                    label={({ value, cx: cxPos, cy: cyPos, midAngle, outerRadius: oR }) => {
                       const total = statusData.reduce((s, d) => s + d.value, 0);
-                      const pct = ((value / total) * 100).toFixed(0);
+                      const pct = Math.round((value / total) * 100);
+                      if (pct < 3) return null;
                       const RADIAN = Math.PI / 180;
                       const radius = oR + 16;
-                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                      return <text x={x} y={y} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" style={{ fontSize: '10px', fontWeight: 600, fill: 'hsl(var(--foreground))' }}>{pct}%</text>;
+                      const x = cxPos + radius * Math.cos(-midAngle * RADIAN);
+                      const y = cyPos + radius * Math.sin(-midAngle * RADIAN);
+                      return <text x={x} y={y} textAnchor={x > cxPos ? 'start' : 'end'} dominantBaseline="central" style={{ fontSize: '10px', fontWeight: 600, fill: 'hsl(var(--foreground))' }}>{pct}%</text>;
                     }}
                     labelLine={false}
                   >
@@ -170,6 +171,13 @@ export default function Dashboard() {
                       <Cell key={entry.name} fill={CHART_COLORS[entry.name as keyof typeof CHART_COLORS] || 'hsl(220,8%,46%)'} />
                     ))}
                   </Pie>
+                  {/* Center total label */}
+                  <text x="50%" y="46%" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '20px', fontWeight: 700, fill: 'hsl(var(--foreground))' }}>
+                    {stats.total}
+                  </text>
+                  <text x="50%" y="56%" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '9px', fontWeight: 500, fill: 'hsl(var(--muted-foreground))' }}>
+                    Total
+                  </text>
                   <Tooltip content={<PieTooltip />} />
                   <Legend
                     iconType="circle"
