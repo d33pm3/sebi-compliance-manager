@@ -13,19 +13,49 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { useMemo, useState } from 'react';
 
 const CHART_COLORS = {
-  Completed: '#166534',
-  'Due Soon': '#d97706',
-  Overdue: '#dc2626',
-  'Not Due': '#6b7280',
-  'In Progress': '#29ABE2',
-  'Not Started': '#9ca3af',
+  Completed: 'hsl(152, 60%, 32%)',
+  'Due Soon': 'hsl(38, 80%, 52%)',
+  Overdue: 'hsl(0, 72%, 51%)',
+  'Not Due': 'hsl(220, 8%, 46%)',
+  'In Progress': 'hsl(197, 78%, 54%)',
+  'Not Started': 'hsl(220, 8%, 64%)',
 };
 
 const RISK_COLORS = {
-  Critical: '#dc2626',
-  High: '#d97706',
-  Medium: '#29ABE2',
-  Low: '#166534',
+  Critical: 'hsl(0, 72%, 51%)',
+  High: 'hsl(38, 80%, 52%)',
+  Medium: 'hsl(197, 78%, 54%)',
+  Low: 'hsl(152, 60%, 32%)',
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
+      {label && <p className="text-xs font-medium text-foreground mb-1">{label}</p>}
+      {payload.map((p: any, i: number) => (
+        <div key={i} className="flex items-center gap-2 text-xs">
+          <div className="h-2.5 w-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: p.color || p.fill }} />
+          <span className="text-muted-foreground">{p.name}:</span>
+          <span className="font-semibold text-foreground">{p.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const PieTooltip = ({ active, payload }: any) => {
+  if (!active || !payload?.length) return null;
+  const d = payload[0];
+  return (
+    <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
+      <div className="flex items-center gap-2 text-xs">
+        <div className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: d.payload.fill }} />
+        <span className="text-muted-foreground">{d.name}:</span>
+        <span className="font-semibold text-foreground">{d.value}</span>
+      </div>
+    </div>
+  );
 };
 
 export default function Dashboard() {
@@ -105,55 +135,98 @@ export default function Dashboard() {
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-semibold">Status Breakdown</CardTitle>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Status Breakdown Donut */}
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-1 pt-4 px-5">
+              <CardTitle className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">Status Breakdown</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={180}>
+            <CardContent className="px-2 pb-4">
+              <ResponsiveContainer width="100%" height={230}>
                 <PieChart>
-                  <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} innerRadius={35} paddingAngle={2}>
+                  <Pie
+                    data={statusData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="48%"
+                    outerRadius={75}
+                    innerRadius={42}
+                    paddingAngle={3}
+                    strokeWidth={2}
+                    stroke="hsl(var(--card))"
+                  >
                     {statusData.map((entry) => (
-                      <Cell key={entry.name} fill={CHART_COLORS[entry.name as keyof typeof CHART_COLORS] || '#6b7280'} />
+                      <Cell key={entry.name} fill={CHART_COLORS[entry.name as keyof typeof CHART_COLORS] || 'hsl(220,8%,46%)'} />
                     ))}
                   </Pie>
-                  <Tooltip />
-                  <Legend wrapperStyle={{ fontSize: '10px' }} />
+                  <Tooltip content={<PieTooltip />} />
+                  <Legend
+                    iconType="circle"
+                    iconSize={8}
+                    wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }}
+                    formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-semibold">Filings by Month (Next 6 Months)</CardTitle>
+          {/* Filings by Month */}
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-1 pt-4 px-5">
+              <CardTitle className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">Filings by Month</CardTitle>
+              <p className="text-[10px] text-muted-foreground/70">Next 6 months outlook</p>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={monthData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(210,20%,90%)" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#1C5277" radius={[3, 3, 0, 0]} />
+            <CardContent className="px-3 pb-4">
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={monthData} barCategoryGap="20%">
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                    axisLine={{ stroke: 'hsl(var(--border))' }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={30}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" name="Filings" radius={[4, 4, 0, 0]} maxBarSize={40} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-semibold">By Category (Top 8)</CardTitle>
+          {/* By Category */}
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-1 pt-4 px-5">
+              <CardTitle className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">By Category</CardTitle>
+              <p className="text-[10px] text-muted-foreground/70">Top 8 categories</p>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={categoryData.slice(0, 8)} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(210,20%,90%)" />
-                  <XAxis type="number" tick={{ fontSize: 10 }} />
-                  <YAxis type="category" dataKey="name" tick={{ fontSize: 9 }} width={100} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#29ABE2" radius={[0, 3, 3, 0]} />
+            <CardContent className="px-1 pb-4">
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={categoryData.slice(0, 8)} layout="vertical" barCategoryGap="16%">
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+                  <XAxis
+                    type="number"
+                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    width={110}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
+                  <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={22} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
