@@ -259,7 +259,14 @@ export default function AdminModule() {
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                     <Input placeholder="Search logs..." value={searchLogs} onChange={e => setSearchLogs(e.target.value)} className="h-8 text-xs pl-8 w-44" />
                   </div>
-                  <Button variant="outline" size="sm" className="h-8 text-xs"><Download className="h-3.5 w-3.5 mr-1" /> Export CSV</Button>
+                  <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => {
+                    downloadGenericCsv(
+                      ['Timestamp', 'Action', 'User', 'Details', 'IP'],
+                      mockAuditLogs.map(l => [l.timestamp, l.action, l.user, l.details, l.ip]),
+                      `Audit_Logs_${new Date().toISOString().slice(0, 10)}.csv`
+                    );
+                    toast.success('Audit logs exported');
+                  }}><Download className="h-3.5 w-3.5 mr-1" /> Export CSV</Button>
                 </div>
               </div>
             </CardHeader>
