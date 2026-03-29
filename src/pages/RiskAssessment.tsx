@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatusBadge, RiskBadge, ApprovalBadge } from '@/components/StatusBadges';
 import { categories, ComplianceItem, RiskLevel, ApprovalStatus } from '@/data/complianceData';
 import { Search, RotateCcw, CheckCircle2, XCircle, RotateCw, Upload, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, FileWarning, Clock, CircleDot } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useState } from 'react';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -110,8 +110,12 @@ export default function RiskAssessment() {
                   wrapperStyle={{ fontSize: '11px', paddingTop: '4px' }}
                   formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
                 />
-                <Bar dataKey="completed" fill="hsl(145, 63%, 62%)" name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                <Bar dataKey="nonCompliant" fill="hsl(350, 80%, 72%)" name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                <Bar dataKey="completed" fill="hsl(145, 63%, 62%)" name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                  <LabelList dataKey="completed" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { const total = items.length; return total > 0 ? `${((v / total) * 100).toFixed(0)}%` : ''; }} />
+                </Bar>
+                <Bar dataKey="nonCompliant" fill="hsl(350, 80%, 72%)" name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                  <LabelList dataKey="nonCompliant" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { const total = items.length; return total > 0 ? `${((v / total) * 100).toFixed(0)}%` : ''; }} />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

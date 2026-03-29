@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StatusBadge, RiskBadge, NatureBadge } from '@/components/StatusBadges';
 import { categories } from '@/data/complianceData';
 import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useState } from 'react';
 
 const CHART_COLORS = {
@@ -155,6 +155,16 @@ export default function Dashboard() {
                     paddingAngle={3}
                     strokeWidth={2}
                     stroke="hsl(var(--card))"
+                    label={({ name, value, cx, cy, midAngle, outerRadius: oR }) => {
+                      const total = statusData.reduce((s, d) => s + d.value, 0);
+                      const pct = ((value / total) * 100).toFixed(0);
+                      const RADIAN = Math.PI / 180;
+                      const radius = oR + 16;
+                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                      return <text x={x} y={y} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" style={{ fontSize: '10px', fontWeight: 600, fill: 'hsl(var(--foreground))' }}>{pct}%</text>;
+                    }}
+                    labelLine={false}
                   >
                     {statusData.map((entry) => (
                       <Cell key={entry.name} fill={CHART_COLORS[entry.name as keyof typeof CHART_COLORS] || 'hsl(220,8%,46%)'} />
@@ -195,7 +205,9 @@ export default function Dashboard() {
                     width={30}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" name="Filings" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" name="Filings" radius={[4, 4, 0, 0]} maxBarSize={40}>
+                    <LabelList dataKey="count" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { const total = monthData.reduce((s, d) => s + d.count, 0); return total > 0 ? `${((v / total) * 100).toFixed(0)}%` : ''; }} />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -226,7 +238,9 @@ export default function Dashboard() {
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
-                  <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={22} />
+                  <Bar dataKey="value" fill="hsl(var(--secondary))" name="Items" radius={[0, 4, 4, 0]} maxBarSize={22}>
+                    <LabelList dataKey="value" position="right" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => { const total = items.length; return total > 0 ? `${((v / total) * 100).toFixed(0)}%` : ''; }} />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
