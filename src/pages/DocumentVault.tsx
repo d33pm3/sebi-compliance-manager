@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { vaultCategories, VaultDocument } from '@/data/vaultData';
 import { useComplianceStore } from '@/store/complianceStore';
-import { Search, Download, Mail, FileText, AlertTriangle, BookOpen, Bot, Upload, Eye, ChevronLeft, ChevronRight, FolderArchive, ShieldAlert, ExternalLink } from 'lucide-react';
+import { Search, Download, Mail, FileText, AlertTriangle, BookOpen, Bot, Eye, ChevronLeft, ChevronRight, FolderArchive, ShieldAlert, ExternalLink } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
