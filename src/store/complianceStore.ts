@@ -55,6 +55,9 @@ interface ComplianceStore {
   tasks: ComplianceTask[];
   notices: NoticeResponse[];
   vaultDocs: VaultDocument[];
+  approvalRequests: ApprovalRequest[];
+  emailLog: EmailNotification[];
+
   filters: Filters;
   selectedItemId: number | null;
   drawerOpen: boolean;
