@@ -257,7 +257,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="px-2 pb-4">
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={categoryData.slice(0, 8)} layout="vertical" barCategoryGap="18%" margin={{ left: 4, right: 40, top: 4, bottom: 4 }}>
+              <BarChart data={categoryData.slice(0, 8)} layout="vertical" barCategoryGap="18%" margin={{ left: 10, right: 40, top: 4, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
                 <XAxis
                   type="number"
@@ -268,8 +268,8 @@ export default function Dashboard() {
                 <YAxis
                   type="category"
                   dataKey="name"
-                  tick={{ fontSize: 10, fill: 'hsl(var(--foreground))' }}
-                  width={150}
+                  tick={<CategoryYAxisTick />}
+                  width={170}
                   interval={0}
                   axisLine={false}
                   tickLine={false}
