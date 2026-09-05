@@ -44,6 +44,10 @@ const App = () => (
           <Route path="/tasks" element={<TaskManager />} />
           <Route path="/timeline" element={<ComplianceTimeline />} />
           <Route path="/kpis" element={<KPIs />} />
+          <Route path="/agent-outputs/:kind" element={<AgentOutputDetail />} />
+          <Route path="/calendar" element={<ComplianceCalendar />} />
+          <Route path="/risk-action-plan" element={<RiskActionPlan />} />
+          <Route path="/register-manager" element={<RegisterManager />} />
 
           <Route path="/compliance/:id" element={<ComplianceItemDetail />} />
           <Route path="/admin" element={<AdminModule />} />
