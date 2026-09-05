@@ -55,8 +55,7 @@ export function AppSidebar() {
           <Shield className="h-7 w-7 text-sidebar-primary flex-shrink-0" />
           {!collapsed && (
             <div>
-              <h1 className="text-sm font-bold text-sidebar-foreground leading-tight">SEBI Compliance</h1>
-              <p className="text-[10px] text-sidebar-foreground/60">Command Centre</p>
+              <h1 className="text-sm font-bold text-sidebar-foreground leading-tight">SEBI Compliance Manager</h1>
             </div>
           )}
         </div>
