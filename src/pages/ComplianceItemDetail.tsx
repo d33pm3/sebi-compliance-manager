@@ -57,6 +57,39 @@ export default function ComplianceItemDetail() {
     note: '',
   });
   const [taskForm, setTaskForm] = useState({ title: '', owner: owners[0], deadline: new Date().toISOString().split('T')[0] });
+  const [approvalForm, setApprovalForm] = useState({
+    approver: approvers[0],
+    requestedBy: owners[0],
+    dueBy: new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0],
+    note: '',
+    filingId: 'none',
+  });
+  const [decisionNotes, setDecisionNotes] = useState<Record<string, string>>({});
+
+  const itemApprovals = useMemo(
+    () => approvalRequests.filter(a => a.itemId === Number(id)),
+    [approvalRequests, id],
+  );
+
+  const handleRequestApproval = () => {
+    if (!item) return;
+    requestApproval(item.id, {
+      approver: approvalForm.approver,
+      requestedBy: approvalForm.requestedBy,
+      dueBy: approvalForm.dueBy,
+      note: approvalForm.note.trim(),
+      filingId: approvalForm.filingId === 'none' ? null : approvalForm.filingId,
+    });
+    setApprovalForm({ ...approvalForm, note: '' });
+    toast.success(`Approval requested — email sent to ${approverEmail(approvalForm.approver)}`);
+  };
+
+  const handleDecision = (requestId: string, approve: boolean) => {
+    decideApprovalRequest(requestId, approve, (decisionNotes[requestId] ?? '').trim());
+    setDecisionNotes({ ...decisionNotes, [requestId]: '' });
+    toast.success(approve ? 'Approved — requester notified by email' : 'Declined — requester notified by email');
+  };
+
 
   const itemFilings = useMemo(() => filings.filter(f => f.itemId === Number(id)), [filings, id]);
   const itemTasks = useMemo(() => tasks.filter(t => t.itemId === Number(id)), [tasks, id]);
