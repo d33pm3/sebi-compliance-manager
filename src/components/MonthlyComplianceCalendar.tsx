@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { ComplianceItem } from '@/data/complianceData';
 import { deriveComplianceState, ComplianceState } from '@/data/workflowData';
 import { useComplianceStore } from '@/store/complianceStore';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const stateStyle: Record<ComplianceState, string> = {
   Completed: 'bg-success/15 text-success border-success/40',
@@ -30,8 +30,6 @@ export function MonthlyComplianceCalendar({ items: itemsProp }: Props) {
     const ids = new Set(itemsProp.map(i => i.id));
     return storeItems.filter(i => ids.has(i.id));
   }, [itemsProp, storeItems]);
-
-  const navigate = useNavigate();
 
   const firstDue = useMemo(() => {
     const dates = items.map(i => i.dueDate).filter(Boolean).sort();
