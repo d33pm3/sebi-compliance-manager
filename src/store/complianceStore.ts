@@ -81,6 +81,10 @@ interface ComplianceStore {
   updateTaskStatus: (taskId: string, status: TaskStatus) => void;
   deleteTask: (taskId: string) => void;
 
+  // Approval requests with email notifications
+  requestApproval: (itemId: number, input: ApprovalRequestInput) => void;
+  decideApprovalRequest: (requestId: string, approve: boolean, note: string, decidedBy?: string) => void;
+
   // SEBI notice response tracker
   updateNotice: (noticeId: string, patch: Partial<NoticeResponse>) => void;
   submitNoticeResponse: (noticeId: string, input: { responseDate: string; documents: string[]; remarks: string }) => void;
