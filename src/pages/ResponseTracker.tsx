@@ -103,12 +103,21 @@ export default function ResponseTracker() {
           <StatTile icon={<CheckCircle2 className="h-4 w-4" />} label="Closed" value={stats.closed} bg={NOTICE_TILE_COLORS.closed} active={filter === 'Closed'} onClick={() => drillTo('Closed')} title="View closed notices" />
         </div>
 
-        <Card>
+        <Card ref={registerRef}>
           <CardHeader className="pb-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
+              <div className="space-y-1">
                 <CardTitle className="text-sm font-semibold">Notice Response Register</CardTitle>
                 <p className="text-[10px] text-muted-foreground">Every notice tracks its response date, submitted documents and status — and feeds the Risk Register automatically</p>
+                {filter !== 'all' && (
+                  <button
+                    type="button"
+                    onClick={() => setFilter('all')}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium px-2.5 py-1 hover:bg-primary/20"
+                  >
+                    Showing: {filter} <X className="h-3 w-3" />
+                  </button>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <Select value={filter} onValueChange={setFilter}>
