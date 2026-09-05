@@ -155,11 +155,21 @@ export default function KPIs() {
     { name: 'Low', value: riskStats.low, fill: CHART_COLORS.Low },
   ], [riskStats]);
 
+  const toTitleCaseLabel = (s: string) => {
+    const ACRONYMS = new Set(['MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO', 'RMC', 'ASCR', 'SAR', 'BRSR', 'GM', 'HVDLE', 'PIT', 'SAST', 'ESG', 'KMP', 'MD&A', 'RPT', 'IPO', 'OFS']);
+    return s.split(/(\s+|\/)/).map(w => {
+      if (/^\s+$/.test(w) || w === '/') return w;
+      const bare = w.replace(/[^A-Za-z&]/g, '');
+      if (ACRONYMS.has(bare.toUpperCase())) return w.toUpperCase();
+      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    }).join('');
+  };
+
   const categoryData = useMemo(() => {
     const counts: Record<string, number> = {};
     items.forEach(i => { counts[i.category] = (counts[i.category] || 0) + 1; });
     return Object.entries(counts)
-      .map(([name, value]) => ({ name, value }))
+      .map(([name, value]) => ({ name: toTitleCaseLabel(name), value }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 8);
   }, [items]);
