@@ -259,7 +259,15 @@ export default function ResponseTracker() {
                         navigate(`/notices/${r.noticeId}`);
                       }}
                     >
-                      <TableCell className="text-[10px] font-mono text-muted-foreground max-w-[160px] truncate">{r.id}</TableCell>
+                      <TableCell className="text-[10px] font-mono text-muted-foreground max-w-[160px] truncate" title={r.id}>
+                        <Link
+                          to={`/risk-assessment?noticeRisk=${encodeURIComponent(r.id)}`}
+                          onClick={e => e.stopPropagation()}
+                          className="text-secondary hover:underline"
+                        >
+                          {r.id}
+                        </Link>
+                      </TableCell>
                       <TableCell className="text-xs font-medium max-w-[240px] truncate" title={r.subject}>{r.subject}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{r.source}</TableCell>
                       <TableCell>
