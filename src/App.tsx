@@ -13,6 +13,7 @@ import AdminModule from "./pages/AdminModule.tsx";
 import ResponseTracker from "./pages/ResponseTracker.tsx";
 import TaskManager from "./pages/TaskManager.tsx";
 import ComplianceTimeline from "./pages/ComplianceTimeline.tsx";
+import KPIs from "./pages/KPIs.tsx";
 
 import ComplianceItemDetail from "./pages/ComplianceItemDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
