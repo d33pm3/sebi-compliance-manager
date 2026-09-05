@@ -536,5 +536,6 @@ export function linkedComplianceItems<T extends { regReference: string; category
   const num = m[2];
   const inFamily = items.filter(i => `${i.regReference} ${i.category}`.toUpperCase().includes(family));
   const exact = inFamily.filter(i => new RegExp(`\\bReg\\.?\\s*${num}\\b`, 'i').test(i.regReference));
-  return (exact.length ? exact : inFamily).slice(0, 12);
+  const rest = inFamily.filter(i => !exact.includes(i));
+  return [...exact, ...rest].slice(0, 12);
 }
