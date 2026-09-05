@@ -36,44 +36,50 @@ export interface ComplianceTask {
   createdAt: string;
 }
 
-const taskTemplates = [
-  'Collect supporting data from Finance',
-  'Prepare draft filing and internal checklist',
-  'Obtain approver sign-off',
-  'Upload evidence to the Document Vault',
-];
+/**
+ * ONE task per Master Compliance Register item — the Task Manager is a strict
+ * 1:1 mirror of the master, so Total Tasks always equals the master item count
+ * (plus any task a user adds manually).
+ */
+const taskTemplateByStatus: Record<string, string> = {
+  Completed: 'Archive filed papers and close the compliance file',
+  Overdue: 'Escalate and file immediately — deadline breached',
+  'Due Soon': 'Prepare draft filing and obtain approver sign-off',
+  'In Progress': 'Complete the draft and upload supporting evidence',
+  'Not Started': 'Collect supporting data and start the filing',
+  'Not Due': 'Track the deadline and gather supporting data',
+};
 
-const taskOwners = ['Priya Sharma (CS)', 'Rajesh Kumar (CFO)', 'Anita Desai (Legal)', 'Vikram Singh (Compliance)'];
+/** Master status → task status. Single source of truth used everywhere. */
+export function taskStatusForItem(item: ComplianceItem): TaskStatus {
+  switch (item.status) {
+    case 'Completed':
+      return 'Done';
+    case 'Overdue':
+      return 'Blocked';
+    case 'Due Soon':
+    case 'In Progress':
+      return 'In Progress';
+    default:
+      return 'Open';
+  }
+}
+
+export function taskTitleForItem(item: ComplianceItem): string {
+  return taskTemplateByStatus[item.status] ?? 'Complete the compliance obligation';
+}
 
 export function seedTasks(items: ComplianceItem[]): ComplianceTask[] {
-  const tasks: ComplianceTask[] = [];
-  items.forEach((item, idx) => {
-    // Seed a to-do list for every item that is not already closed out
-    const count = item.status === 'Completed' ? 1 : item.status === 'Overdue' ? 3 : 2;
-    for (let t = 0; t < count; t++) {
-      const due = new Date(item.dueDate);
-      due.setDate(due.getDate() - (count - t) * 3);
-      tasks.push({
-        id: `T-${item.id}-${t + 1}`,
-        itemId: item.id,
-        title: taskTemplates[t % taskTemplates.length],
-        owner: taskOwners[(idx + t) % taskOwners.length],
-        deadline: due.toISOString().split('T')[0],
-        status:
-          item.status === 'Completed'
-            ? 'Done'
-            : item.status === 'Overdue'
-              ? t === 0
-                ? 'Done'
-                : 'Blocked'
-              : t === 0
-                ? 'In Progress'
-                : 'Open',
-        createdAt: '2026-04-01',
-      });
-    }
-  });
-  return tasks;
+  return items.map(item => ({
+    id: `T-${item.id}`,
+    itemId: item.id,
+    title: taskTitleForItem(item),
+    // Owner and deadline mirror the master register exactly
+    owner: item.owner,
+    deadline: item.dueDate,
+    status: taskStatusForItem(item),
+    createdAt: '2026-04-01',
+  }));
 }
 
 /* ------------------------------------------------------------------ */
