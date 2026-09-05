@@ -196,7 +196,7 @@ export default function TaskManager() {
                 </TableHeader>
                 <TableBody>
                   {rows.length === 0 ? (
-                    <TableRow><TableCell colSpan={7} className="text-xs text-muted-foreground text-center py-6">No tasks match the current filters.</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={8} className="text-xs text-muted-foreground text-center py-6">No tasks match the current filters.</TableCell></TableRow>
                   ) : rows.map(t => {
                     const item = itemById.get(t.itemId);
                     const late = t.status !== 'Done' && t.deadline < today;
