@@ -12,11 +12,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatusBadge, RiskBadge, NatureBadge, ApprovalBadge } from '@/components/StatusBadges';
 import { TaskStatusBadge } from '@/pages/TaskManager';
 import { ComplianceStatus, ApprovalStatus } from '@/data/complianceData';
-import { TaskStatus, deriveComplianceState } from '@/data/workflowData';
+import { TaskStatus, deriveComplianceState, approverEmail } from '@/data/workflowData';
 import {
   AlertTriangle, ArrowLeft, Building2, Calendar, CheckCircle2, ExternalLink, FileText,
-  ListTodo, Plus, Send, Upload, XCircle,
+  ListTodo, Mail, Plus, Send, Stamp, Upload, XCircle,
 } from 'lucide-react';
+
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
