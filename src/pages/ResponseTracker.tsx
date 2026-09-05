@@ -9,9 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { buildNoticeRisks, NoticeResponse } from '@/data/workflowData';
-import { AlertTriangle, ArrowLeft, CheckCircle2, Clock, FileSpreadsheet, FileText, Send, ShieldAlert } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { AlertTriangle, ArrowLeft, CheckCircle2, Clock, FileSpreadsheet, FileText, Send, ShieldAlert, X } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { StatTile } from '@/components/StatTile';
+import { NOTICE_TILE_COLORS } from '@/lib/chartTheme';
 import { toast } from 'sonner';
 
 const badge = 'inline-flex items-center justify-center rounded-full text-[10px] font-semibold whitespace-nowrap min-w-[92px] h-5 px-2.5 leading-none';
@@ -37,9 +39,11 @@ function RiskStatusBadge({ status }: { status: NoticeResponse['riskStatus'] }) {
 
 export default function ResponseTracker() {
   const { notices, submitNoticeResponse, updateNotice } = useComplianceStore();
+  const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
   const [open, setOpen] = useState<string | null>(null);
   const [form, setForm] = useState({ responseDate: new Date().toISOString().split('T')[0], documents: '', remarks: '' });
+  const registerRef = useRef<HTMLDivElement>(null);
 
   const risks = useMemo(() => buildNoticeRisks(notices), [notices]);
   const visible = filter === 'all' ? notices : notices.filter(n => n.responseStatus === filter);
@@ -51,6 +55,11 @@ export default function ResponseTracker() {
     submitted: notices.filter(n => n.responseStatus === 'Submitted').length,
     closed: notices.filter(n => n.responseStatus === 'Closed').length,
   }), [notices]);
+
+  const drillTo = (status: string) => {
+    setFilter(status);
+    setTimeout(() => registerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
 
   const handleSubmit = (notice: NoticeResponse) => {
     const docs = form.documents.split('\n').map(d => d.trim()).filter(Boolean);
@@ -87,19 +96,28 @@ export default function ResponseTracker() {
     <AppLayout title="Response Tracker" subtitle="Module 8 — SEBI & Exchange Notice Responses">
       <div className="space-y-4">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <Stat icon={<FileText className="h-4 w-4" />} label="Total Notices" value={stats.total} color="text-foreground" />
-          <Stat icon={<AlertTriangle className="h-4 w-4" />} label="Awaiting Response" value={stats.awaiting} color="text-destructive" />
-          <Stat icon={<Clock className="h-4 w-4" />} label="Drafting" value={stats.drafting} color="text-warning" />
-          <Stat icon={<Send className="h-4 w-4" />} label="Submitted" value={stats.submitted} color="text-secondary" />
-          <Stat icon={<CheckCircle2 className="h-4 w-4" />} label="Closed" value={stats.closed} color="text-success" />
+          <StatTile icon={<FileText className="h-4 w-4" />} label="Total Notices" value={stats.total} bg={NOTICE_TILE_COLORS.total} active={filter === 'all'} onClick={() => drillTo('all')} title="View all notices" />
+          <StatTile icon={<AlertTriangle className="h-4 w-4" />} label="Awaiting Response" value={stats.awaiting} bg={NOTICE_TILE_COLORS.awaiting} active={filter === 'Awaiting Response'} onClick={() => drillTo('Awaiting Response')} title="View notices awaiting response" />
+          <StatTile icon={<Clock className="h-4 w-4" />} label="Drafting" value={stats.drafting} bg={NOTICE_TILE_COLORS.drafting} active={filter === 'Drafting'} onClick={() => drillTo('Drafting')} title="View notices in drafting" />
+          <StatTile icon={<Send className="h-4 w-4" />} label="Submitted" value={stats.submitted} bg={NOTICE_TILE_COLORS.submitted} active={filter === 'Submitted'} onClick={() => drillTo('Submitted')} title="View submitted notices" />
+          <StatTile icon={<CheckCircle2 className="h-4 w-4" />} label="Closed" value={stats.closed} bg={NOTICE_TILE_COLORS.closed} active={filter === 'Closed'} onClick={() => drillTo('Closed')} title="View closed notices" />
         </div>
 
-        <Card>
+        <Card ref={registerRef}>
           <CardHeader className="pb-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
+              <div className="space-y-1">
                 <CardTitle className="text-sm font-semibold">Notice Response Register</CardTitle>
                 <p className="text-[10px] text-muted-foreground">Every notice tracks its response date, submitted documents and status — and feeds the Risk Register automatically</p>
+                {filter !== 'all' && (
+                  <button
+                    type="button"
+                    onClick={() => setFilter('all')}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium px-2.5 py-1 hover:bg-primary/20"
+                  >
+                    Showing: {filter} <X className="h-3 w-3" />
+                  </button>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <Select value={filter} onValueChange={setFilter}>
@@ -141,9 +159,17 @@ export default function ResponseTracker() {
                 </TableHeader>
                 <TableBody>
                   {visible.map(n => (
-                    <TableRow key={n.noticeId} className="hover:bg-muted/40">
+                    <TableRow
+                      key={n.noticeId}
+                      className="hover:bg-muted/40 cursor-pointer"
+                      onClick={e => {
+                        const target = e.target as HTMLElement;
+                        if (target.closest('a, button, [role="dialog"]')) return;
+                        navigate(`/notices/${n.noticeId}`);
+                      }}
+                    >
                       <TableCell className="text-[11px] font-mono">
-                        <Link to={`/notices/${n.noticeId}`} className="text-secondary hover:underline">{n.noticeNo}</Link>
+                        <Link to={`/notices/${n.noticeId}`} className="text-secondary hover:underline" onClick={e => e.stopPropagation()}>{n.noticeNo}</Link>
                       </TableCell>
                       <TableCell className="text-xs font-medium max-w-[240px] truncate" title={n.subject}>{n.subject}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{n.issuedBy}</TableCell>
@@ -248,16 +274,3 @@ export default function ResponseTracker() {
   );
 }
 
-function Stat({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
-  return (
-    <Card>
-      <CardContent className="p-3 flex items-center gap-3">
-        <div className={color}>{icon}</div>
-        <div className="min-w-0">
-          <p className={`text-xl font-bold leading-none ${color}`}>{value}</p>
-          <p className="text-[10px] text-muted-foreground mt-1 truncate">{label}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

@@ -48,6 +48,15 @@ export const RISK_TILE_COLORS: Record<string, TileColor> = {
   Low: { bg: RISK_COLORS.Low, fg: 'hsl(150, 60%, 14%)' },
 };
 
+/** Notice response status tiles — same palette as the dashboard so the numbers feel familiar */
+export const NOTICE_TILE_COLORS: Record<string, TileColor> = {
+  total: { bg: 'hsl(220, 26%, 22%)', fg: LIGHT_TEXT },
+  awaiting: { bg: CHART_COLORS.Overdue, fg: 'hsl(350, 60%, 18%)' },
+  drafting: { bg: CHART_COLORS['Due Soon'], fg: 'hsl(30, 60%, 12%)' },
+  submitted: { bg: CHART_COLORS['In Progress'], fg: 'hsl(200, 70%, 12%)' },
+  closed: { bg: CHART_COLORS.Completed, fg: 'hsl(150, 60%, 14%)' },
+};
+
 const ACRONYMS = new Set([
   'MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO',
   'RMC', 'ASCR', 'SAR', 'BRSR', 'GM', 'HVDLE', 'PIT', 'SAST', 'ESG', 'KMP', 'MD&A', 'RPT',
