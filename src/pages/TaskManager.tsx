@@ -210,6 +210,15 @@ export default function TaskManager() {
                         </TableCell>
                         <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{t.owner}</TableCell>
                         <TableCell className={`text-xs ${late ? 'text-destructive font-semibold' : ''}`}>{t.deadline}</TableCell>
+                        <TableCell className={`text-[11px] whitespace-nowrap ${late ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}>
+                          {(() => {
+                            const days = Math.ceil((new Date(t.deadline).getTime() - new Date(today).getTime()) / 86400000);
+                            if (t.status === 'Done') return '—';
+                            if (days < 0) return `${Math.abs(days)} Days Overdue`;
+                            return days === 0 ? 'Due Today' : `${days} Days Left`;
+                          })()}
+                        </TableCell>
+
                         <TableCell><TaskStatusBadge status={t.status} /></TableCell>
                         <TableCell>
                           <Select value={t.status} onValueChange={v => { updateTaskStatus(t.id, v as TaskStatus); toast.success('Task updated'); }}>
