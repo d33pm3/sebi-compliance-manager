@@ -114,6 +114,9 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
   tasks: seedTasks(complianceItems),
   notices: seedNotices,
   vaultDocs: vaultDocuments,
+  approvalRequests: [],
+  emailLog: [],
+
   filters: defaultFilters,
   selectedItemId: null,
   drawerOpen: false,
