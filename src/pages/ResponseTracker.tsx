@@ -39,9 +39,11 @@ function RiskStatusBadge({ status }: { status: NoticeResponse['riskStatus'] }) {
 
 export default function ResponseTracker() {
   const { notices, submitNoticeResponse, updateNotice } = useComplianceStore();
+  const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
   const [open, setOpen] = useState<string | null>(null);
   const [form, setForm] = useState({ responseDate: new Date().toISOString().split('T')[0], documents: '', remarks: '' });
+  const registerRef = useRef<HTMLDivElement>(null);
 
   const risks = useMemo(() => buildNoticeRisks(notices), [notices]);
   const visible = filter === 'all' ? notices : notices.filter(n => n.responseStatus === filter);
@@ -53,6 +55,11 @@ export default function ResponseTracker() {
     submitted: notices.filter(n => n.responseStatus === 'Submitted').length,
     closed: notices.filter(n => n.responseStatus === 'Closed').length,
   }), [notices]);
+
+  const drillTo = (status: string) => {
+    setFilter(status);
+    setTimeout(() => registerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
 
   const handleSubmit = (notice: NoticeResponse) => {
     const docs = form.documents.split('\n').map(d => d.trim()).filter(Boolean);
