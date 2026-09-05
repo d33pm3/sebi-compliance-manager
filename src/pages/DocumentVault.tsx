@@ -109,10 +109,14 @@ export default function DocumentVault() {
     }
   };
 
-  /** Row click: notices open their notice page, everything else opens the master item */
+  /** Row click: notices open their notice page, agent outputs open their deliverable, everything else opens the master item */
   const openDoc = (doc: VaultDocument) => {
     if (doc.section === 'sebi-notices') {
       navigate(`/notices/${doc.id}`);
+      return;
+    }
+    if (doc.section === 'agent-outputs') {
+      navigate(`/agent-outputs/${agentOutputKindFromTitle(doc.title)}`);
       return;
     }
     const item = linkedItem(doc);
