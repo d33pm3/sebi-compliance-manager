@@ -57,6 +57,16 @@ export const NOTICE_TILE_COLORS: Record<string, TileColor> = {
   closed: { bg: CHART_COLORS.Completed, fg: 'hsl(150, 60%, 14%)' },
 };
 
+/** Task Manager tiles — mapped to the master status they mirror */
+export const TASK_TILE_COLORS: Record<string, TileColor> = {
+  total: { bg: 'hsl(220, 26%, 22%)', fg: LIGHT_TEXT },
+  open: { bg: CHART_COLORS['Not Due'], fg: LIGHT_TEXT },
+  inProgress: { bg: CHART_COLORS['In Progress'], fg: 'hsl(200, 70%, 12%)' },
+  blocked: { bg: CHART_COLORS.Overdue, fg: 'hsl(350, 60%, 18%)' },
+  pastDeadline: { bg: CHART_COLORS['Due Soon'], fg: 'hsl(30, 60%, 12%)' },
+  done: { bg: CHART_COLORS.Completed, fg: 'hsl(150, 60%, 14%)' },
+};
+
 const ACRONYMS = new Set([
   'MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO',
   'RMC', 'ASCR', 'SAR', 'BRSR', 'GM', 'HVDLE', 'PIT', 'SAST', 'ESG', 'KMP', 'MD&A', 'RPT',
