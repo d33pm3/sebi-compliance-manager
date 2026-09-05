@@ -274,16 +274,3 @@ export default function ResponseTracker() {
   );
 }
 
-function Stat({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
-  return (
-    <Card>
-      <CardContent className="p-3 flex items-center gap-3">
-        <div className={color}>{icon}</div>
-        <div className="min-w-0">
-          <p className={`text-xl font-bold leading-none ${color}`}>{value}</p>
-          <p className="text-[10px] text-muted-foreground mt-1 truncate">{label}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
