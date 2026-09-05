@@ -24,7 +24,12 @@ const stateStyle = {
   late: { dot: 'bg-destructive text-destructive-foreground', text: 'text-destructive' },
 } as const;
 
+const ACRONYMS = new Set(['MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO', 'RMC', 'MD&A', 'GM', 'BRSR', 'SAR', 'ASCR', 'HVDLE']);
+const toTitleCase = (s: string) =>
+  s.split(/(\s+|\/|-)/).map(w => ACRONYMS.has(w.toUpperCase()) ? w.toUpperCase() : (/^[a-zA-Z]/.test(w) ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w)).join('');
+
 export default function ComplianceTimeline() {
+
   const { items, filings, approvalRequests, tasks } = useComplianceStore();
   const [params] = useSearchParams();
   const [search, setSearch] = useState('');
