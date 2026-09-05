@@ -156,8 +156,8 @@ export default function RiskAssessment() {
           completed: d.completed,
           nonCompliant: d.nonCompliant,
           total: d.total,
-          completedPct: totalItems > 0 ? Math.round((d.completed / totalItems) * 100) : 0,
-          nonCompliantPct: totalItems > 0 ? Math.round((d.nonCompliant / totalItems) * 100) : 0,
+          completedPct: d.total > 0 ? Math.round((d.completed / d.total) * 100) : 0,
+          nonCompliantPct: d.total > 0 ? Math.round((d.nonCompliant / d.total) * 100) : 0,
         };
       })
       .filter(d => d.completed + d.nonCompliant > 0)
@@ -231,6 +231,7 @@ export default function RiskAssessment() {
                   axisLine={false}
                   tickLine={false}
                   width={30}
+                  allowDecimals={false}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
                 <Legend
@@ -277,7 +278,7 @@ export default function RiskAssessment() {
                       <TableHead className="text-[10px]">Due Date</TableHead>
                       <TableHead className="text-[10px] hidden md:table-cell">Owner</TableHead>
                       <TableHead className="text-[10px] hidden md:table-cell">Approval</TableHead>
-                      <TableHead className="text-[10px]">Reason</TableHead>
+                      <TableHead className="text-[10px] w-[220px]">Reason</TableHead>
                       <TableHead className="text-[10px] w-16">Detail</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -287,11 +288,11 @@ export default function RiskAssessment() {
                         <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
                         <TableCell className="text-xs font-medium max-w-[200px] truncate">{item.filingName}</TableCell>
                         <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{toTitleCaseLabel(item.category)}</TableCell>
-                        <TableCell><RiskBadge level="High" /></TableCell>
-                        <TableCell className="text-xs text-destructive font-semibold">{item.dueDate}</TableCell>
+                        <TableCell><RiskBadge level={effectiveRiskLevel(item)} /></TableCell>
+                        <TableCell className="text-xs text-destructive font-semibold whitespace-nowrap">{item.dueDate}</TableCell>
                         <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell truncate">{item.owner}</TableCell>
                         <TableCell className="hidden md:table-cell"><ApprovalBadge status={item.approvalStatus} /></TableCell>
-                        <TableCell className="text-[10px] text-muted-foreground max-w-[220px]">{riskReasons(item)[0]}</TableCell>
+                        <TableCell className="text-[10px] text-muted-foreground max-w-[220px] truncate" title={riskReasons(item).join(' · ')}>{riskReasons(item)[0]}</TableCell>
                         <TableCell onClick={e => e.stopPropagation()}>
                           <Link to={`/compliance/${item.id}`} className="inline-flex items-center gap-1 text-[10px] font-medium text-secondary hover:underline">
                             <ExternalLink className="h-3 w-3 flex-shrink-0" /> Open
@@ -333,7 +334,7 @@ export default function RiskAssessment() {
                       <TableHead className="text-[10px]">Flag</TableHead>
                       <TableHead className="text-[10px]">Due Date</TableHead>
                       <TableHead className="text-[10px] hidden md:table-cell">Owner</TableHead>
-                      <TableHead className="text-[10px]">Reason</TableHead>
+                      <TableHead className="text-[10px] w-[220px]">Reason</TableHead>
                       <TableHead className="text-[10px] w-16">Detail</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -343,15 +344,15 @@ export default function RiskAssessment() {
                         <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
                         <TableCell className="text-xs font-medium max-w-[200px] truncate">{item.filingName}</TableCell>
                         <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{toTitleCaseLabel(item.category)}</TableCell>
-                        <TableCell><RiskBadge level="High" /></TableCell>
+                        <TableCell><RiskBadge level={effectiveRiskLevel(item)} /></TableCell>
                         <TableCell>
                           <span className="inline-flex items-center gap-1 rounded-full bg-warning/15 text-warning border border-warning/30 text-[10px] font-semibold px-2 py-0.5 whitespace-nowrap">
                             <FileWarning className="h-2.5 w-2.5" /> Doc Missing
                           </span>
                         </TableCell>
-                        <TableCell className="text-xs font-medium">{item.dueDate}</TableCell>
+                        <TableCell className="text-xs font-medium whitespace-nowrap">{item.dueDate}</TableCell>
                         <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell truncate">{item.owner}</TableCell>
-                        <TableCell className="text-[10px] text-muted-foreground max-w-[220px]">{riskReasons(item)[0]}</TableCell>
+                        <TableCell className="text-[10px] text-muted-foreground max-w-[220px] truncate" title={riskReasons(item).join(' · ')}>{riskReasons(item)[0]}</TableCell>
                         <TableCell onClick={e => e.stopPropagation()}>
                           <Link to={`/compliance/${item.id}`} className="inline-flex items-center gap-1 text-[10px] font-medium text-secondary hover:underline">
                             <ExternalLink className="h-3 w-3 flex-shrink-0" /> Open
