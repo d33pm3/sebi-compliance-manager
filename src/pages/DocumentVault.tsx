@@ -183,16 +183,16 @@ export default function DocumentVault() {
             <p className="text-[11px] text-muted-foreground">{filtered.length} documents</p>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-[10px] w-10"></TableHead>
                     <TableHead className="text-[10px]">Vault ID</TableHead>
                     <TableHead className="text-[10px]">Title</TableHead>
-                    <TableHead className="text-[10px] hidden md:table-cell">Category</TableHead>
+                    <TableHead className="text-[10px] hidden xl:table-cell">Category</TableHead>
                     <TableHead className="text-[10px] hidden lg:table-cell">Date</TableHead>
-                    <TableHead className="text-[10px] hidden md:table-cell">Type</TableHead>
+                    <TableHead className="text-[10px] hidden xl:table-cell">Type</TableHead>
                     <TableHead className="text-[10px]">Linked Compliance</TableHead>
                     <TableHead className="text-[10px]">Risk</TableHead>
                     {section === 'sebi-notices' && <TableHead className="text-[10px]">Status</TableHead>}
@@ -206,11 +206,11 @@ export default function DocumentVault() {
                     return (
                     <TableRow key={doc.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => openDoc(doc)}>
                       <TableCell>{sectionIcon(doc.section)}</TableCell>
-                      <TableCell className="text-[11px] font-mono text-muted-foreground">{doc.vaultId.slice(0, 20)}…</TableCell>
+                      <TableCell className="text-[11px] font-mono text-muted-foreground whitespace-nowrap max-w-[130px] truncate">{doc.vaultId}</TableCell>
                       <TableCell className="text-xs font-medium max-w-[200px] truncate text-primary hover:underline">{doc.title}</TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{doc.category}</TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{doc.uploadedAt}</TableCell>
-                      <TableCell className="hidden md:table-cell"><Badge variant="outline" className="text-[10px]">{doc.fileType}</Badge></TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground hidden xl:table-cell max-w-[120px] truncate">{doc.category}</TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell whitespace-nowrap">{doc.uploadedAt}</TableCell>
+                      <TableCell className="hidden xl:table-cell"><Badge variant="outline" className="text-[10px]">{doc.fileType}</Badge></TableCell>
                       <TableCell className="text-[11px] max-w-[150px]">
                         {item ? (
                           <Link
@@ -278,7 +278,7 @@ export default function DocumentVault() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
