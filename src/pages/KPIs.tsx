@@ -6,6 +6,7 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { CheckCircle2, AlertTriangle, Clock, ListTodo, ShieldAlert, FileCheck, MailWarning, TrendingUp, CalendarClock } from 'lucide-react';
 import { useMemo } from 'react';
 import { deriveComplianceState } from '@/data/workflowData';
+import { toTitleCaseLabel } from '@/lib/chartTheme';
 import { Link } from 'react-router-dom';
 
 const CHART_COLORS = {
@@ -154,16 +155,6 @@ export default function KPIs() {
     { name: 'Medium', value: riskStats.medium, fill: CHART_COLORS.Medium },
     { name: 'Low', value: riskStats.low, fill: CHART_COLORS.Low },
   ], [riskStats]);
-
-  const toTitleCaseLabel = (s: string) => {
-    const ACRONYMS = new Set(['MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO', 'RMC', 'ASCR', 'SAR', 'BRSR', 'GM', 'HVDLE', 'PIT', 'SAST', 'ESG', 'KMP', 'MD&A', 'RPT', 'IPO', 'OFS']);
-    return s.split(/(\s+|\/)/).map(w => {
-      if (/^\s+$/.test(w) || w === '/') return w;
-      const bare = w.replace(/[^A-Za-z&]/g, '');
-      if (ACRONYMS.has(bare.toUpperCase())) return w.toUpperCase();
-      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-    }).join('');
-  };
 
   const categoryData = useMemo(() => {
     const counts: Record<string, number> = {};

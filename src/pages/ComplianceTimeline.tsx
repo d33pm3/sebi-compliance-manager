@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { buildItemTimeline, MilestoneKind, TimelineMilestone } from '@/data/workflowData';
+import { toTitleCaseLabel } from '@/lib/chartTheme';
 import { CalendarClock, CheckCircle2, Circle, FileCheck2, FileText, ListTodo, Search, Stamp, TriangleAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -24,9 +25,7 @@ const stateStyle = {
   late: { dot: 'bg-destructive text-destructive-foreground', text: 'text-destructive' },
 } as const;
 
-const ACRONYMS = new Set(['MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO', 'RMC', 'MD&A', 'GM', 'BRSR', 'SAR', 'ASCR', 'HVDLE']);
-const toTitleCase = (s: string) =>
-  s.split(/(\s+|\/|-)/).map(w => ACRONYMS.has(w.toUpperCase()) ? w.toUpperCase() : (/^[a-zA-Z]/.test(w) ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w)).join('');
+const toTitleCase = toTitleCaseLabel;
 
 export default function ComplianceTimeline() {
 
