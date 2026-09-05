@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { materialEvents, type MaterialEvent } from '@/data/materialEventsData';
 import { useMemo, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Zap, AlertTriangle, Clock, Info } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Zap, AlertTriangle, Clock, Info, FileText, Calendar, Bell } from 'lucide-react';
 
 const urgencyConfig = {
   critical: { label: 'Critical', className: 'bg-destructive/15 text-destructive border-destructive/30', icon: Zap },
