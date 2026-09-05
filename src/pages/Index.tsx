@@ -79,10 +79,23 @@ export default function Dashboard() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const perPage = 15;
   const registerRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const scrollToRegister = () => {
     requestAnimationFrame(() => registerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
+
+  // Deep link: /?state=Overdue (from the KPIs page) filters the register by derived compliance state
+  const stateParam = searchParams.get('state');
+  useEffect(() => {
+    if (!stateParam) return;
+    resetFilters();
+    setFilter('state', stateParam);
+    setPage(0);
+    setSearchParams({}, { replace: true });
+    scrollToRegister();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stateParam]);
 
   // One-click drill-down: any dashboard number lands on the matching rows of the Master Register
   const drillTo = (status: string) => {
