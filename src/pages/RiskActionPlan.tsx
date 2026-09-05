@@ -40,10 +40,14 @@ const daysLeft = (deadline: string) => Math.ceil((new Date(deadline).getTime() -
 
 export default function RiskActionPlan() {
   const { items, tasks, addTask, updateTaskStatus } = useComplianceStore();
-  const [levelFilter, setLevelFilter] = useState<'all' | 'Critical' | 'High' | 'Medium' | 'Low'>('all');
+  const navigate = useNavigate();
   const [planFilter, setPlanFilter] = useState<'all' | 'with' | 'without'>('all');
   const [dialogItem, setDialogItem] = useState<ComplianceItem | null>(null);
   const [form, setForm] = useState({ title: '', owner: owners[0], deadline: new Date().toISOString().split('T')[0] });
+
+  /* Tiles deep-link into the Risk Assessment module, which lists every item
+     behind that risk level straight from the Master Compliance Register. */
+  const openInRiskAssessment = (level: string) => navigate(`/risk-assessment?level=${level}`);
 
   /** Every risk row resolves straight from the Master Compliance Register */
   const plans = useMemo(() => items.map(item => {
