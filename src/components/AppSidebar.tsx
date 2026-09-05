@@ -37,6 +37,11 @@ const modules = [
   { title: 'Task Manager', url: '/tasks', icon: ListTodo, module: 'M9' },
   { title: 'Compliance Timeline', url: '/timeline', icon: CalendarClock, module: 'M10' },
   { title: 'KPIs', url: '/kpis', icon: Target, module: 'M11' },
+  { title: 'Compliance Calendar', url: '/calendar', icon: CalendarDays, module: 'M12' },
+  { title: 'Risk Action Plan', url: '/risk-action-plan', icon: ClipboardList, module: 'M13' },
+  { title: 'Register Editor', url: '/register-manager', icon: FilePlus2, module: 'M14' },
+  { title: 'Agent Deliverables', url: '/agent-outputs/register-extract', icon: Bot, module: 'M15' },
+
 
   { title: 'AI Chatbot', url: '/chatbot', icon: MessageSquare, module: 'M5' },
   { title: 'Assistant', url: '/assistant', icon: BarChart3, module: 'M6' },
