@@ -560,7 +560,7 @@ export default function Dashboard() {
                     >
                       <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
                       <TableCell className="text-xs font-medium max-w-[200px] truncate">{item.filingName}</TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{item.category}</TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{toTitleCaseLabel(item.category)}</TableCell>
                       <TableCell className="hidden lg:table-cell"><NatureBadge nature={item.complianceNature} /></TableCell>
                       <TableCell><StatusBadge status={item.status} /></TableCell>
                       <TableCell className="hidden md:table-cell"><RiskBadge level={item.riskLevel} /></TableCell>
