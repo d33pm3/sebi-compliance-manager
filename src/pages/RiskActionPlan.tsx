@@ -14,7 +14,7 @@ import { TaskStatus, deriveComplianceState, effectiveRiskLevel, riskReasons } fr
 import { RISK_TILE_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
 import { ExternalLink, FileSpreadsheet, Plus, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const badge = 'inline-flex items-center justify-center rounded-full border text-[10px] font-semibold whitespace-nowrap h-5 min-w-[80px] px-2 leading-none';
@@ -40,10 +40,14 @@ const daysLeft = (deadline: string) => Math.ceil((new Date(deadline).getTime() -
 
 export default function RiskActionPlan() {
   const { items, tasks, addTask, updateTaskStatus } = useComplianceStore();
-  const [levelFilter, setLevelFilter] = useState<'all' | 'Critical' | 'High' | 'Medium' | 'Low'>('all');
+  const navigate = useNavigate();
   const [planFilter, setPlanFilter] = useState<'all' | 'with' | 'without'>('all');
   const [dialogItem, setDialogItem] = useState<ComplianceItem | null>(null);
   const [form, setForm] = useState({ title: '', owner: owners[0], deadline: new Date().toISOString().split('T')[0] });
+
+  /* Tiles deep-link into the Risk Assessment module, which lists every item
+     behind that risk level straight from the Master Compliance Register. */
+  const openInRiskAssessment = (level: string) => navigate(`/risk-assessment?level=${level}`);
 
   /** Every risk row resolves straight from the Master Compliance Register */
   const plans = useMemo(() => items.map(item => {
@@ -67,9 +71,9 @@ export default function RiskActionPlan() {
     .sort((a, b) => (a.level === b.level ? a.item.dueDate.localeCompare(b.item.dueDate) : a.level === 'Critical' ? -1 : 1)), [plans]);
 
   const visible = useMemo(() => plans
-    .filter(p => levelFilter === 'all' ? p.level === 'Critical' || p.level === 'High' : p.level === levelFilter)
+    .filter(p => p.level === 'Critical' || p.level === 'High')
     .filter(p => planFilter === 'all' ? true : planFilter === 'with' ? p.tasks.length > 0 : p.tasks.length === 0)
-    .sort((a, b) => a.item.dueDate.localeCompare(b.item.dueDate)), [plans, levelFilter, planFilter]);
+    .sort((a, b) => a.item.dueDate.localeCompare(b.item.dueDate)), [plans, planFilter]);
 
   const counts = useMemo(() => ({
     Critical: plans.filter(p => p.level === 'Critical').length,
@@ -127,9 +131,8 @@ export default function RiskActionPlan() {
               label={`${level} Risk Items`}
               value={counts[level]}
               bg={RISK_TILE_COLORS[level]}
-              active={levelFilter === level}
-              onClick={() => setLevelFilter(f => (f === level ? 'all' : level))}
-              title={`List every ${level} risk item`}
+              onClick={() => openInRiskAssessment(level)}
+              title={`See every ${level} risk item in Risk Assessment`}
             />
           ))}
         </div>
@@ -166,7 +169,7 @@ export default function RiskActionPlan() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <CardTitle className="text-sm font-semibold">
-                  Action Plans — {visible.length} {levelFilter === 'all' ? 'High & Critical' : levelFilter} Risk Items
+                  Action Plans — {visible.length} High & Critical Risk Items
                 </CardTitle>
                 <p className="text-[11px] text-muted-foreground mt-1">Risk levels and reasons are derived from the Master Compliance Register, never entered by hand.</p>
               </div>
@@ -195,9 +198,14 @@ export default function RiskActionPlan() {
                       <span className={`${badge} min-w-[92px] ${p.state === 'Overdue' ? 'bg-destructive/15 text-destructive border-destructive/40' : p.state === 'Completed' ? 'bg-success/15 text-success border-success/40' : p.state === 'Documents Missing' ? 'bg-warning/15 text-warning border-warning/40' : 'bg-secondary/15 text-secondary border-secondary/40'}`}>{p.state}</span>
                       <span className="text-[11px] text-muted-foreground">Due {p.item.dueDate}</span>
                     </div>
-                    <Link to={`/compliance/${p.item.id}`} className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1 mt-1.5">
-                      {p.item.filingName} <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                    </Link>
+                    <div className="flex items-center gap-3 flex-wrap mt-1.5">
+                      <Link to={`/compliance/${p.item.id}`} className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1">
+                        {p.item.filingName} <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                      </Link>
+                      <Link to={`/risk-assessment?level=${p.level}`} className="text-[11px] text-secondary hover:underline inline-flex items-center gap-1">
+                        In Risk Assessment <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                      </Link>
+                    </div>
                     <p className="text-[11px] text-muted-foreground">{toTitleCaseLabel(p.item.category)} · {p.item.regReference} · Owner {p.item.owner}</p>
                     {p.reasons.length > 0 && (
                       <ul className="mt-1.5 space-y-0.5">

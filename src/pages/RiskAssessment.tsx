@@ -102,6 +102,18 @@ export default function RiskAssessment() {
     return () => window.clearTimeout(t);
   }, [focusedNoticeRisk]);
 
+  /* Deep link from the Risk Action Plan: /risk-assessment?level=Critical
+     applies the matching risk-level drill-down and scrolls to the register. */
+  const linkedLevel = searchParams.get('level');
+  useEffect(() => {
+    if (!linkedLevel || !['Critical', 'High', 'Medium', 'Low'].includes(linkedLevel)) return;
+    drillTo('riskLevel', linkedLevel);
+    const next = new URLSearchParams(searchParams);
+    next.delete('level');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkedLevel]);
+
   /* One-click drill-down: every number on this page lands on the matching rows of
      the Master Compliance Register, read live from the shared compliance store. */
   const drillTo = (key: 'approvalStatus' | 'status' | 'riskLevel', value: string) => {
