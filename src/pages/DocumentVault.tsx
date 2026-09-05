@@ -17,6 +17,7 @@ import { STAT_COLORS } from '@/lib/chartTheme';
 import { ComplianceItem } from '@/data/complianceData';
 import { resolveVaultDoc } from '@/data/workflowData';
 import { DocumentUploadForm } from '@/components/DocumentUploadForm';
+import { agentOutputKindFromTitle, agentOutputKinds, agentOutputSpecs, buildAgentOutput } from '@/data/agentOutputs';
 
 
 export default function DocumentVault() {
