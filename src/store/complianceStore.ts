@@ -33,6 +33,27 @@ export interface FilingSubmissionInput {
   remarks: string;
 }
 
+export interface UploadedFileMeta {
+  name: string;
+  sizeBytes: number;
+  extension: string;
+  url: string;
+}
+
+export interface DocumentUploadInput {
+  /** Master Compliance Register item this evidence belongs to */
+  itemId: number | null;
+  section: VaultDocument['section'];
+  documentType: string;
+  fiscalYear: string;
+  uploadedBy: string;
+  /** Uploaded → evidence on record, Filed → obligation discharged */
+  docStatus: 'Uploaded' | 'Filed';
+  remarks: string;
+  files: UploadedFileMeta[];
+}
+
+
 interface Filters {
   search: string;
   category: string;
@@ -77,6 +98,11 @@ interface ComplianceStore {
   // Filing workflow — one submission updates Register, Risk and Vault together
   submitFiling: (id: number, input: FilingSubmissionInput) => void;
   approveFiling: (filingId: string, approve: boolean) => void;
+
+  // Real document uploads into the Vault, wired to the Master Register
+  uploadDocuments: (input: DocumentUploadInput) => void;
+  deleteVaultDoc: (vaultId: string) => void;
+
 
   // Compliance to-do lists
   addTask: (itemId: number, task: { title: string; owner: string; deadline: string }) => void;
@@ -222,6 +248,64 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
         : i),
     };
   }),
+
+  uploadDocuments: (input) => set(state => {
+    const item = input.itemId != null ? state.items.find(i => i.id === input.itemId) : undefined;
+    const today = new Date().toISOString().split('T')[0];
+    const stamp = Date.now();
+    const newDocs: VaultDocument[] = input.files.map((f, idx) => {
+      const vaultId = `VAULT-UPL-${today.replace(/-/g, '').slice(0, 8)}-${String(stamp).slice(-5)}${idx + 1}`;
+      return {
+        id: vaultId,
+        vaultId,
+        title: item ? `${item.filingName} — ${f.name}` : f.name,
+        // Category and regulation always mirror the Master Compliance Register
+        category: item ? item.category : 'Uploaded Document',
+        section: input.section,
+        documentType: input.documentType,
+        fiscalYear: input.fiscalYear,
+        uploadedBy: input.uploadedBy || 'Compliance Team',
+        uploadedAt: today,
+        fileSize: `${(f.sizeBytes / (1024 * 1024)).toFixed(2)} MB`,
+        fileType: f.extension.toUpperCase(),
+        regulation: item ? item.regReference : 'All',
+        status: input.docStatus,
+        itemId: item?.id,
+        fileUrl: f.url,
+        fileName: f.name,
+      };
+    });
+
+    if (!item) return { vaultDocs: [...newDocs, ...state.vaultDocs] };
+
+    const filed = input.docStatus === 'Filed';
+    return {
+      vaultDocs: [...newDocs, ...state.vaultDocs],
+      items: state.items.map(i => i.id === item.id ? {
+        ...i,
+        // Evidence now on record — clears "Documents Missing" everywhere at once
+        evidenceUploaded: true,
+        status: (filed
+          ? 'Completed'
+          : i.status === 'Not Started' ? 'In Progress' : i.status) as ComplianceStatus,
+        approvalStatus: (i.approvalStatus === 'Doc Missing' || i.approvalStatus === 'Not Started'
+          ? 'Pending'
+          : i.approvalStatus) as ApprovalStatus,
+        comments: [...i.comments, {
+          id: String(stamp),
+          author: input.uploadedBy || 'Compliance Team',
+          text: `${input.files.length} document(s) uploaded to the Document Vault on ${today} (${input.documentType}, ${input.fiscalYear})${filed ? ' and the filing marked as completed' : ''}.${input.remarks ? ` Remarks: ${input.remarks}` : ''}`,
+          timestamp: new Date().toLocaleString(),
+        }],
+      } : i),
+    };
+  }),
+
+  deleteVaultDoc: (vaultId) => set(state => ({
+    vaultDocs: state.vaultDocs.filter(d => d.vaultId !== vaultId),
+  })),
+
+
 
   addTask: (itemId, task) => set(state => ({
     tasks: [

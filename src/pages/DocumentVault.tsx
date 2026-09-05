@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { vaultCategories, VaultDocument } from '@/data/vaultData';
 import { useComplianceStore } from '@/store/complianceStore';
-import { Search, Download, Mail, FileText, AlertTriangle, BookOpen, Bot, Upload, Eye, ChevronLeft, ChevronRight, FolderArchive, ShieldAlert, ExternalLink } from 'lucide-react';
+import { Search, Download, Mail, FileText, AlertTriangle, BookOpen, Bot, Eye, ChevronLeft, ChevronRight, FolderArchive, ShieldAlert, ExternalLink } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -15,7 +15,9 @@ import { downloadDocumentPlaceholder } from '@/lib/downloadUtils';
 import { StatTile } from '@/components/StatTile';
 import { STAT_COLORS } from '@/lib/chartTheme';
 import { ComplianceItem } from '@/data/complianceData';
-import { deriveComplianceState, effectiveRiskLevel, linkedComplianceItems } from '@/data/workflowData';
+import { resolveVaultDoc } from '@/data/workflowData';
+import { DocumentUploadForm } from '@/components/DocumentUploadForm';
+
 
 export default function DocumentVault() {
   const vaultDocuments = useComplianceStore(s => s.vaultDocs);
@@ -42,30 +44,22 @@ export default function DocumentVault() {
   const totalPages = Math.ceil(filtered.length / perPage);
 
   /* ---------------------------------------------------------------- */
-  /* Everything below is derived from the Master Compliance Register   */
-  /* so a single change in the master flows through this module.       */
+  /* Everything below is resolved against the Master Compliance        */
+  /* Register through one shared helper, so a single master update      */
+  /* flows through the Vault, the Notices and the Risk Assessment.      */
   /* ---------------------------------------------------------------- */
 
-  /** The compliance item in the master that this document belongs to */
-  const linkedItem = (doc: VaultDocument): ComplianceItem | undefined =>
-    linkedComplianceItems(doc.regulation, items)[0];
+  const resolve = (doc: VaultDocument) => resolveVaultDoc(doc, items);
 
-  /**
-   * Risk of a vault document, always resolved against the master:
-   * open/pending notices, overdue filings and missing evidence are High risk.
-   */
-  const docRisk = (doc: VaultDocument): { level: 'High' | 'Critical' | null; reason: string } => {
-    if (doc.section === 'sebi-notices' && doc.status === 'Pending') {
-      return { level: 'High', reason: 'Response Pending' };
-    }
-    const item = linkedItem(doc);
-    if (item) {
-      const state = deriveComplianceState(item);
-      if (state === 'Overdue') return { level: effectiveRiskLevel(item) === 'Critical' ? 'Critical' : 'High', reason: 'Overdue Filing' };
-      if (state === 'Documents Missing') return { level: 'High', reason: 'Documents Missing' };
-    }
-    return { level: null, reason: '' };
+  /** The compliance item in the master that this document belongs to */
+  const linkedItem = (doc: VaultDocument): ComplianceItem | undefined => resolve(doc).item;
+
+  /** Risk of a vault document, always derived from the master */
+  const docRisk = (doc: VaultDocument): { level: 'High' | 'Critical' | 'Medium' | 'Low' | null; reason: string } => {
+    const r = resolve(doc);
+    return { level: r.riskLevel, reason: r.riskReason };
   };
+
 
   const sectionIcon = (s: string) => {
     switch (s) {
@@ -84,6 +78,8 @@ export default function DocumentVault() {
       case 'Pending': return 'bg-warning text-warning-foreground border-warning';
       case 'Responded': return 'bg-success text-success-foreground border-success';
       case 'Closed': return 'bg-muted text-muted-foreground border-border';
+      case 'Uploaded': return 'bg-secondary text-secondary-foreground border-secondary';
+      case 'Filed': return 'bg-success text-success-foreground border-success';
       default: return 'bg-muted text-muted-foreground border-border';
     }
   };
@@ -98,6 +94,14 @@ export default function DocumentVault() {
 
   const handleAction = (action: string, doc: VaultDocument) => {
     if (action === 'Download') {
+      if (doc.fileUrl) {
+        const a = document.createElement('a');
+        a.href = doc.fileUrl;
+        a.download = doc.fileName || doc.title;
+        a.click();
+        toast.success(`Downloaded: ${doc.fileName || doc.title}`);
+        return;
+      }
       downloadDocumentPlaceholder(doc.title, doc.vaultId);
       toast.success(`Downloaded: ${doc.title}`);
     } else {
@@ -142,16 +146,9 @@ export default function DocumentVault() {
         </div>
 
 
-        {/* Upload Zone */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer" onClick={() => toast.info('Upload simulation — no backend connected')}>
-              <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm font-medium">Drag & drop files or click to browse</p>
-              <p className="text-[11px] text-muted-foreground mt-1">Supported: PDF, XLSX, DOCX, PPTX, XML, XBRL, CSV, ZIP</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Upload Form — writes back to the Master Compliance Register */}
+        <DocumentUploadForm />
+
 
         {/* Filters + Document Table */}
         <Card>
@@ -195,20 +192,21 @@ export default function DocumentVault() {
                     <TableHead className="text-[10px] hidden xl:table-cell">Type</TableHead>
                     <TableHead className="text-[10px]">Linked Compliance</TableHead>
                     <TableHead className="text-[10px]">Risk</TableHead>
-                    {section === 'sebi-notices' && <TableHead className="text-[10px]">Status</TableHead>}
+                    <TableHead className="text-[10px]">Status</TableHead>
                     <TableHead className="text-[10px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paged.map(doc => {
-                    const item = linkedItem(doc);
-                    const risk = docRisk(doc);
+                    const res = resolve(doc);
+                    const item = res.item;
+                    const risk = { level: res.riskLevel, reason: res.riskReason };
                     return (
                     <TableRow key={doc.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => openDoc(doc)}>
                       <TableCell>{sectionIcon(doc.section)}</TableCell>
                       <TableCell className="text-[11px] font-mono text-muted-foreground whitespace-nowrap max-w-[130px] truncate">{doc.vaultId}</TableCell>
                       <TableCell className="text-xs font-medium max-w-[200px] truncate text-primary hover:underline">{doc.title}</TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden 2xl:table-cell max-w-[120px] truncate">{doc.category}</TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground hidden 2xl:table-cell max-w-[120px] truncate">{res.category}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell whitespace-nowrap">{doc.uploadedAt}</TableCell>
                       <TableCell className="hidden xl:table-cell"><Badge variant="outline" className="text-[10px]">{doc.fileType}</Badge></TableCell>
                       <TableCell className="text-[11px] max-w-[150px]">
@@ -239,11 +237,13 @@ export default function DocumentVault() {
                           <span className={`${badgeBase} bg-muted text-muted-foreground border-border`}>No Risk</span>
                         )}
                       </TableCell>
-                      {section === 'sebi-notices' && (
-                        <TableCell>
-                          {doc.status && <span className={`${badgeBase} ${statusColor(doc.status)}`}>{doc.status}</span>}
-                        </TableCell>
-                      )}
+                      <TableCell>
+                        {doc.status
+                          ? <span className={`${badgeBase} ${statusColor(doc.status)}`}>{doc.status}</span>
+                          : res.state
+                            ? <span className={`${badgeBase} bg-muted text-muted-foreground border-border`}>{res.state}</span>
+                            : <span className="text-[11px] text-muted-foreground">—</span>}
+                      </TableCell>
                       <TableCell onClick={e => e.stopPropagation()}>
                         <div className="flex gap-1">
                           <Button variant="ghost" size="icon" className="h-6 w-6" title="View Details" onClick={() => openDoc(doc)}><Eye className="h-3.5 w-3.5" /></Button>
