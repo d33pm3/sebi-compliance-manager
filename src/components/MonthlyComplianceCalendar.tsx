@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { ComplianceItem } from '@/data/complianceData';
 import { deriveComplianceState, ComplianceState } from '@/data/workflowData';
-import { Link } from 'react-router-dom';
+import { useComplianceStore } from '@/store/complianceStore';
+import { Link, useNavigate } from 'react-router-dom';
 
 const stateStyle: Record<ComplianceState, string> = {
   Completed: 'bg-success/15 text-success border-success/40',
@@ -17,11 +18,21 @@ const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 interface Props {
-  items: ComplianceItem[];
+  items?: ComplianceItem[];
   onDrillCategory?: (category: string) => void;
 }
 
-export function MonthlyComplianceCalendar({ items }: Props) {
+export function MonthlyComplianceCalendar({ items: itemsProp }: Props) {
+  const storeItems = useComplianceStore(s => s.items);
+  // Always resolve against the Master Compliance Register so any change there flows through.
+  const items = useMemo(() => {
+    if (!itemsProp) return storeItems;
+    const ids = new Set(itemsProp.map(i => i.id));
+    return storeItems.filter(i => ids.has(i.id));
+  }, [itemsProp, storeItems]);
+
+  const navigate = useNavigate();
+
   const firstDue = useMemo(() => {
     const dates = items.map(i => i.dueDate).filter(Boolean).sort();
     return dates[0] ? new Date(dates[0]) : new Date();
@@ -33,6 +44,7 @@ export function MonthlyComplianceCalendar({ items }: Props) {
   const todayStr = new Date().toISOString().split('T')[0];
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
+
 
   const byDate = useMemo(() => {
     const map = new Map<string, ComplianceItem[]>();
