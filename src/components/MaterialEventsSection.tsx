@@ -42,10 +42,18 @@ export function MaterialEventsSection() {
             <div className="flex gap-1.5">
               {(Object.entries(counts) as [keyof typeof urgencyConfig, number][]).map(([key, count]) => {
                 const cfg = urgencyConfig[key];
+                const active = urgencyFilter === key;
                 return (
-                  <Badge key={key} variant="outline" className={`inline-flex items-center justify-center whitespace-nowrap leading-none text-[10px] font-semibold h-6 min-w-[64px] px-2.5 flex-shrink-0 ${cfg.className}`}>
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setUrgencyFilter(active ? 'all' : key)}
+                    className={`inline-flex items-center justify-center whitespace-nowrap leading-none text-[10px] font-semibold h-6 min-w-[64px] px-2.5 flex-shrink-0 rounded-full border transition-colors cursor-pointer ${cfg.className} ${active ? 'ring-2 ring-offset-1 ring-primary' : 'hover:opacity-90'}`}
+                    aria-pressed={active}
+                    aria-label={`Show ${cfg.label} material events`}
+                  >
                     {cfg.label}: {count}
-                  </Badge>
+                  </button>
                 );
               })}
             </div>
