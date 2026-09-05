@@ -159,9 +159,17 @@ export default function ResponseTracker() {
                 </TableHeader>
                 <TableBody>
                   {visible.map(n => (
-                    <TableRow key={n.noticeId} className="hover:bg-muted/40">
+                    <TableRow
+                      key={n.noticeId}
+                      className="hover:bg-muted/40 cursor-pointer"
+                      onClick={e => {
+                        const target = e.target as HTMLElement;
+                        if (target.closest('a, button, [role="dialog"]')) return;
+                        navigate(`/notices/${n.noticeId}`);
+                      }}
+                    >
                       <TableCell className="text-[11px] font-mono">
-                        <Link to={`/notices/${n.noticeId}`} className="text-secondary hover:underline">{n.noticeNo}</Link>
+                        <Link to={`/notices/${n.noticeId}`} className="text-secondary hover:underline" onClick={e => e.stopPropagation()}>{n.noticeNo}</Link>
                       </TableCell>
                       <TableCell className="text-xs font-medium max-w-[240px] truncate" title={n.subject}>{n.subject}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{n.issuedBy}</TableCell>
