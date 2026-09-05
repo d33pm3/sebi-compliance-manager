@@ -11,7 +11,7 @@ import {
   AlertTriangle, ArrowLeft, Building2, Calendar, ExternalLink, FileText, Mail, Scale, ShieldAlert, User,
 } from 'lucide-react';
 import { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const pill =
   'inline-flex items-center justify-center rounded-full text-[10px] font-semibold whitespace-nowrap min-w-[76px] h-5 px-2.5 leading-none';
@@ -20,7 +20,8 @@ export default function NoticeDetail() {
   const { noticeId } = useParams();
   const notices = useComplianceStore(s => s.notices);
   const items = useComplianceStore(s => s.items);
-  const selectItem = useComplianceStore(s => s.selectItem);
+
+  const navigate = useNavigate();
 
   const notice = notices.find(n => n.noticeId === noticeId);
 
@@ -175,7 +176,7 @@ export default function NoticeDetail() {
                   </TableHeader>
                   <TableBody>
                     {linked.map(i => (
-                      <TableRow key={i.id} className="hover:bg-muted/40 cursor-pointer" onClick={() => selectItem(i)}>
+                      <TableRow key={i.id} className="hover:bg-muted/40 cursor-pointer" onClick={() => navigate(`/compliance/${i.id}`)}>
                         <TableCell className="text-xs font-medium max-w-[260px]">{i.filingName}</TableCell>
                         <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">
                           {toTitleCaseLabel(i.category)}

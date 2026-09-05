@@ -256,6 +256,7 @@ export const noticeResponses: NoticeResponse[] = [
 
 export interface NoticeRiskItem {
   id: string;
+  noticeId: string;
   noticeNo: string;
   subject: string;
   source: string;
@@ -276,6 +277,7 @@ export function buildNoticeRisks(responses: NoticeResponse[], today = new Date()
       n.riskStatus === 'Closed' ? 'Low' : days < 0 ? 'Critical' : n.responseStatus === 'Submitted' ? 'Medium' : 'High';
     return {
       id: `RISK-NOTICE-${n.noticeNo.replace(/[^A-Za-z0-9]/g, '-')}`,
+      noticeId: n.noticeId,
       noticeNo: n.noticeNo,
       subject: n.subject,
       source: n.issuedBy,

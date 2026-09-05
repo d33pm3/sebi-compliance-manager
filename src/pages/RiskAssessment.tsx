@@ -412,11 +412,12 @@ export default function RiskAssessment() {
                         <TableHead className="text-[10px]">Response</TableHead>
                         <TableHead className="text-[10px]">Deadline</TableHead>
                         <TableHead className="text-[10px] hidden lg:table-cell">Owner</TableHead>
+                        <TableHead className="text-[10px]">Open</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {noticeRisks.map(r => (
-                        <TableRow key={r.id} className="hover:bg-destructive/5">
+                        <TableRow key={r.id} className="hover:bg-destructive/5 cursor-pointer" onClick={() => navigate(`/notices/${r.noticeId}`)}>
                           <TableCell className="text-[11px] font-mono">{r.noticeNo}</TableCell>
                           <TableCell className="text-xs font-medium max-w-[220px] truncate" title={r.subject}>{r.subject}</TableCell>
                           <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{r.source}</TableCell>
@@ -432,6 +433,9 @@ export default function RiskAssessment() {
                             </span>
                           </TableCell>
                           <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{r.owner}</TableCell>
+                          <TableCell>
+                            <Link to={`/notices/${r.noticeId}`} onClick={e => e.stopPropagation()} className="text-[10px] font-medium text-secondary hover:underline">View Notice</Link>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
