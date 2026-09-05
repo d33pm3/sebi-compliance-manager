@@ -584,16 +584,37 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function StatCard({
+  icon,
+  label,
+  value,
+  bg,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  bg: { bg: string; fg: string };
+  active?: boolean;
+  onClick?: () => void;
+}) {
   return (
-    <Card>
-      <CardContent className="p-3 flex items-center gap-3">
-        <div className={`${color}`}>{icon}</div>
-        <div>
-          <p className={`text-xl font-bold ${color}`}>{value}</p>
-          <p className="text-[10px] text-muted-foreground tracking-wider">{label}</p>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`group w-full rounded-lg text-left transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${active ? 'ring-2 ring-offset-2 ring-ring' : ''}`}
+      style={{ backgroundColor: bg.bg, color: bg.fg }}
+      title={`View ${label} in the Master Compliance Register`}
+    >
+      <div className="p-3 flex items-center gap-3">
+        <div className="opacity-80" style={{ color: bg.fg }}>{icon}</div>
+        <div className="min-w-0">
+          <p className="text-xl font-bold leading-none" style={{ color: bg.fg }}>{value}</p>
+          <p className="text-[10px] font-medium mt-1 truncate opacity-80" style={{ color: bg.fg }}>{label}</p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </button>
   );
 }
