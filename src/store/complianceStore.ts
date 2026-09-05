@@ -78,6 +78,11 @@ interface ComplianceStore {
   submitFiling: (id: number, input: FilingSubmissionInput) => void;
   approveFiling: (filingId: string, approve: boolean) => void;
 
+  // Real document uploads into the Vault, wired to the Master Register
+  uploadDocuments: (input: DocumentUploadInput) => void;
+  deleteVaultDoc: (vaultId: string) => void;
+
+
   // Compliance to-do lists
   addTask: (itemId: number, task: { title: string; owner: string; deadline: string }) => void;
   updateTaskStatus: (taskId: string, status: TaskStatus) => void;
