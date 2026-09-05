@@ -347,6 +347,64 @@ export default function RiskAssessment() {
           );
         })()}
 
+        {/* Open High Risks — Overdue Tasks */}
+        {overdueTaskRisks.length > 0 && (
+          <Card className="border-destructive/30">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                <CardTitle className="text-sm font-semibold text-destructive">
+                  Open High Risks — Overdue Tasks ({overdueTaskRisks.length})
+                </CardTitle>
+                <Link to="/tasks" className="text-[10px] font-medium text-secondary hover:underline">Open Task Manager</Link>
+                <Button variant="outline" size="sm" className="ml-auto text-[10px] h-7 px-2.5 gap-1" onClick={exportOverdueTaskRisks}>
+                  <FileSpreadsheet className="h-3 w-3 flex-shrink-0" /> Export .xlsx
+                </Button>
+              </div>
+              <p className="text-[10px] text-muted-foreground">Every task past its deadline in the Task Manager appears here as an open high risk with days left</p>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border border-destructive/20 overflow-auto max-h-[420px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-[10px]">Task</TableHead>
+                      <TableHead className="text-[10px]">Compliance Item</TableHead>
+                      <TableHead className="text-[10px] hidden md:table-cell">Category</TableHead>
+                      <TableHead className="text-[10px]">Risk</TableHead>
+                      <TableHead className="text-[10px]">Task Status</TableHead>
+                      <TableHead className="text-[10px]">Deadline</TableHead>
+                      <TableHead className="text-[10px] hidden lg:table-cell">Owner</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {overdueTaskRisks.map(r => (
+                      <TableRow key={r.taskId} className="hover:bg-destructive/5">
+                        <TableCell className="text-xs font-medium max-w-[220px]">{r.title}</TableCell>
+                        <TableCell className="text-[11px] max-w-[200px] truncate">
+                          <Link to={`/compliance/${r.itemId}`} className="text-secondary hover:underline" title={r.filingName}>{r.filingName}</Link>
+                        </TableCell>
+                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{r.category}</TableCell>
+                        <TableCell><RiskBadge level={r.riskLevel} /></TableCell>
+                        <TableCell>
+                          <span className="inline-flex items-center justify-center rounded-full text-[10px] font-semibold whitespace-nowrap min-w-[76px] h-5 px-2.5 leading-none bg-destructive text-destructive-foreground">{r.status}</span>
+                        </TableCell>
+                        <TableCell className="text-xs font-semibold text-destructive">
+                          {r.deadline}
+                          <span className="block text-[10px] font-normal text-muted-foreground">{Math.abs(r.daysLeft)} days overdue</span>
+                        </TableCell>
+                        <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{r.owner}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+
+
         {/* Filters */}
         <Card>
           <CardHeader className="pb-3">
