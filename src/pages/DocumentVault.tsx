@@ -19,6 +19,8 @@ import { deriveComplianceState, effectiveRiskLevel, linkedComplianceItems } from
 
 export default function DocumentVault() {
   const vaultDocuments = useComplianceStore(s => s.vaultDocs);
+  const items = useComplianceStore(s => s.items);
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [section, setSection] = useState('all');
   const [category, setCategory] = useState('all');
@@ -39,6 +41,32 @@ export default function DocumentVault() {
   const paged = filtered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.ceil(filtered.length / perPage);
 
+  /* ---------------------------------------------------------------- */
+  /* Everything below is derived from the Master Compliance Register   */
+  /* so a single change in the master flows through this module.       */
+  /* ---------------------------------------------------------------- */
+
+  /** The compliance item in the master that this document belongs to */
+  const linkedItem = (doc: VaultDocument): ComplianceItem | undefined =>
+    linkedComplianceItems(doc.regulation, items)[0];
+
+  /**
+   * Risk of a vault document, always resolved against the master:
+   * open/pending notices, overdue filings and missing evidence are High risk.
+   */
+  const docRisk = (doc: VaultDocument): { level: 'High' | 'Critical' | null; reason: string } => {
+    if (doc.section === 'sebi-notices' && doc.status === 'Pending') {
+      return { level: 'High', reason: 'Response Pending' };
+    }
+    const item = linkedItem(doc);
+    if (item) {
+      const state = deriveComplianceState(item);
+      if (state === 'Overdue') return { level: effectiveRiskLevel(item) === 'Critical' ? 'Critical' : 'High', reason: 'Overdue Filing' };
+      if (state === 'Documents Missing') return { level: 'High', reason: 'Documents Missing' };
+    }
+    return { level: null, reason: '' };
+  };
+
   const sectionIcon = (s: string) => {
     switch (s) {
       case 'compliance-filings': return <FileText className="h-3.5 w-3.5" />;
@@ -49,12 +77,14 @@ export default function DocumentVault() {
     }
   };
 
+  const badgeBase = 'inline-flex items-center justify-center rounded-full border text-[10px] font-semibold whitespace-nowrap h-5 min-w-[76px] px-2 leading-none';
+
   const statusColor = (status?: string) => {
     switch (status) {
-      case 'Pending': return 'bg-warning/15 text-warning border-warning/30';
-      case 'Responded': return 'bg-success/15 text-success border-success/30';
+      case 'Pending': return 'bg-warning/20 text-warning-foreground border-warning/40';
+      case 'Responded': return 'bg-success/20 text-success-foreground border-success/40';
       case 'Closed': return 'bg-muted text-muted-foreground border-border';
-      default: return '';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -75,33 +105,42 @@ export default function DocumentVault() {
     }
   };
 
+  /** Row click: notices open their notice page, everything else opens the master item */
+  const openDoc = (doc: VaultDocument) => {
+    if (doc.section === 'sebi-notices') {
+      navigate(`/notices/${doc.id}`);
+      return;
+    }
+    const item = linkedItem(doc);
+    if (item) navigate(`/compliance/${item.id}`);
+    else toast.info('No linked item in the Master Compliance Register for this document');
+  };
+
   return (
     <AppLayout title="Documentation Vault" subtitle="Module 4 — Compliance Document Repository">
       <div className="space-y-4">
-        {/* Stats */}
+        {/* Stats — palette shared with the Risk Assessment module */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
-            { label: 'All Documents', count: sectionCounts.all, icon: <FolderArchive className="h-4 w-4" />, key: 'all' },
-            { label: 'Filings', count: sectionCounts['compliance-filings'], icon: <FileText className="h-4 w-4" />, key: 'compliance-filings' },
-            { label: 'Notices', count: sectionCounts['sebi-notices'], icon: <AlertTriangle className="h-4 w-4" />, key: 'sebi-notices' },
-            { label: 'Regulatory', count: sectionCounts['regulatory-docs'], icon: <BookOpen className="h-4 w-4" />, key: 'regulatory-docs' },
-            { label: 'Agent Outputs', count: sectionCounts['agent-outputs'], icon: <Bot className="h-4 w-4" />, key: 'agent-outputs' },
+            { label: 'All Documents', count: sectionCounts.all, icon: <FolderArchive className="h-4 w-4" />, key: 'all', bg: STAT_COLORS.total },
+            { label: 'Filings', count: sectionCounts['compliance-filings'], icon: <FileText className="h-4 w-4" />, key: 'compliance-filings', bg: STAT_COLORS.completed },
+            { label: 'Notices', count: sectionCounts['sebi-notices'], icon: <AlertTriangle className="h-4 w-4" />, key: 'sebi-notices', bg: STAT_COLORS.overdue },
+            { label: 'Regulatory', count: sectionCounts['regulatory-docs'], icon: <BookOpen className="h-4 w-4" />, key: 'regulatory-docs', bg: STAT_COLORS.inProgress },
+            { label: 'Agent Outputs', count: sectionCounts['agent-outputs'], icon: <Bot className="h-4 w-4" />, key: 'agent-outputs', bg: STAT_COLORS.upcoming },
           ].map(s => (
-            <Card
+            <StatTile
               key={s.key}
-              className={`cursor-pointer transition-all ${section === s.key ? 'border-primary ring-1 ring-primary/20' : 'hover:border-primary/30'}`}
+              icon={s.icon}
+              label={s.label}
+              value={s.count}
+              bg={s.bg}
+              active={section === s.key}
+              title={`Show ${s.label} in the Document Register`}
               onClick={() => { setSection(s.key); setPage(0); }}
-            >
-              <CardContent className="p-3 flex items-center gap-3">
-                <div className={section === s.key ? 'text-primary' : 'text-muted-foreground'}>{s.icon}</div>
-                <div>
-                  <p className={`text-xl font-bold ${section === s.key ? 'text-primary' : 'text-foreground'}`}>{s.count}</p>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{s.label}</p>
-                </div>
-              </CardContent>
-            </Card>
+            />
           ))}
         </div>
+
 
         {/* Upload Zone */}
         <Card>
