@@ -388,6 +388,15 @@ export default function Dashboard() {
                     <h3 className="text-xs font-semibold text-primary">{toTitleCaseLabel(expandedCategory)} — {catItems.length} Compliance Items</h3>
                     <div className="flex items-center gap-1.5">
                       <Button
+                        variant="secondary"
+                        size="sm"
+                        className="text-[10px] h-7 px-2.5 gap-1"
+                        onClick={() => drillToCategory(expandedCategory)}
+                      >
+                        <FileText className="h-3 w-3 flex-shrink-0" />
+                        View in Master Register
+                      </Button>
+                      <Button
                         variant="outline"
                         size="sm"
                         className="text-[10px] h-7 px-2.5 gap-1"
