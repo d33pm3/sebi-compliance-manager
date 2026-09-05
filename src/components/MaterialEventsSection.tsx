@@ -93,8 +93,8 @@ export function MaterialEventsSection() {
                       {event.regulation}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={`text-[10px] gap-1 ${cfg.className}`}>
-                        <Icon className="h-2.5 w-2.5" />
+                      <Badge variant="outline" className={`inline-flex items-center justify-center whitespace-nowrap leading-none text-[10px] font-semibold gap-1 h-5 min-w-[70px] px-2 flex-shrink-0 ${cfg.className}`}>
+                        <Icon className="h-2.5 w-2.5 flex-shrink-0" />
                         {cfg.label}
                       </Badge>
                     </TableCell>
