@@ -183,6 +183,71 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
     items: state.items.map(item => item.id === id ? { ...item, evidenceUploaded: !item.evidenceUploaded } : item)
   })),
 
+  /* ---------------------------------------------------------------- */
+  /* Master Compliance Register maintenance — the single source of      */
+  /* truth every other module reads from.                              */
+  /* ---------------------------------------------------------------- */
+
+  addItem: (input) => {
+    const state = get();
+    const id = state.items.reduce((max, i) => Math.max(max, i.id), 0) + 1;
+    const sNo = state.items.reduce((max, i) => Math.max(max, i.sNo), 0) + 1;
+    const item: ComplianceItem = {
+      id,
+      sNo,
+      category: input.category,
+      filingName: input.filingName,
+      regReference: input.regReference,
+      applicableTo: input.applicableTo,
+      filingAuthority: input.filingAuthority,
+      frequency: input.frequency,
+      trigger: input.trigger,
+      timeline: input.timeline,
+      format: input.format,
+      penalty: input.penalty,
+      sourceUrl: input.sourceUrl || 'https://www.sebi.gov.in',
+      complianceNature: input.complianceNature,
+      obligorTier: input.obligorTier,
+      dueDate: input.dueDate,
+      status: input.status,
+      riskLevel: input.riskLevel,
+      owner: input.owner,
+      approver: input.approver,
+      approvalStatus: input.approvalStatus,
+      comments: [{
+        id: `${Date.now()}`,
+        author: input.owner,
+        text: `Entry created in the Master Compliance Register on ${new Date().toISOString().split('T')[0]}.`,
+        timestamp: new Date().toLocaleString(),
+      }],
+      evidenceUploaded: false,
+    };
+    set({ items: [...state.items, item] });
+    return id;
+  },
+
+  updateItem: (id, input) => set(state => ({
+    items: state.items.map(i => i.id === id ? {
+      ...i,
+      ...input,
+      sourceUrl: input.sourceUrl || i.sourceUrl,
+      comments: [...i.comments, {
+        id: `${Date.now()}`,
+        author: input.owner || i.owner,
+        text: `Master Compliance Register entry updated on ${new Date().toISOString().split('T')[0]}.`,
+        timestamp: new Date().toLocaleString(),
+      }],
+    } : i),
+  })),
+
+  deleteItem: (id) => set(state => ({
+    items: state.items.filter(i => i.id !== id),
+    tasks: state.tasks.filter(t => t.itemId !== id),
+    filings: state.filings.filter(f => f.itemId !== id),
+    vaultDocs: state.vaultDocs.filter(d => d.itemId !== id),
+    selectedItemId: state.selectedItemId === id ? null : state.selectedItemId,
+  })),
+
   submitFiling: (id, input) => set(state => {
     const item = state.items.find(i => i.id === id);
     if (!item) return {};
