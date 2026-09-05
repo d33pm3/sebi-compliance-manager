@@ -139,8 +139,6 @@ export default function RiskAssessment() {
   const paged = tabFiltered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.ceil(tabFiltered.length / perPage);
 
-  const toTitleCase = (s: string) => s.toLowerCase().replace(/(?:^|\s|\/)\w/g, c => c.toUpperCase());
-
   const execSummary = useMemo(() => {
     const catMap: Record<string, { total: number; completed: number; nonCompliant: number }> = {};
     items.forEach(i => {
@@ -152,7 +150,7 @@ export default function RiskAssessment() {
     const totalItems = items.length;
     return Object.entries(catMap)
       .map(([name, d]) => {
-        const label = toTitleCase(name);
+        const label = toTitleCaseLabel(name);
         return {
           name: label.length > 20 ? label.slice(0, 18) + '…' : label,
           completed: d.completed,
@@ -288,7 +286,7 @@ export default function RiskAssessment() {
                       <TableRow key={item.id} className="cursor-pointer hover:bg-destructive/5" onClick={() => selectItem(item.id)}>
                         <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
                         <TableCell className="text-xs font-medium max-w-[200px] truncate">{item.filingName}</TableCell>
-                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{item.category}</TableCell>
+                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{toTitleCaseLabel(item.category)}</TableCell>
                         <TableCell><RiskBadge level="High" /></TableCell>
                         <TableCell className="text-xs text-destructive font-semibold">{item.dueDate}</TableCell>
                         <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell truncate">{item.owner}</TableCell>
@@ -344,7 +342,7 @@ export default function RiskAssessment() {
                       <TableRow key={item.id} className="cursor-pointer hover:bg-warning/5" onClick={() => selectItem(item.id)}>
                         <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
                         <TableCell className="text-xs font-medium max-w-[200px] truncate">{item.filingName}</TableCell>
-                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{item.category}</TableCell>
+                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{toTitleCaseLabel(item.category)}</TableCell>
                         <TableCell><RiskBadge level="High" /></TableCell>
                         <TableCell>
                           <span className="inline-flex items-center gap-1 rounded-full bg-warning/15 text-warning border border-warning/30 text-[10px] font-semibold px-2 py-0.5 whitespace-nowrap">
@@ -481,7 +479,7 @@ export default function RiskAssessment() {
                         <TableCell className="text-[11px] max-w-[200px] truncate">
                           <Link to={`/compliance/${r.itemId}`} className="text-secondary hover:underline" title={r.filingName}>{r.filingName}</Link>
                         </TableCell>
-                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{r.category}</TableCell>
+                        <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{toTitleCaseLabel(r.category)}</TableCell>
                         <TableCell><RiskBadge level={r.riskLevel} /></TableCell>
                         <TableCell>
                           <span className="inline-flex items-center justify-center rounded-full text-[10px] font-semibold whitespace-nowrap min-w-[76px] h-5 px-2.5 leading-none bg-destructive text-destructive-foreground">{r.status}</span>
@@ -587,7 +585,7 @@ export default function RiskAssessment() {
                         <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50" onClick={() => selectItem(item.id)}>
                           <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
                           <TableCell className="text-xs font-medium max-w-[180px] truncate">{item.filingName}</TableCell>
-                          <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[100px] truncate">{item.category}</TableCell>
+                          <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[100px] truncate">{toTitleCaseLabel(item.category)}</TableCell>
                           <TableCell><RiskBadge level={effectiveRiskLevel(item)} /></TableCell>
                           <TableCell><StatusBadge status={item.status} /></TableCell>
                           <TableCell className="hidden md:table-cell"><ApprovalBadge status={item.approvalStatus} /></TableCell>
