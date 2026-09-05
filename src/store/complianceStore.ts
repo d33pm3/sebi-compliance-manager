@@ -13,6 +13,8 @@ import {
   effectiveRiskLevel,
   noticeResponses as seedNotices,
   seedTasks,
+  taskStatusForItem,
+  taskTitleForItem,
 } from '@/data/workflowData';
 
 export interface ApprovalRequestInput {
@@ -245,12 +247,27 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
       }],
       evidenceUploaded: false,
     };
-    set({ items: [...state.items, item] });
+    set({
+      items: [...state.items, item],
+      // Every master entry gets its mirrored task, so counts stay reconciled
+      tasks: [
+        {
+          id: `T-${id}`,
+          itemId: id,
+          title: taskTitleForItem(item),
+          owner: item.owner,
+          deadline: item.dueDate,
+          status: taskStatusForItem(item),
+          createdAt: new Date().toISOString().split('T')[0],
+        },
+        ...state.tasks,
+      ],
+    });
     return id;
   },
 
-  updateItem: (id, input) => set(state => ({
-    items: state.items.map(i => i.id === id ? {
+  updateItem: (id, input) => set(state => {
+    const updated = state.items.map(i => i.id === id ? {
       ...i,
       ...input,
       sourceUrl: input.sourceUrl || i.sourceUrl,
@@ -260,8 +277,18 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
         text: `Master Compliance Register entry updated on ${new Date().toISOString().split('T')[0]}.`,
         timestamp: new Date().toLocaleString(),
       }],
-    } : i),
-  })),
+    } : i);
+    const item = updated.find(i => i.id === id);
+    return {
+      items: updated,
+      // The mirrored task follows the master entry's owner, deadline and status
+      tasks: item
+        ? state.tasks.map(t => t.id === `T-${id}`
+            ? { ...t, owner: item.owner, deadline: item.dueDate, status: taskStatusForItem(item), title: taskTitleForItem(item) }
+            : t)
+        : state.tasks,
+    };
+  }),
 
   deleteItem: (id) => set(state => ({
     items: state.items.filter(i => i.id !== id),
