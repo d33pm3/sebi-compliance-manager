@@ -343,7 +343,11 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* Monthly compliance calendar */}
+        <MonthlyComplianceCalendar items={items} />
+
         {/* Event Trigger Map + Filing Calendar */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-2">
