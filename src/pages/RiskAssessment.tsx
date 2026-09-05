@@ -263,7 +263,7 @@ export default function RiskAssessment() {
                   <FileSpreadsheet className="h-3 w-3" /> Export .xlsx
                 </Button>
               </div>
-              <p className="text-[10px] text-muted-foreground">All overdue compliance items are automatically flagged as High Risk</p>
+              <p className="text-[10px] text-muted-foreground">Every overdue filing in the Master Compliance Register becomes an open Critical risk here — click a row for the reasons</p>
             </CardHeader>
             <CardContent>
               <div className="rounded-md border border-destructive/20 max-h-[280px] overflow-auto">
@@ -319,7 +319,7 @@ export default function RiskAssessment() {
                   <FileSpreadsheet className="h-3 w-3" /> Export .xlsx
                 </Button>
               </div>
-              <p className="text-[10px] text-muted-foreground">All compliance items with missing documents are automatically flagged as High Risk</p>
+              <p className="text-[10px] text-muted-foreground">Every filing with missing documents becomes an open risk here — click a row for the reasons</p>
             </CardHeader>
             <CardContent>
               <div className="rounded-md border border-warning/20 max-h-[280px] overflow-auto">

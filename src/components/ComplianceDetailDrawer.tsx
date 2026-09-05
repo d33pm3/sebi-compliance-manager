@@ -1,6 +1,7 @@
 import { useComplianceStore } from '@/store/complianceStore';
 import { ComplianceItem } from '@/data/complianceData';
 import { effectiveRiskLevel, riskReasons } from '@/data/workflowData';
+import { toTitleCaseLabel } from '@/lib/chartTheme';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { StatusBadge, RiskBadge, NatureBadge, ApprovalBadge } from '@/components/StatusBadges';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +41,7 @@ export function ComplianceDetailDrawer() {
             <RiskBadge level={effectiveRiskLevel(item)} />
           </div>
           <SheetTitle className="text-base leading-snug">{item.filingName}</SheetTitle>
-          <SheetDescription className="text-xs">{item.category}</SheetDescription>
+          <SheetDescription className="text-xs">{toTitleCaseLabel(item.category)}</SheetDescription>
         </SheetHeader>
 
         <div className="mt-3">
