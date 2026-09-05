@@ -83,6 +83,32 @@ export default function Dashboard() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const toTitleCaseLabel = (s: string) => s.toLowerCase().replace(/(?:^|\s|\/)\w/g, c => c.toUpperCase());
   const perPage = 15;
+  const registerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToRegister = () => {
+    requestAnimationFrame(() => registerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  };
+
+  // One-click drill-down: any dashboard number lands on the matching rows of the Master Register
+  const drillTo = (status: string) => {
+    resetFilters();
+    if (status) setFilter('status', status);
+    setPage(0);
+    scrollToRegister();
+  };
+
+  const drillToCategory = (category: string) => {
+    resetFilters();
+    setFilter('category', category);
+    setPage(0);
+    scrollToRegister();
+  };
+
+  const activeDrill = filters.status
+    ? filters.status
+    : filters.category
+      ? toTitleCaseLabel(filters.category)
+      : '';
 
   const stats = useMemo(() => ({
     total: items.length,
