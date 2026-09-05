@@ -15,7 +15,7 @@ import { StatusBadge, RiskBadge, ApprovalBadge } from '@/components/StatusBadges
 import { categories, ComplianceItem, RiskLevel, ApprovalStatus } from '@/data/complianceData';
 import { Search, RotateCcw, CheckCircle2, XCircle, RotateCw, Upload, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, FileWarning, Clock, CircleDot, FileSpreadsheet, AlertTriangle, X, ExternalLink, ShieldQuestion } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 function exportRiskItemsToXlsx(title: string, riskItems: ComplianceItem[], flag: string) {
