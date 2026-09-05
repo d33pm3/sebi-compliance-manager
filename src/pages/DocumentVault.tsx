@@ -78,6 +78,8 @@ export default function DocumentVault() {
       case 'Pending': return 'bg-warning text-warning-foreground border-warning';
       case 'Responded': return 'bg-success text-success-foreground border-success';
       case 'Closed': return 'bg-muted text-muted-foreground border-border';
+      case 'Uploaded': return 'bg-secondary text-secondary-foreground border-secondary';
+      case 'Filed': return 'bg-success text-success-foreground border-success';
       default: return 'bg-muted text-muted-foreground border-border';
     }
   };
@@ -92,6 +94,14 @@ export default function DocumentVault() {
 
   const handleAction = (action: string, doc: VaultDocument) => {
     if (action === 'Download') {
+      if (doc.fileUrl) {
+        const a = document.createElement('a');
+        a.href = doc.fileUrl;
+        a.download = doc.fileName || doc.title;
+        a.click();
+        toast.success(`Downloaded: ${doc.fileName || doc.title}`);
+        return;
+      }
       downloadDocumentPlaceholder(doc.title, doc.vaultId);
       toast.success(`Downloaded: ${doc.title}`);
     } else {
@@ -182,20 +192,21 @@ export default function DocumentVault() {
                     <TableHead className="text-[10px] hidden xl:table-cell">Type</TableHead>
                     <TableHead className="text-[10px]">Linked Compliance</TableHead>
                     <TableHead className="text-[10px]">Risk</TableHead>
-                    {section === 'sebi-notices' && <TableHead className="text-[10px]">Status</TableHead>}
+                    <TableHead className="text-[10px]">Status</TableHead>
                     <TableHead className="text-[10px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paged.map(doc => {
-                    const item = linkedItem(doc);
-                    const risk = docRisk(doc);
+                    const res = resolve(doc);
+                    const item = res.item;
+                    const risk = { level: res.riskLevel, reason: res.riskReason };
                     return (
                     <TableRow key={doc.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => openDoc(doc)}>
                       <TableCell>{sectionIcon(doc.section)}</TableCell>
                       <TableCell className="text-[11px] font-mono text-muted-foreground whitespace-nowrap max-w-[130px] truncate">{doc.vaultId}</TableCell>
                       <TableCell className="text-xs font-medium max-w-[200px] truncate text-primary hover:underline">{doc.title}</TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden 2xl:table-cell max-w-[120px] truncate">{doc.category}</TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground hidden 2xl:table-cell max-w-[120px] truncate">{res.category}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell whitespace-nowrap">{doc.uploadedAt}</TableCell>
                       <TableCell className="hidden xl:table-cell"><Badge variant="outline" className="text-[10px]">{doc.fileType}</Badge></TableCell>
                       <TableCell className="text-[11px] max-w-[150px]">
@@ -226,11 +237,13 @@ export default function DocumentVault() {
                           <span className={`${badgeBase} bg-muted text-muted-foreground border-border`}>No Risk</span>
                         )}
                       </TableCell>
-                      {section === 'sebi-notices' && (
-                        <TableCell>
-                          {doc.status && <span className={`${badgeBase} ${statusColor(doc.status)}`}>{doc.status}</span>}
-                        </TableCell>
-                      )}
+                      <TableCell>
+                        {doc.status
+                          ? <span className={`${badgeBase} ${statusColor(doc.status)}`}>{doc.status}</span>
+                          : res.state
+                            ? <span className={`${badgeBase} bg-muted text-muted-foreground border-border`}>{res.state}</span>
+                            : <span className="text-[11px] text-muted-foreground">—</span>}
+                      </TableCell>
                       <TableCell onClick={e => e.stopPropagation()}>
                         <div className="flex gap-1">
                           <Button variant="ghost" size="icon" className="h-6 w-6" title="View Details" onClick={() => openDoc(doc)}><Eye className="h-3.5 w-3.5" /></Button>
