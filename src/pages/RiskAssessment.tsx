@@ -413,6 +413,18 @@ export default function RiskAssessment() {
                   </Button>
                 </div>
                 <p className="text-[10px] text-muted-foreground">Each notice in the Response Tracker automatically creates a risk item here with its own status and deadline</p>
+                {focusedNoticeRisk && (
+                  <button
+                    type="button"
+                    onClick={() => { const next = new URLSearchParams(searchParams); next.delete('noticeRisk'); setSearchParams(next, { replace: true }); }}
+                    className="mt-1 inline-flex items-center gap-1.5 self-start rounded-full bg-primary/10 text-primary text-[10px] font-medium px-2.5 py-1 hover:bg-primary/20"
+                  >
+                    Highlighted: {focusedNoticeRisk} <X className="h-3 w-3" />
+                  </button>
+                )}
+                {focusedNoticeRisk && !noticeRisks.some(r => r.id === focusedNoticeRisk) && (
+                  <p className="text-[10px] text-muted-foreground">That notice risk is now closed, so it no longer appears in the open list.</p>
+                )}
               </CardHeader>
               <CardContent>
                 <div className="rounded-md border border-destructive/20 overflow-auto">
