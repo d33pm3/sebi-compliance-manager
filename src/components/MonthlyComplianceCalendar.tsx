@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { ComplianceItem } from '@/data/complianceData';
 import { deriveComplianceState, ComplianceState } from '@/data/workflowData';
+import { useComplianceStore } from '@/store/complianceStore';
 import { Link } from 'react-router-dom';
 
 const stateStyle: Record<ComplianceState, string> = {
@@ -17,11 +18,19 @@ const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 interface Props {
-  items: ComplianceItem[];
+  items?: ComplianceItem[];
   onDrillCategory?: (category: string) => void;
 }
 
-export function MonthlyComplianceCalendar({ items }: Props) {
+export function MonthlyComplianceCalendar({ items: itemsProp }: Props) {
+  const storeItems = useComplianceStore(s => s.items);
+  // Always resolve against the Master Compliance Register so any change there flows through.
+  const items = useMemo(() => {
+    if (!itemsProp) return storeItems;
+    const ids = new Set(itemsProp.map(i => i.id));
+    return storeItems.filter(i => ids.has(i.id));
+  }, [itemsProp, storeItems]);
+
   const firstDue = useMemo(() => {
     const dates = items.map(i => i.dueDate).filter(Boolean).sort();
     return dates[0] ? new Date(dates[0]) : new Date();
@@ -33,6 +42,7 @@ export function MonthlyComplianceCalendar({ items }: Props) {
   const todayStr = new Date().toISOString().split('T')[0];
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
+
 
   const byDate = useMemo(() => {
     const map = new Map<string, ComplianceItem[]>();
@@ -96,39 +106,56 @@ export function MonthlyComplianceCalendar({ items }: Props) {
             <div key={d} className="text-[10px] text-muted-foreground text-center font-medium pb-1">{d}</div>
           ))}
           {cells.map((date, idx) => {
-            if (!date) return <div key={`e-${idx}`} className="min-h-[62px] rounded-md bg-muted/20" />;
+            if (!date) return <div key={`e-${idx}`} className="min-h-[74px] rounded-md bg-muted/20" />;
             const dayItems = byDate.get(date) ?? [];
-            const counts = dayItems.reduce<Record<string, number>>((acc, i) => {
-              const s = deriveComplianceState(i);
-              acc[s] = (acc[s] ?? 0) + 1;
-              return acc;
-            }, {});
             const isToday = date === todayStr;
             const isSelected = date === selectedDay;
+            const shown = dayItems.slice(0, 2);
+            const extra = dayItems.length - shown.length;
             return (
-              <button
+              <div
                 key={date}
-                onClick={() => setSelectedDay(isSelected ? null : date)}
-                disabled={dayItems.length === 0}
-                className={`min-h-[62px] rounded-md border p-1.5 text-left transition-colors ${
+                className={`min-h-[74px] rounded-md border p-1.5 text-left transition-colors ${
                   isSelected ? 'border-secondary bg-secondary/10'
                     : isToday ? 'border-secondary/60 bg-secondary/5'
-                    : dayItems.length ? 'border-border hover:bg-muted/50' : 'border-transparent bg-muted/20 cursor-default'
+                    : dayItems.length ? 'border-border' : 'border-transparent bg-muted/20'
                 }`}
               >
-                <span className={`text-[10px] font-semibold ${isToday ? 'text-secondary' : 'text-muted-foreground'}`}>
+                <button
+                  type="button"
+                  onClick={() => dayItems.length && setSelectedDay(isSelected ? null : date)}
+                  className={`text-[10px] font-semibold ${isToday ? 'text-secondary' : 'text-muted-foreground'} ${dayItems.length ? 'hover:text-secondary' : 'cursor-default'}`}
+                >
                   {Number(date.slice(-2))}
-                </span>
+                </button>
                 <div className="mt-1 space-y-0.5">
-                  {Object.entries(counts).map(([s, n]) => (
-                    <span key={s} className={`block rounded-sm border px-1 text-[9px] leading-4 truncate ${stateStyle[s as ComplianceState]}`}>
-                      {n} {s === 'Documents Missing' ? 'Docs Missing' : s}
-                    </span>
-                  ))}
+                  {shown.map(i => {
+                    const s = deriveComplianceState(i);
+                    return (
+                      <Link
+                        key={i.id}
+                        to={`/compliance/${i.id}`}
+                        title={`${i.filingName} — ${s}`}
+                        className={`block rounded-sm border px-1 text-[9px] leading-4 truncate hover:brightness-95 ${stateStyle[s]}`}
+                      >
+                        {i.filingName}
+                      </Link>
+                    );
+                  })}
+                  {extra > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDay(isSelected ? null : date)}
+                      className="block w-full text-left rounded-sm px-1 text-[9px] leading-4 text-muted-foreground hover:text-secondary"
+                    >
+                      +{extra} More
+                    </button>
+                  )}
                 </div>
-              </button>
+              </div>
             );
           })}
+
         </div>
 
         <div className="flex items-center gap-3 flex-wrap pt-1">
