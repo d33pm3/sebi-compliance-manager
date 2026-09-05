@@ -279,6 +279,14 @@ export default function ResponseTracker() {
                         {r.riskStatus === 'Closed' ? '—' : r.daysToDeadline < 0 ? `${Math.abs(r.daysToDeadline)} days overdue` : `${r.daysToDeadline} days`}
                       </TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{r.owner}</TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        <div className="flex flex-col gap-0.5">
+                          <Link to={`/notices/${r.noticeId}`} onClick={e => e.stopPropagation()} className="text-[10px] font-medium text-secondary hover:underline">View Notice</Link>
+                          {r.riskStatus !== 'Closed' && (
+                            <Link to={`/risk-assessment?noticeRisk=${encodeURIComponent(r.id)}`} onClick={e => e.stopPropagation()} className="text-[10px] font-medium text-secondary hover:underline">In Risk Assessment</Link>
+                          )}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
