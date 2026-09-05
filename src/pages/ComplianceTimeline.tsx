@@ -95,8 +95,9 @@ export default function ComplianceTimeline() {
                 <CardTitle className="text-sm font-semibold">{activeItem ? activeItem.filingName : 'Select A Filing'}</CardTitle>
                 {activeItem && (
                   <p className="text-[10px] text-muted-foreground mt-1">
-                    {activeItem.category} · {activeItem.regReference} · {activeItem.frequency} · Owner {activeItem.owner}
+                    {toTitleCase(activeItem.category)} · {activeItem.regReference} · {activeItem.frequency} · Owner {activeItem.owner}
                   </p>
+
                 )}
               </div>
               {activeItem && (
