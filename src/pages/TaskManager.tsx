@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { TaskStatus } from '@/data/workflowData';
+import { TASK_TILE_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
+import { taskStatusForItem } from '@/data/workflowData';
 import { CheckCircle2, CircleDot, Clock, FileSpreadsheet, ListTodo, Plus, ShieldAlert, Trash2, Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -35,7 +37,9 @@ export default function TaskManager() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [ownerFilter, setOwnerFilter] = useState('all');
   const [itemFilter, setItemFilter] = useState(params.get('item') ?? 'all');
+  const [pastOnly, setPastOnly] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const registerRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({ itemId: '', title: '', owner: owners[0], deadline: new Date().toISOString().split('T')[0] });
 
   const itemById = useMemo(() => new Map(items.map(i => [i.id, i])), [items]);
@@ -46,12 +50,13 @@ export default function TaskManager() {
     if (statusFilter !== 'all' && t.status !== statusFilter) return false;
     if (ownerFilter !== 'all' && t.owner !== ownerFilter) return false;
     if (itemFilter !== 'all' && String(t.itemId) !== itemFilter) return false;
+    if (pastOnly && !(t.status !== 'Done' && t.deadline < today)) return false;
     if (search) {
       const q = search.toLowerCase();
       if (!t.title.toLowerCase().includes(q) && !(item?.filingName.toLowerCase().includes(q))) return false;
     }
     return true;
-  }), [tasks, statusFilter, ownerFilter, itemFilter, search, itemById]);
+  }), [tasks, statusFilter, ownerFilter, itemFilter, search, itemById, pastOnly, today]);
 
   const stats = useMemo(() => ({
     total: tasks.length,
@@ -61,6 +66,46 @@ export default function TaskManager() {
     overdue: tasks.filter(t => t.status !== 'Done' && t.deadline < today).length,
     done: tasks.filter(t => t.status === 'Done').length,
   }), [tasks, today]);
+
+  /* ------------------------------------------------------------------ */
+  /* Reconciliation against the Master Compliance Register.              */
+  /* Every master item mirrors exactly one task, so the two sides must   */
+  /* agree line for line. Manually added tasks are shown separately.     */
+  /* ------------------------------------------------------------------ */
+  const reconciliation = useMemo(() => {
+    const mirrored = tasks.filter(t => t.id === `T-${t.itemId}`);
+    const extra = tasks.length - mirrored.length;
+    const buckets: Record<string, { master: number; tasks: number; taskStatus: string }> = {};
+    items.forEach(i => {
+      const ts = taskStatusForItem(i);
+      buckets[i.status] = buckets[i.status] ?? { master: 0, tasks: 0, taskStatus: ts };
+      buckets[i.status].master += 1;
+    });
+    items.forEach(i => {
+      const t = tasks.find(x => x.id === `T-${i.id}`);
+      if (t) buckets[i.status].tasks += 1;
+    });
+    return {
+      masterCount: items.length,
+      mirroredCount: mirrored.length,
+      extra,
+      rows: Object.entries(buckets).map(([status, v]) => ({ status, ...v })),
+      balanced: mirrored.length === items.length,
+    };
+  }, [items, tasks]);
+
+  const scrollToRegister = () => setTimeout(() => registerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+
+  const drillTo = (status: string, past = false) => {
+    setSearch('');
+    setOwnerFilter('all');
+    setItemFilter('all');
+    setStatusFilter(status);
+    setPastOnly(past);
+    scrollToRegister();
+  };
+
+  const activeDrill = pastOnly ? 'Past Deadline' : statusFilter !== 'all' ? statusFilter : null;
 
   const exportXlsx = () => {
     import('xlsx').then(XLSX => {
@@ -95,19 +140,71 @@ export default function TaskManager() {
     <AppLayout title="Task Manager" subtitle="Module 9 — Compliance To-Do Lists, Owners & Deadlines">
       <div className="space-y-4">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-          <Stat icon={<ListTodo className="h-4 w-4" />} label="Total Tasks" value={stats.total} color="text-foreground" />
-          <Stat icon={<CircleDot className="h-4 w-4" />} label="Open" value={stats.open} color="text-muted-foreground" />
-          <Stat icon={<Clock className="h-4 w-4" />} label="In Progress" value={stats.inProgress} color="text-secondary" />
-          <Stat icon={<ShieldAlert className="h-4 w-4" />} label="Blocked" value={stats.blocked} color="text-destructive" />
-          <Stat icon={<ShieldAlert className="h-4 w-4" />} label="Past Deadline" value={stats.overdue} color="text-destructive" />
-          <Stat icon={<CheckCircle2 className="h-4 w-4" />} label="Done" value={stats.done} color="text-success" />
+          <StatTile icon={<ListTodo className="h-4 w-4" />} label="Total Tasks" value={stats.total} tile={TASK_TILE_COLORS.total} active={!activeDrill} onClick={() => drillTo('all')} />
+          <StatTile icon={<CircleDot className="h-4 w-4" />} label="Open" value={stats.open} tile={TASK_TILE_COLORS.open} active={activeDrill === 'Open'} onClick={() => drillTo('Open')} />
+          <StatTile icon={<Clock className="h-4 w-4" />} label="In Progress" value={stats.inProgress} tile={TASK_TILE_COLORS.inProgress} active={activeDrill === 'In Progress'} onClick={() => drillTo('In Progress')} />
+          <StatTile icon={<ShieldAlert className="h-4 w-4" />} label="Blocked" value={stats.blocked} tile={TASK_TILE_COLORS.blocked} active={activeDrill === 'Blocked'} onClick={() => drillTo('Blocked')} />
+          <StatTile icon={<ShieldAlert className="h-4 w-4" />} label="Past Deadline" value={stats.overdue} tile={TASK_TILE_COLORS.pastDeadline} active={activeDrill === 'Past Deadline'} onClick={() => drillTo('all', true)} />
+          <StatTile icon={<CheckCircle2 className="h-4 w-4" />} label="Done" value={stats.done} tile={TASK_TILE_COLORS.done} active={activeDrill === 'Done'} onClick={() => drillTo('Done')} />
         </div>
 
         <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <CardTitle className="text-sm font-semibold">Reconciliation With The Master Compliance Register</CardTitle>
+              <span className={`${badge} ${reconciliation.balanced ? 'bg-success text-success-foreground' : 'bg-destructive text-destructive-foreground'} min-w-[120px]`}>
+                {reconciliation.balanced ? 'Reconciled' : 'Out Of Balance'}
+              </span>
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              One task mirrors every master entry — {reconciliation.mirroredCount} of {reconciliation.masterCount} master items
+              {reconciliation.extra > 0 ? `, plus ${reconciliation.extra} task(s) added manually` : ''}. Total {stats.total}.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-[10px]">Master Status</TableHead>
+                    <TableHead className="text-[10px]">Master Items</TableHead>
+                    <TableHead className="text-[10px]">Mirrored Tasks</TableHead>
+                    <TableHead className="text-[10px]">Task Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {reconciliation.rows.map(r => (
+                    <TableRow key={r.status} className="hover:bg-muted/40 cursor-pointer" onClick={() => drillTo(r.taskStatus)}>
+                      <TableCell className="text-xs font-medium">{toTitleCaseLabel(r.status)}</TableCell>
+                      <TableCell className="text-xs">{r.master}</TableCell>
+                      <TableCell className={`text-xs ${r.master === r.tasks ? '' : 'text-destructive font-semibold'}`}>{r.tasks}</TableCell>
+                      <TableCell><TaskStatusBadge status={r.taskStatus as TaskStatus} /></TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow className="bg-muted/40 font-semibold">
+                    <TableCell className="text-xs">Total</TableCell>
+                    <TableCell className="text-xs">{reconciliation.masterCount}</TableCell>
+                    <TableCell className="text-xs">{reconciliation.mirroredCount}</TableCell>
+                    <TableCell className="text-[10px] text-muted-foreground">{reconciliation.extra > 0 ? `+${reconciliation.extra} Added Manually` : 'Exact Match'}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card ref={registerRef} className="scroll-mt-4">
           <CardHeader className="pb-3">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
               <div>
-                <CardTitle className="text-sm font-semibold">Compliance Task List</CardTitle>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <CardTitle className="text-sm font-semibold">Compliance Task List</CardTitle>
+                  {activeDrill && (
+                    <button onClick={() => drillTo('all')} className="text-[10px] rounded-full bg-secondary/15 text-secondary px-2 py-0.5 hover:bg-secondary/25">
+                      Showing: {activeDrill} ✕
+                    </button>
+                  )}
+                </div>
                 <p className="text-[10px] text-muted-foreground">{rows.length} of {tasks.length} tasks — every task is linked to an item in the Master Compliance Register</p>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
@@ -249,16 +346,19 @@ export default function TaskManager() {
   );
 }
 
-function Stat({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function StatTile({ icon, label, value, tile, active, onClick }: { icon: React.ReactNode; label: string; value: number; tile: { bg: string; fg: string }; active?: boolean; onClick: () => void }) {
   return (
-    <Card>
-      <CardContent className="p-3 flex items-center gap-3">
-        <div className={color}>{icon}</div>
-        <div className="min-w-0">
-          <p className={`text-xl font-bold leading-none ${color}`}>{value}</p>
-          <p className="text-[10px] text-muted-foreground mt-1 truncate">{label}</p>
-        </div>
-      </CardContent>
-    </Card>
+    <button
+      type="button"
+      onClick={onClick}
+      style={{ backgroundColor: tile.bg, color: tile.fg }}
+      className={`rounded-lg p-3 flex items-center gap-3 text-left transition-transform hover:-translate-y-0.5 hover:shadow-md ${active ? 'ring-2 ring-offset-1 ring-secondary' : ''}`}
+    >
+      <div className="flex-shrink-0 opacity-80">{icon}</div>
+      <div className="min-w-0">
+        <p className="text-xl font-bold leading-none">{value}</p>
+        <p className="text-[10px] mt-1 truncate opacity-85">{label}</p>
+      </div>
+    </button>
   );
 }
