@@ -243,7 +243,93 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
     tasks: state.tasks.filter(t => t.id !== taskId),
   })),
 
+  requestApproval: (itemId, input) => set(state => {
+    const item = state.items.find(i => i.id === itemId);
+    if (!item) return {};
+    const today = new Date().toISOString().split('T')[0];
+    const email = approverEmail(input.approver);
+    const notification: EmailNotification = {
+      id: `MAIL-${Date.now()}`,
+      to: email,
+      subject: `Approval required: ${item.filingName} (${item.regReference})`,
+      body: `${input.requestedBy} has requested your approval for "${item.filingName}" under ${item.regReference}. Statutory due date ${item.dueDate}. Please decide by ${input.dueBy}.${input.note ? ` Note: ${input.note}` : ''}`,
+      sentAt: new Date().toLocaleString(),
+    };
+    const request: ApprovalRequest = {
+      id: `APR-${itemId}-${state.approvalRequests.length + 1}`,
+      itemId,
+      filingId: input.filingId ?? null,
+      requestedBy: input.requestedBy,
+      approver: input.approver,
+      approverEmail: email,
+      requestedOn: today,
+      dueBy: input.dueBy,
+      note: input.note,
+      status: 'Pending',
+      decidedOn: null,
+      decidedBy: null,
+      decisionNote: '',
+      notifications: [notification],
+    };
+    return {
+      approvalRequests: [request, ...state.approvalRequests],
+      emailLog: [notification, ...state.emailLog],
+      items: state.items.map(i => i.id === itemId ? {
+        ...i,
+        approvalStatus: 'Pending' as ApprovalStatus,
+        approver: input.approver,
+        comments: [...i.comments, {
+          id: String(Date.now()),
+          author: input.requestedBy,
+          text: `Approval requested from ${input.approver} (${email}) on ${today}, decision due by ${input.dueBy}.`,
+          timestamp: new Date().toLocaleString(),
+        }],
+      } : i),
+    };
+  }),
+
+  decideApprovalRequest: (requestId, approve, note, decidedBy) => set(state => {
+    const request = state.approvalRequests.find(r => r.id === requestId);
+    if (!request) return {};
+    const item = state.items.find(i => i.id === request.itemId);
+    const today = new Date().toISOString().split('T')[0];
+    const decider = decidedBy || request.approver;
+    const notification: EmailNotification = {
+      id: `MAIL-${Date.now()}`,
+      to: approverEmail(request.requestedBy),
+      subject: `Approval ${approve ? 'approved' : 'declined'}: ${item?.filingName ?? 'Compliance item'}`,
+      body: `${decider} has ${approve ? 'approved' : 'declined'} the approval request raised on ${request.requestedOn}.${note ? ` Remarks: ${note}` : ''}`,
+      sentAt: new Date().toLocaleString(),
+    };
+    return {
+      approvalRequests: state.approvalRequests.map(r => r.id === requestId ? {
+        ...r,
+        status: approve ? 'Approved' : 'Declined',
+        decidedOn: today,
+        decidedBy: decider,
+        decisionNote: note,
+        notifications: [...r.notifications, notification],
+      } : r),
+      emailLog: [notification, ...state.emailLog],
+      filings: state.filings.map(f => request.filingId && f.id === request.filingId
+        ? { ...f, approvalStatus: approve ? 'Approved' : 'Rejected', approvedOn: today }
+        : f),
+      items: state.items.map(i => i.id === request.itemId ? {
+        ...i,
+        approvalStatus: (approve ? 'Approved' : 'Rejected') as ApprovalStatus,
+        status: approve ? i.status : ('In Progress' as ComplianceStatus),
+        comments: [...i.comments, {
+          id: String(Date.now() + 1),
+          author: decider,
+          text: `Approval ${approve ? 'approved' : 'declined'} on ${today}.${note ? ` Remarks: ${note}` : ''} Notification emailed to ${notification.to}.`,
+          timestamp: new Date().toLocaleString(),
+        }],
+      } : i),
+    };
+  }),
+
   updateNotice: (noticeId, patch) => set(state => ({
+
     notices: state.notices.map(n => n.noticeId === noticeId ? { ...n, ...patch } : n),
   })),
 
