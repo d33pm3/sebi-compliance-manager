@@ -54,6 +54,29 @@ export interface DocumentUploadInput {
 }
 
 
+/** Editable fields of a Master Compliance Register entry */
+export interface MasterEntryInput {
+  category: string;
+  filingName: string;
+  regReference: string;
+  trigger: string;
+  timeline: string;
+  dueDate: string;
+  frequency: string;
+  filingAuthority: string;
+  applicableTo: string;
+  format: string;
+  penalty: string;
+  sourceUrl: string;
+  complianceNature: ComplianceItem['complianceNature'];
+  obligorTier: ComplianceItem['obligorTier'];
+  status: ComplianceStatus;
+  riskLevel: RiskLevel;
+  approvalStatus: ApprovalStatus;
+  owner: string;
+  approver: string;
+}
+
 interface Filters {
   search: string;
   category: string;
