@@ -36,6 +36,7 @@ const modules = [
   { title: 'Response Tracker', url: '/response-tracker', icon: MailWarning, module: 'M8' },
   { title: 'Task Manager', url: '/tasks', icon: ListTodo, module: 'M9' },
   { title: 'Compliance Timeline', url: '/timeline', icon: CalendarClock, module: 'M10' },
+  { title: 'KPIs', url: '/kpis', icon: Target, module: 'M11' },
 
   { title: 'AI Chatbot', url: '/chatbot', icon: MessageSquare, module: 'M5' },
   { title: 'Assistant', url: '/assistant', icon: BarChart3, module: 'M6' },
