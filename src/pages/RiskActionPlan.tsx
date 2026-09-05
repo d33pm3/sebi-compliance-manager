@@ -169,7 +169,7 @@ export default function RiskActionPlan() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <CardTitle className="text-sm font-semibold">
-                  Action Plans — {visible.length} {levelFilter === 'all' ? 'High & Critical' : levelFilter} Risk Items
+                  Action Plans — {visible.length} High & Critical Risk Items
                 </CardTitle>
                 <p className="text-[11px] text-muted-foreground mt-1">Risk levels and reasons are derived from the Master Compliance Register, never entered by hand.</p>
               </div>
