@@ -198,9 +198,14 @@ export default function RiskActionPlan() {
                       <span className={`${badge} min-w-[92px] ${p.state === 'Overdue' ? 'bg-destructive/15 text-destructive border-destructive/40' : p.state === 'Completed' ? 'bg-success/15 text-success border-success/40' : p.state === 'Documents Missing' ? 'bg-warning/15 text-warning border-warning/40' : 'bg-secondary/15 text-secondary border-secondary/40'}`}>{p.state}</span>
                       <span className="text-[11px] text-muted-foreground">Due {p.item.dueDate}</span>
                     </div>
-                    <Link to={`/compliance/${p.item.id}`} className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1 mt-1.5">
-                      {p.item.filingName} <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                    </Link>
+                    <div className="flex items-center gap-3 flex-wrap mt-1.5">
+                      <Link to={`/compliance/${p.item.id}`} className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1">
+                        {p.item.filingName} <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                      </Link>
+                      <Link to={`/risk-assessment?level=${p.level}`} className="text-[11px] text-secondary hover:underline inline-flex items-center gap-1">
+                        In Risk Assessment <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                      </Link>
+                    </div>
                     <p className="text-[11px] text-muted-foreground">{toTitleCaseLabel(p.item.category)} · {p.item.regReference} · Owner {p.item.owner}</p>
                     {p.reasons.length > 0 && (
                       <ul className="mt-1.5 space-y-0.5">
