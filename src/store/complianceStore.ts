@@ -335,6 +335,8 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
     return {
       filings: [filing, ...state.filings],
       vaultDocs: [vaultDoc, ...state.vaultDocs],
+      // Filing done → the mirrored task closes out too
+      tasks: state.tasks.map(t => t.itemId === id ? { ...t, status: 'Done' as TaskStatus } : t),
       items: state.items.map(i => i.id === id ? {
         ...i,
         status: 'Completed' as ComplianceStatus,
@@ -366,6 +368,9 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
             status: (approve ? 'Completed' : 'In Progress') as ComplianceStatus,
           }
         : i),
+      tasks: state.tasks.map(t => t.itemId === filing.itemId
+        ? { ...t, status: (approve ? 'Done' : 'In Progress') as TaskStatus }
+        : t),
     };
   }),
 
@@ -401,6 +406,9 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
     const filed = input.docStatus === 'Filed';
     return {
       vaultDocs: [...newDocs, ...state.vaultDocs],
+      tasks: state.tasks.map(t => t.itemId === item.id
+        ? { ...t, status: (filed ? 'Done' : t.status === 'Open' ? 'In Progress' : t.status) as TaskStatus }
+        : t),
       items: state.items.map(i => i.id === item.id ? {
         ...i,
         // Evidence now on record — clears "Documents Missing" everywhere at once
