@@ -31,6 +31,15 @@ const RISK_COLORS = {
   Low: 'hsl(145, 63%, 62%)',
 };
 
+// Stat tiles reuse the exact donut-chart palette so numbers and colours reconcile visually
+const STAT_COLORS = {
+  total: { bg: 'hsl(220, 26%, 22%)', fg: 'hsl(0, 0%, 100%)' },
+  dueSoon: { bg: CHART_COLORS['Due Soon'], fg: 'hsl(30, 60%, 12%)' },
+  overdue: { bg: CHART_COLORS.Overdue, fg: 'hsl(350, 60%, 18%)' },
+  completed: { bg: CHART_COLORS.Completed, fg: 'hsl(150, 60%, 14%)' },
+  upcoming: { bg: CHART_COLORS['Not Due'], fg: 'hsl(0, 0%, 100%)' },
+};
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
