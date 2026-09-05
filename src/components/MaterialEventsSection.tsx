@@ -16,6 +16,7 @@ const urgencyConfig = {
 
 export function MaterialEventsSection() {
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
+  const [selectedEvent, setSelectedEvent] = useState<MaterialEvent | null>(null);
 
   const filtered = useMemo(() => {
     if (urgencyFilter === 'all') return materialEvents;
