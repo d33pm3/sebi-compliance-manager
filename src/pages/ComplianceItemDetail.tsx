@@ -40,7 +40,9 @@ export default function ComplianceItemDetail() {
   const {
     items, filings, tasks, vaultDocs, addComment, submitFiling, approveFiling,
     addTask, updateTaskStatus, updateItemStatus, updateApprovalStatus, toggleEvidence,
+    approvalRequests, requestApproval, decideApprovalRequest,
   } = useComplianceStore();
+
 
   const item = items.find(i => i.id === Number(id));
 
