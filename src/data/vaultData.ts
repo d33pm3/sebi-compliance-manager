@@ -1,3 +1,5 @@
+export type VaultDocStatus = 'Pending' | 'Responded' | 'Closed' | 'Uploaded' | 'Filed';
+
 export interface VaultDocument {
   id: string;
   vaultId: string;
@@ -11,11 +13,17 @@ export interface VaultDocument {
   fileSize: string;
   fileType: string;
   regulation: string;
-  status?: 'Pending' | 'Responded' | 'Closed';
+  status?: VaultDocStatus;
   responseDue?: string;
   issuedBy?: string;
   noticeNo?: string;
+  /** Explicit link to the Master Compliance Register item (single source of truth) */
+  itemId?: number;
+  /** Object URL of a genuinely uploaded file, so it can be opened / downloaded */
+  fileUrl?: string;
+  fileName?: string;
 }
+
 
 export const vaultDocuments: VaultDocument[] = [
   // Section A: Compliance Filings
