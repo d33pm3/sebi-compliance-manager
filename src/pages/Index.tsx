@@ -269,7 +269,10 @@ export default function Dashboard() {
                     iconType="circle"
                     iconSize={8}
                     wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }}
-                    formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
+                    formatter={(value: string) => {
+                      const count = statusData.find(d => d.name === value)?.value ?? 0;
+                      return <span className="text-muted-foreground ml-1">{value} <span className="font-semibold text-foreground">({count})</span></span>;
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>
