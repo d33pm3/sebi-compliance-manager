@@ -497,7 +497,8 @@ export default function Dashboard() {
         </Card>
 
         {/* Filters + Master Register Table */}
-        <Card ref={registerRef} className="scroll-mt-20">
+        <div ref={registerRef} className="scroll-mt-20">
+        <Card>
           <CardHeader className="pb-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
@@ -621,6 +622,8 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
+
+        </div>
 
         <ComplianceDetailDrawer />
       </div>

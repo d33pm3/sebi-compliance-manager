@@ -31,6 +31,8 @@ const stateStyle: Record<string, string> = {
   'On Track': 'bg-secondary text-secondary-foreground',
 };
 
+const toTitleCase = (s: string) => s.toLowerCase().replace(/(?:^|\s|\/|-)\w/g, c => c.toUpperCase());
+
 export default function ComplianceItemDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -130,7 +132,7 @@ export default function ComplianceItemDetail() {
               <span className={`inline-flex items-center justify-center rounded-full text-[10px] font-semibold whitespace-nowrap min-w-[110px] h-5 px-2.5 leading-none ${stateStyle[state]}`}>{state}</span>
             </div>
             <CardTitle className="text-base leading-snug mt-2">{item.filingName}</CardTitle>
-            <p className="text-xs text-muted-foreground">{item.category}</p>
+            <p className="text-xs text-muted-foreground">{toTitleCase(item.category)}</p>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
@@ -140,7 +142,7 @@ export default function ComplianceItemDetail() {
               <Field icon={<Calendar className="h-3 w-3" />} label="Due Date" value={item.dueDate} />
               <Field label="Owner" value={item.owner} />
               <Field label="Approver" value={item.approver} />
-              <Field label="Obligor Tier" value={item.obligorTier} />
+              <Field label="Obligor Tier" value={toTitleCase(item.obligorTier)} />
               <Field label="Evidence" value={item.evidenceUploaded ? 'Uploaded' : 'Missing'} />
             </div>
           </CardContent>

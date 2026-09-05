@@ -225,8 +225,8 @@ export default function ResponseTracker() {
                       </TableCell>
                       <TableCell><RiskStatusBadge status={r.riskStatus} /></TableCell>
                       <TableCell className="text-xs font-semibold">{r.deadline}</TableCell>
-                      <TableCell className={`text-xs hidden md:table-cell ${r.daysToDeadline < 0 ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}>
-                        {r.daysToDeadline < 0 ? `${Math.abs(r.daysToDeadline)} days overdue` : `${r.daysToDeadline} days`}
+                      <TableCell className={`text-xs hidden md:table-cell ${r.riskStatus !== 'Closed' && r.daysToDeadline < 0 ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}>
+                        {r.riskStatus === 'Closed' ? '—' : r.daysToDeadline < 0 ? `${Math.abs(r.daysToDeadline)} days overdue` : `${r.daysToDeadline} days`}
                       </TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{r.owner}</TableCell>
                     </TableRow>
