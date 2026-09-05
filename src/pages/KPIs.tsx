@@ -165,8 +165,8 @@ export default function KPIs() {
   }, [items]);
 
   return (
-    <AppLayout>
-      <div className="space-y-4 p-4 md:p-6">
+    <AppLayout title="Compliance KPIs" subtitle="Live metrics wired to the Master Compliance Register">
+      <div className="space-y-4">
         <div>
           <h1 className="text-xl font-bold">Compliance KPIs</h1>
           <p className="text-xs text-muted-foreground">Live metrics wired to the Master Compliance Register</p>
