@@ -10,12 +10,12 @@ import { StatusBadge, RiskBadge, NatureBadge } from '@/components/StatusBadges';
 import { categories } from '@/data/complianceData';
 import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, RotateCcw, ChevronLeft, ChevronRight, FileSpreadsheet, Presentation } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { MaterialEventsSection } from '@/components/MaterialEventsSection';
 import { MonthlyComplianceCalendar } from '@/components/MonthlyComplianceCalendar';
 
 import { deriveComplianceState } from '@/data/workflowData';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { exportCategoryToXlsx, exportCategoryToPptx } from '@/lib/categoryExportUtils';
 import { toast } from 'sonner';
 import { CHART_COLORS, RISK_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
@@ -79,10 +79,23 @@ export default function Dashboard() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const perPage = 15;
   const registerRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const scrollToRegister = () => {
     requestAnimationFrame(() => registerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
+
+  // Deep link: /?state=Overdue (from the KPIs page) filters the register by derived compliance state
+  const stateParam = searchParams.get('state');
+  useEffect(() => {
+    if (!stateParam) return;
+    resetFilters();
+    setFilter('state', stateParam);
+    setPage(0);
+    setSearchParams({}, { replace: true });
+    scrollToRegister();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stateParam]);
 
   // One-click drill-down: any dashboard number lands on the matching rows of the Master Register
   const drillTo = (status: string) => {
@@ -101,9 +114,11 @@ export default function Dashboard() {
 
   const activeDrill = filters.status
     ? filters.status
-    : filters.category
-      ? toTitleCaseLabel(filters.category)
-      : '';
+    : filters.state
+      ? filters.state
+      : filters.category
+        ? toTitleCaseLabel(filters.category)
+        : '';
 
   const stats = useMemo(() => ({
     total: items.length,
