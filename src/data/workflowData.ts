@@ -539,3 +539,92 @@ export function linkedComplianceItems<T extends { regReference: string; category
   const rest = inFamily.filter(i => !exact.includes(i));
   return [...exact, ...rest].slice(0, 12);
 }
+
+/* ------------------------------------------------------------------ */
+/* Document Vault -> Compliance Master resolution                      */
+/* Every vault document resolves its category, regulation, state and   */
+/* risk from the Master Compliance Register, so a single master update  */
+/* flows through the Vault, the Notices and the Risk Assessment.       */
+/* ------------------------------------------------------------------ */
+
+export interface ResolvedVaultDoc {
+  item?: ComplianceItem;
+  /** Category shown in the Vault — the master's category when linked */
+  category: string;
+  /** Regulation reference — the master's regReference when linked */
+  regulation: string;
+  state?: ComplianceState;
+  riskLevel: RiskLevel | null;
+  riskReason: string;
+  reasons: string[];
+  dueDate?: string;
+  owner?: string;
+}
+
+export function resolveVaultDoc(
+  doc: {
+    itemId?: number;
+    regulation: string;
+    category: string;
+    section: string;
+    status?: string;
+    responseDue?: string;
+  },
+  items: ComplianceItem[],
+): ResolvedVaultDoc {
+  const item = doc.itemId != null
+    ? items.find(i => i.id === doc.itemId)
+    : linkedComplianceItems(doc.regulation, items)[0];
+
+  // Notices carry their own risk: an unanswered notice is High risk by default.
+  if (doc.section === 'sebi-notices' && doc.status === 'Pending') {
+    return {
+      item,
+      category: doc.category,
+      regulation: item?.regReference ?? doc.regulation,
+      state: item ? deriveComplianceState(item) : undefined,
+      riskLevel: 'High',
+      riskReason: 'Response Pending',
+      reasons: [
+        `Response to the notice is still pending${doc.responseDue ? ` — due by ${doc.responseDue}` : ''}`,
+        ...(item ? riskReasons(item) : []),
+      ],
+      dueDate: doc.responseDue ?? item?.dueDate,
+      owner: item?.owner,
+    };
+  }
+
+  if (!item) {
+    return {
+      item: undefined,
+      category: doc.category,
+      regulation: doc.regulation,
+      riskLevel: null,
+      riskReason: '',
+      reasons: ['Reference document — not linked to a filing obligation'],
+    };
+  }
+
+  const state = deriveComplianceState(item);
+  let riskLevel: RiskLevel | null = null;
+  let riskReason = '';
+  if (state === 'Overdue') {
+    riskLevel = effectiveRiskLevel(item);
+    riskReason = 'Overdue Filing';
+  } else if (state === 'Documents Missing') {
+    riskLevel = 'High';
+    riskReason = 'Documents Missing';
+  }
+
+  return {
+    item,
+    category: item.category,
+    regulation: item.regReference,
+    state,
+    riskLevel,
+    riskReason,
+    reasons: riskReasons(item),
+    dueDate: item.dueDate,
+    owner: item.owner,
+  };
+}
