@@ -1,6 +1,6 @@
 import { AppLayout } from '@/components/AppLayout';
 import { useComplianceStore } from '@/store/complianceStore';
-import { buildNoticeRisks } from '@/data/workflowData';
+import { buildNoticeRisks, buildOverdueTaskRisks } from '@/data/workflowData';
 import { Link } from 'react-router-dom';
 import { ComplianceDetailDrawer } from '@/components/ComplianceDetailDrawer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
