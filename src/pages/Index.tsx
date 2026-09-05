@@ -84,12 +84,22 @@ export default function Dashboard() {
   }, [items]);
 
   const categoryData = useMemo(() => {
-    const toTitleCase = (s: string) => s.toLowerCase().replace(/(?:^|\s|\/)\w/g, c => c.toUpperCase());
+    const formatLabel = (s: string) => {
+      const acronyms = ['MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO', 'RMC', 'ASCR', 'SAR', 'BRSR', 'MD&A', 'GM', 'HVDLE'];
+      let formatted = s.toLowerCase().replace(/(?:^|\s|\/)\w/g, c => c.toUpperCase());
+      acronyms.forEach(a => {
+        const re = new RegExp(a.replace(/&/g, '\\&').split('').join('\\s?'), 'gi');
+        formatted = formatted.replace(re, a);
+      });
+      // Keep common multi-word acronyms exact
+      formatted = formatted.replace(/Mca/gi, 'MCA').replace(/Agm/gi, 'AGM').replace(/Egm/gi, 'EGM');
+      return formatted;
+    };
     const counts: Record<string, number> = {};
     items.forEach(i => { counts[i.category] = (counts[i.category] || 0) + 1; });
     return Object.entries(counts).map(([name, value]) => {
-      const titled = toTitleCase(name);
-      return { name: titled.length > 22 ? titled.slice(0, 20) + '…' : titled, value, fullName: titled };
+      const formatted = formatLabel(name);
+      return { name: formatted, value, fullName: formatted };
     }).sort((a, b) => b.value - a.value);
   }, [items]);
 
