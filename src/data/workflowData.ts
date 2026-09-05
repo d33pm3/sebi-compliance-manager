@@ -213,3 +213,192 @@ export function deriveComplianceState(item: ComplianceItem): ComplianceState {
   if (item.approvalStatus === 'Doc Missing' || !item.evidenceUploaded) return 'Documents Missing';
   return 'On Track';
 }
+
+/* ------------------------------------------------------------------ */
+/* Approval requests + email notifications                             */
+/* ------------------------------------------------------------------ */
+
+export type ApprovalDecision = 'Pending' | 'Approved' | 'Declined';
+
+export interface EmailNotification {
+  id: string;
+  to: string;
+  subject: string;
+  body: string;
+  sentAt: string;
+}
+
+export interface ApprovalRequest {
+  id: string;
+  itemId: number;
+  filingId: string | null;
+  requestedBy: string;
+  approver: string;
+  approverEmail: string;
+  requestedOn: string;
+  dueBy: string;
+  note: string;
+  status: ApprovalDecision;
+  decidedOn: string | null;
+  decidedBy: string | null;
+  decisionNote: string;
+  notifications: EmailNotification[];
+}
+
+export const approverDirectory: Record<string, string> = {
+  'Suresh Mehta (Director)': 'suresh.mehta@e-cxo.example',
+  'Kavita Rao (Audit Chair)': 'kavita.rao@e-cxo.example',
+  'Deepak Gupta (MD)': 'deepak.gupta@e-cxo.example',
+  'Ritu Agarwal (ID)': 'ritu.agarwal@e-cxo.example',
+};
+
+export function approverEmail(name: string): string {
+  if (approverDirectory[name]) return approverDirectory[name];
+  const slug = name.replace(/\(.*\)/, '').trim().toLowerCase().replace(/[^a-z]+/g, '.');
+  return `${slug || 'approver'}@e-cxo.example`;
+}
+
+/* ------------------------------------------------------------------ */
+/* Overdue task risks (feed the Risk Assessment High Risks tables)     */
+/* ------------------------------------------------------------------ */
+
+export interface OverdueTaskRisk {
+  taskId: string;
+  itemId: number;
+  title: string;
+  owner: string;
+  deadline: string;
+  status: TaskStatus;
+  daysLeft: number;
+  filingName: string;
+  category: string;
+  riskLevel: 'Critical' | 'High';
+}
+
+export function buildOverdueTaskRisks(
+  tasks: ComplianceTask[],
+  items: ComplianceItem[],
+  today = new Date(),
+): OverdueTaskRisk[] {
+  const byId = new Map(items.map(i => [i.id, i]));
+  const midnight = new Date(today.toISOString().split('T')[0]);
+  return tasks
+    .filter(t => t.status !== 'Done')
+    .map(t => {
+      const days = Math.ceil((new Date(t.deadline).getTime() - midnight.getTime()) / 86400000);
+      const item = byId.get(t.itemId);
+      return {
+        taskId: t.id,
+        itemId: t.itemId,
+        title: t.title,
+        owner: t.owner,
+        deadline: t.deadline,
+        status: t.status,
+        daysLeft: days,
+        filingName: item?.filingName ?? '—',
+        category: item?.category ?? '—',
+        riskLevel: (days < -7 ? 'Critical' : 'High') as 'Critical' | 'High',
+      };
+    })
+    .filter(t => t.daysLeft < 0)
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+}
+
+/* ------------------------------------------------------------------ */
+/* Compliance timeline (dates, approvals and milestones per filing)    */
+/* ------------------------------------------------------------------ */
+
+export type MilestoneKind = 'Due Date' | 'Filing' | 'Approval' | 'Task' | 'Document' | 'Comment';
+
+export interface TimelineMilestone {
+  id: string;
+  date: string;
+  kind: MilestoneKind;
+  title: string;
+  detail: string;
+  state: 'done' | 'pending' | 'late';
+}
+
+export function buildItemTimeline(
+  item: ComplianceItem,
+  filings: FilingSubmission[],
+  approvals: ApprovalRequest[],
+  tasks: ComplianceTask[],
+  today = new Date(),
+): TimelineMilestone[] {
+  const todayStr = today.toISOString().split('T')[0];
+  const ms: TimelineMilestone[] = [];
+
+  ms.push({
+    id: `due-${item.id}`,
+    date: item.dueDate,
+    kind: 'Due Date',
+    title: `Statutory deadline — ${item.frequency}`,
+    detail: `${item.regReference} · ${item.filingAuthority}`,
+    state: item.status === 'Completed' ? 'done' : item.dueDate < todayStr ? 'late' : 'pending',
+  });
+
+  tasks.filter(t => t.itemId === item.id).forEach(t => {
+    ms.push({
+      id: `task-${t.id}`,
+      date: t.deadline,
+      kind: 'Task',
+      title: t.title,
+      detail: `${t.owner} · ${t.status}`,
+      state: t.status === 'Done' ? 'done' : t.deadline < todayStr ? 'late' : 'pending',
+    });
+  });
+
+  filings.filter(f => f.itemId === item.id).forEach(f => {
+    ms.push({
+      id: `filing-${f.id}`,
+      date: f.filingDate,
+      kind: 'Filing',
+      title: `Filed — ${f.referenceNo}`,
+      detail: `Submitted by ${f.submittedBy} · ${f.documents.length} document(s)`,
+      state: 'done',
+    });
+    f.documents.forEach((d, i) => {
+      ms.push({
+        id: `doc-${f.id}-${i}`,
+        date: f.filingDate,
+        kind: 'Document',
+        title: d,
+        detail: `Vault ID ${f.vaultId}`,
+        state: 'done',
+      });
+    });
+  });
+
+  approvals.filter(a => a.itemId === item.id).forEach(a => {
+    ms.push({
+      id: `appr-req-${a.id}`,
+      date: a.requestedOn,
+      kind: 'Approval',
+      title: `Approval requested from ${a.approver}`,
+      detail: `Raised by ${a.requestedBy} · Due by ${a.dueBy}`,
+      state: 'done',
+    });
+    if (a.status !== 'Pending' && a.decidedOn) {
+      ms.push({
+        id: `appr-dec-${a.id}`,
+        date: a.decidedOn,
+        kind: 'Approval',
+        title: `Approval ${a.status.toLowerCase()} by ${a.decidedBy ?? a.approver}`,
+        detail: a.decisionNote || 'No remarks recorded',
+        state: a.status === 'Approved' ? 'done' : 'late',
+      });
+    } else {
+      ms.push({
+        id: `appr-wait-${a.id}`,
+        date: a.dueBy,
+        kind: 'Approval',
+        title: `Awaiting decision from ${a.approver}`,
+        detail: a.note || 'Approval pending',
+        state: a.dueBy < todayStr ? 'late' : 'pending',
+      });
+    }
+  });
+
+  return ms.sort((a, b) => a.date.localeCompare(b.date));
+}

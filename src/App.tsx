@@ -12,6 +12,8 @@ import ComplianceAssistant from "./pages/ComplianceAssistant.tsx";
 import AdminModule from "./pages/AdminModule.tsx";
 import ResponseTracker from "./pages/ResponseTracker.tsx";
 import TaskManager from "./pages/TaskManager.tsx";
+import ComplianceTimeline from "./pages/ComplianceTimeline.tsx";
+
 import ComplianceItemDetail from "./pages/ComplianceItemDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/assistant" element={<ComplianceAssistant />} />
           <Route path="/response-tracker" element={<ResponseTracker />} />
           <Route path="/tasks" element={<TaskManager />} />
+          <Route path="/timeline" element={<ComplianceTimeline />} />
+
           <Route path="/compliance/:id" element={<ComplianceItemDetail />} />
           <Route path="/admin" element={<AdminModule />} />
           <Route path="*" element={<NotFound />} />

@@ -6,6 +6,8 @@ import {
   MessageSquare,
   MailWarning,
   ListTodo,
+  CalendarClock,
+
   BarChart3,
   Settings,
   Shield,
@@ -33,6 +35,8 @@ const modules = [
   { title: 'Doc Vault', url: '/doc-vault', icon: FolderArchive, module: 'M4' },
   { title: 'Response Tracker', url: '/response-tracker', icon: MailWarning, module: 'M8' },
   { title: 'Task Manager', url: '/tasks', icon: ListTodo, module: 'M9' },
+  { title: 'Compliance Timeline', url: '/timeline', icon: CalendarClock, module: 'M10' },
+
   { title: 'AI Chatbot', url: '/chatbot', icon: MessageSquare, module: 'M5' },
   { title: 'Assistant', url: '/assistant', icon: BarChart3, module: 'M6' },
   { title: 'Admin', url: '/admin', icon: Settings, module: 'M7' },

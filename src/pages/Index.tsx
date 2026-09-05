@@ -12,6 +12,8 @@ import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, Rot
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useRef, useState } from 'react';
 import { MaterialEventsSection } from '@/components/MaterialEventsSection';
+import { MonthlyComplianceCalendar } from '@/components/MonthlyComplianceCalendar';
+
 import { deriveComplianceState } from '@/data/workflowData';
 import { Link } from 'react-router-dom';
 import { exportCategoryToXlsx, exportCategoryToPptx } from '@/lib/categoryExportUtils';
@@ -343,7 +345,11 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* Monthly compliance calendar */}
+        <MonthlyComplianceCalendar items={items} />
+
         {/* Event Trigger Map + Filing Calendar */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-2">
@@ -606,7 +612,11 @@ export default function Dashboard() {
                       <TableCell className="text-xs text-muted-foreground hidden lg:table-cell">{item.dueDate}</TableCell>
                       <TableCell className="text-[10px] text-muted-foreground hidden lg:table-cell">{toTitleCaseLabel(item.obligorTier)}</TableCell>
                       <TableCell onClick={e => e.stopPropagation()}>
-                        <Link to={`/compliance/${item.id}`} className="text-[10px] font-medium text-secondary hover:underline whitespace-nowrap">Full Detail</Link>
+                        <span className="flex items-center gap-2 whitespace-nowrap">
+                          <Link to={`/compliance/${item.id}`} className="text-[10px] font-medium text-secondary hover:underline">Full Detail</Link>
+                          <Link to={`/timeline?item=${item.id}`} className="text-[10px] font-medium text-secondary hover:underline">Timeline</Link>
+                        </span>
+
                       </TableCell>
                     </TableRow>
                   ))}
