@@ -565,7 +565,7 @@ export default function Dashboard() {
                       <TableCell><StatusBadge status={item.status} /></TableCell>
                       <TableCell className="hidden md:table-cell"><RiskBadge level={item.riskLevel} /></TableCell>
                       <TableCell className="text-xs text-muted-foreground hidden lg:table-cell">{item.dueDate}</TableCell>
-                      <TableCell className="text-[10px] text-muted-foreground hidden lg:table-cell">{item.obligorTier}</TableCell>
+                      <TableCell className="text-[10px] text-muted-foreground hidden lg:table-cell">{toTitleCaseLabel(item.obligorTier)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
