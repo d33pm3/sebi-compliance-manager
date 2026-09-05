@@ -42,30 +42,22 @@ export default function DocumentVault() {
   const totalPages = Math.ceil(filtered.length / perPage);
 
   /* ---------------------------------------------------------------- */
-  /* Everything below is derived from the Master Compliance Register   */
-  /* so a single change in the master flows through this module.       */
+  /* Everything below is resolved against the Master Compliance        */
+  /* Register through one shared helper, so a single master update      */
+  /* flows through the Vault, the Notices and the Risk Assessment.      */
   /* ---------------------------------------------------------------- */
 
-  /** The compliance item in the master that this document belongs to */
-  const linkedItem = (doc: VaultDocument): ComplianceItem | undefined =>
-    linkedComplianceItems(doc.regulation, items)[0];
+  const resolve = (doc: VaultDocument) => resolveVaultDoc(doc, items);
 
-  /**
-   * Risk of a vault document, always resolved against the master:
-   * open/pending notices, overdue filings and missing evidence are High risk.
-   */
-  const docRisk = (doc: VaultDocument): { level: 'High' | 'Critical' | null; reason: string } => {
-    if (doc.section === 'sebi-notices' && doc.status === 'Pending') {
-      return { level: 'High', reason: 'Response Pending' };
-    }
-    const item = linkedItem(doc);
-    if (item) {
-      const state = deriveComplianceState(item);
-      if (state === 'Overdue') return { level: effectiveRiskLevel(item) === 'Critical' ? 'Critical' : 'High', reason: 'Overdue Filing' };
-      if (state === 'Documents Missing') return { level: 'High', reason: 'Documents Missing' };
-    }
-    return { level: null, reason: '' };
+  /** The compliance item in the master that this document belongs to */
+  const linkedItem = (doc: VaultDocument): ComplianceItem | undefined => resolve(doc).item;
+
+  /** Risk of a vault document, always derived from the master */
+  const docRisk = (doc: VaultDocument): { level: 'High' | 'Critical' | 'Medium' | 'Low' | null; reason: string } => {
+    const r = resolve(doc);
+    return { level: r.riskLevel, reason: r.riskReason };
   };
+
 
   const sectionIcon = (s: string) => {
     switch (s) {
