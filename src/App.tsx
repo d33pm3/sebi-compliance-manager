@@ -15,6 +15,11 @@ import ResponseTracker from "./pages/ResponseTracker.tsx";
 import TaskManager from "./pages/TaskManager.tsx";
 import ComplianceTimeline from "./pages/ComplianceTimeline.tsx";
 import KPIs from "./pages/KPIs.tsx";
+import AgentOutputDetail from "./pages/AgentOutputDetail.tsx";
+import ComplianceCalendar from "./pages/ComplianceCalendar.tsx";
+import RiskActionPlan from "./pages/RiskActionPlan.tsx";
+import RegisterManager from "./pages/RegisterManager.tsx";
+
 
 import ComplianceItemDetail from "./pages/ComplianceItemDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -39,6 +44,10 @@ const App = () => (
           <Route path="/tasks" element={<TaskManager />} />
           <Route path="/timeline" element={<ComplianceTimeline />} />
           <Route path="/kpis" element={<KPIs />} />
+          <Route path="/agent-outputs/:kind" element={<AgentOutputDetail />} />
+          <Route path="/calendar" element={<ComplianceCalendar />} />
+          <Route path="/risk-action-plan" element={<RiskActionPlan />} />
+          <Route path="/register-manager" element={<RegisterManager />} />
 
           <Route path="/compliance/:id" element={<ComplianceItemDetail />} />
           <Route path="/admin" element={<AdminModule />} />

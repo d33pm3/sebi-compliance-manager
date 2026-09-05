@@ -17,6 +17,7 @@ import { STAT_COLORS } from '@/lib/chartTheme';
 import { ComplianceItem } from '@/data/complianceData';
 import { resolveVaultDoc } from '@/data/workflowData';
 import { DocumentUploadForm } from '@/components/DocumentUploadForm';
+import { agentOutputKindFromTitle, agentOutputKinds, agentOutputSpecs, buildAgentOutput } from '@/data/agentOutputs';
 
 
 export default function DocumentVault() {
@@ -109,10 +110,14 @@ export default function DocumentVault() {
     }
   };
 
-  /** Row click: notices open their notice page, everything else opens the master item */
+  /** Row click: notices open their notice page, agent outputs open their deliverable, everything else opens the master item */
   const openDoc = (doc: VaultDocument) => {
     if (doc.section === 'sebi-notices') {
       navigate(`/notices/${doc.id}`);
+      return;
+    }
+    if (doc.section === 'agent-outputs') {
+      navigate(`/agent-outputs/${agentOutputKindFromTitle(doc.title)}`);
       return;
     }
     const item = linkedItem(doc);
@@ -145,6 +150,41 @@ export default function DocumentVault() {
           ))}
         </div>
 
+
+        {/* Agent deliverables — live extracts of the Master Compliance Register */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <Bot className="h-4 w-4 text-secondary" /> Agent Deliverables
+            </CardTitle>
+            <p className="text-[11px] text-muted-foreground">
+              Each deliverable is rebuilt live from the Master Compliance Register — open one to see every row and export it.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+              {agentOutputKinds.map(kind => {
+                const spec = agentOutputSpecs[kind];
+                const count = buildAgentOutput(kind, items).rows.length;
+                return (
+                  <Link
+                    key={kind}
+                    to={`/agent-outputs/${kind}`}
+                    className="rounded-lg border p-3 hover:bg-muted/50 hover:border-primary/40 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-xs font-semibold text-primary">{spec.title}</p>
+                      <span className="text-[10px] font-semibold rounded-full border bg-secondary/15 text-secondary border-secondary/40 h-5 min-w-[52px] px-2 inline-flex items-center justify-center whitespace-nowrap leading-none flex-shrink-0">
+                        {count} Rows
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground mt-1">{spec.description}</p>
+                  </Link>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Upload Form — writes back to the Master Compliance Register */}
         <DocumentUploadForm />
