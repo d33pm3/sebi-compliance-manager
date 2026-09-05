@@ -96,11 +96,11 @@ export default function ResponseTracker() {
     <AppLayout title="Response Tracker" subtitle="Module 8 — SEBI & Exchange Notice Responses">
       <div className="space-y-4">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <Stat icon={<FileText className="h-4 w-4" />} label="Total Notices" value={stats.total} color="text-foreground" />
-          <Stat icon={<AlertTriangle className="h-4 w-4" />} label="Awaiting Response" value={stats.awaiting} color="text-destructive" />
-          <Stat icon={<Clock className="h-4 w-4" />} label="Drafting" value={stats.drafting} color="text-warning" />
-          <Stat icon={<Send className="h-4 w-4" />} label="Submitted" value={stats.submitted} color="text-secondary" />
-          <Stat icon={<CheckCircle2 className="h-4 w-4" />} label="Closed" value={stats.closed} color="text-success" />
+          <StatTile icon={<FileText className="h-4 w-4" />} label="Total Notices" value={stats.total} bg={NOTICE_TILE_COLORS.total} active={filter === 'all'} onClick={() => drillTo('all')} title="View all notices" />
+          <StatTile icon={<AlertTriangle className="h-4 w-4" />} label="Awaiting Response" value={stats.awaiting} bg={NOTICE_TILE_COLORS.awaiting} active={filter === 'Awaiting Response'} onClick={() => drillTo('Awaiting Response')} title="View notices awaiting response" />
+          <StatTile icon={<Clock className="h-4 w-4" />} label="Drafting" value={stats.drafting} bg={NOTICE_TILE_COLORS.drafting} active={filter === 'Drafting'} onClick={() => drillTo('Drafting')} title="View notices in drafting" />
+          <StatTile icon={<Send className="h-4 w-4" />} label="Submitted" value={stats.submitted} bg={NOTICE_TILE_COLORS.submitted} active={filter === 'Submitted'} onClick={() => drillTo('Submitted')} title="View submitted notices" />
+          <StatTile icon={<CheckCircle2 className="h-4 w-4" />} label="Closed" value={stats.closed} bg={NOTICE_TILE_COLORS.closed} active={filter === 'Closed'} onClick={() => drillTo('Closed')} title="View closed notices" />
         </div>
 
         <Card>
