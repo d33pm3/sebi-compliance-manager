@@ -1,7 +1,7 @@
 import { AppLayout } from '@/components/AppLayout';
 import { useComplianceStore } from '@/store/complianceStore';
 import { buildNoticeRisks, buildOverdueTaskRisks, effectiveRiskLevel, riskReasons } from '@/data/workflowData';
-import { RISK_TILE_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
+import { CHART_COLORS, RISK_TILE_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
 import { StatTile } from '@/components/StatTile';
 import { Link } from 'react-router-dom';
 import { ComplianceDetailDrawer } from '@/components/ComplianceDetailDrawer';
@@ -173,9 +173,9 @@ export default function RiskAssessment() {
         {/* Summary Status Bar — every tile drills into the Master Compliance Register */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           <StatTile icon={<ShieldCheck className="h-4 w-4" />} label="Approved" value={summaryStats.approved} bg={STAT_COLORS.completed} active={filters.approvalStatus === 'Approved'} onClick={() => drillTo('approvalStatus', 'Approved')} />
-          <StatTile icon={<Clock className="h-4 w-4" />} label="Pending" value={summaryStats.pending} bg={STAT_COLORS.pending} active={filters.approvalStatus === 'Pending'} onClick={() => drillTo('approvalStatus', 'Pending')} />
-          <StatTile icon={<FileWarning className="h-4 w-4" />} label="Doc Missing" value={summaryStats.docMissing} bg={STAT_COLORS.overdue} active={filters.approvalStatus === 'Doc Missing'} onClick={() => drillTo('approvalStatus', 'Doc Missing')} />
-          <StatTile icon={<ShieldAlert className="h-4 w-4" />} label="Overdue / High Risk" value={summaryStats.overdue} bg={STAT_COLORS.upcoming} active={filters.status === 'Overdue'} onClick={() => drillTo('status', 'Overdue')} />
+          <StatTile icon={<Clock className="h-4 w-4" />} label="Pending" value={summaryStats.pending} bg={STAT_COLORS.inProgress} active={filters.approvalStatus === 'Pending'} onClick={() => drillTo('approvalStatus', 'Pending')} />
+          <StatTile icon={<FileWarning className="h-4 w-4" />} label="Doc Missing" value={summaryStats.docMissing} bg={STAT_COLORS.dueSoon} active={filters.approvalStatus === 'Doc Missing'} onClick={() => drillTo('approvalStatus', 'Doc Missing')} />
+          <StatTile icon={<ShieldAlert className="h-4 w-4" />} label="Overdue / High Risk" value={summaryStats.overdue} bg={STAT_COLORS.overdue} active={filters.status === 'Overdue'} onClick={() => drillTo('status', 'Overdue')} />
           <StatTile icon={<CircleDot className="h-4 w-4" />} label="Not Started" value={summaryStats.notStarted} bg={STAT_COLORS.notStarted} active={filters.approvalStatus === 'Not Started'} onClick={() => drillTo('approvalStatus', 'Not Started')} />
         </div>
 
@@ -241,10 +241,10 @@ export default function RiskAssessment() {
                   wrapperStyle={{ fontSize: '11px', paddingTop: '4px' }}
                   formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
                 />
-                <Bar dataKey="completed" fill="hsl(145, 63%, 62%)" name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                <Bar dataKey="completed" fill={CHART_COLORS.Completed} name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
                   <LabelList dataKey="completedPct" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${v}%`} />
                 </Bar>
-                <Bar dataKey="nonCompliant" fill="hsl(350, 80%, 72%)" name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                <Bar dataKey="nonCompliant" fill={CHART_COLORS.Overdue} name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
                   <LabelList dataKey="nonCompliantPct" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${v}%`} />
                 </Bar>
               </BarChart>
