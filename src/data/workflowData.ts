@@ -1,4 +1,4 @@
-import { ComplianceItem } from '@/data/complianceData';
+import { ComplianceItem, RiskLevel } from '@/data/complianceData';
 
 /* ------------------------------------------------------------------ */
 /* Filing submissions                                                  */
