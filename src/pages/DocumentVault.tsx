@@ -5,16 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { vaultCategories, VaultDocument } from '@/data/vaultData';
 import { useComplianceStore } from '@/store/complianceStore';
-import { Search, Download, Mail, FileText, AlertTriangle, BookOpen, Bot, Upload, Eye, ChevronLeft, ChevronRight, FolderArchive } from 'lucide-react';
+import { Search, Download, Mail, FileText, AlertTriangle, BookOpen, Bot, Upload, Eye, ChevronLeft, ChevronRight, FolderArchive, ShieldAlert, ExternalLink } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { downloadDocumentPlaceholder } from '@/lib/downloadUtils';
+import { StatTile } from '@/components/StatTile';
+import { STAT_COLORS } from '@/lib/chartTheme';
+import { ComplianceItem } from '@/data/complianceData';
+import { deriveComplianceState, effectiveRiskLevel, linkedComplianceItems } from '@/data/workflowData';
 
 export default function DocumentVault() {
   const vaultDocuments = useComplianceStore(s => s.vaultDocs);
+  const items = useComplianceStore(s => s.items);
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [section, setSection] = useState('all');
   const [category, setCategory] = useState('all');
@@ -35,6 +41,32 @@ export default function DocumentVault() {
   const paged = filtered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.ceil(filtered.length / perPage);
 
+  /* ---------------------------------------------------------------- */
+  /* Everything below is derived from the Master Compliance Register   */
+  /* so a single change in the master flows through this module.       */
+  /* ---------------------------------------------------------------- */
+
+  /** The compliance item in the master that this document belongs to */
+  const linkedItem = (doc: VaultDocument): ComplianceItem | undefined =>
+    linkedComplianceItems(doc.regulation, items)[0];
+
+  /**
+   * Risk of a vault document, always resolved against the master:
+   * open/pending notices, overdue filings and missing evidence are High risk.
+   */
+  const docRisk = (doc: VaultDocument): { level: 'High' | 'Critical' | null; reason: string } => {
+    if (doc.section === 'sebi-notices' && doc.status === 'Pending') {
+      return { level: 'High', reason: 'Response Pending' };
+    }
+    const item = linkedItem(doc);
+    if (item) {
+      const state = deriveComplianceState(item);
+      if (state === 'Overdue') return { level: effectiveRiskLevel(item) === 'Critical' ? 'Critical' : 'High', reason: 'Overdue Filing' };
+      if (state === 'Documents Missing') return { level: 'High', reason: 'Documents Missing' };
+    }
+    return { level: null, reason: '' };
+  };
+
   const sectionIcon = (s: string) => {
     switch (s) {
       case 'compliance-filings': return <FileText className="h-3.5 w-3.5" />;
@@ -45,12 +77,14 @@ export default function DocumentVault() {
     }
   };
 
+  const badgeBase = 'inline-flex items-center justify-center rounded-full border text-[10px] font-semibold whitespace-nowrap h-5 min-w-[76px] px-2 leading-none';
+
   const statusColor = (status?: string) => {
     switch (status) {
-      case 'Pending': return 'bg-warning/15 text-warning border-warning/30';
-      case 'Responded': return 'bg-success/15 text-success border-success/30';
+      case 'Pending': return 'bg-warning text-warning-foreground border-warning';
+      case 'Responded': return 'bg-success text-success-foreground border-success';
       case 'Closed': return 'bg-muted text-muted-foreground border-border';
-      default: return '';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -71,33 +105,42 @@ export default function DocumentVault() {
     }
   };
 
+  /** Row click: notices open their notice page, everything else opens the master item */
+  const openDoc = (doc: VaultDocument) => {
+    if (doc.section === 'sebi-notices') {
+      navigate(`/notices/${doc.id}`);
+      return;
+    }
+    const item = linkedItem(doc);
+    if (item) navigate(`/compliance/${item.id}`);
+    else toast.info('No linked item in the Master Compliance Register for this document');
+  };
+
   return (
     <AppLayout title="Documentation Vault" subtitle="Module 4 — Compliance Document Repository">
       <div className="space-y-4">
-        {/* Stats */}
+        {/* Stats — palette shared with the Risk Assessment module */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
-            { label: 'All Documents', count: sectionCounts.all, icon: <FolderArchive className="h-4 w-4" />, key: 'all' },
-            { label: 'Filings', count: sectionCounts['compliance-filings'], icon: <FileText className="h-4 w-4" />, key: 'compliance-filings' },
-            { label: 'Notices', count: sectionCounts['sebi-notices'], icon: <AlertTriangle className="h-4 w-4" />, key: 'sebi-notices' },
-            { label: 'Regulatory', count: sectionCounts['regulatory-docs'], icon: <BookOpen className="h-4 w-4" />, key: 'regulatory-docs' },
-            { label: 'Agent Outputs', count: sectionCounts['agent-outputs'], icon: <Bot className="h-4 w-4" />, key: 'agent-outputs' },
+            { label: 'All Documents', count: sectionCounts.all, icon: <FolderArchive className="h-4 w-4" />, key: 'all', bg: STAT_COLORS.total },
+            { label: 'Filings', count: sectionCounts['compliance-filings'], icon: <FileText className="h-4 w-4" />, key: 'compliance-filings', bg: STAT_COLORS.completed },
+            { label: 'Notices', count: sectionCounts['sebi-notices'], icon: <AlertTriangle className="h-4 w-4" />, key: 'sebi-notices', bg: STAT_COLORS.overdue },
+            { label: 'Regulatory', count: sectionCounts['regulatory-docs'], icon: <BookOpen className="h-4 w-4" />, key: 'regulatory-docs', bg: STAT_COLORS.inProgress },
+            { label: 'Agent Outputs', count: sectionCounts['agent-outputs'], icon: <Bot className="h-4 w-4" />, key: 'agent-outputs', bg: STAT_COLORS.upcoming },
           ].map(s => (
-            <Card
+            <StatTile
               key={s.key}
-              className={`cursor-pointer transition-all ${section === s.key ? 'border-primary ring-1 ring-primary/20' : 'hover:border-primary/30'}`}
+              icon={s.icon}
+              label={s.label}
+              value={s.count}
+              bg={s.bg}
+              active={section === s.key}
+              title={`Show ${s.label} in the Document Register`}
               onClick={() => { setSection(s.key); setPage(0); }}
-            >
-              <CardContent className="p-3 flex items-center gap-3">
-                <div className={section === s.key ? 'text-primary' : 'text-muted-foreground'}>{s.icon}</div>
-                <div>
-                  <p className={`text-xl font-bold ${section === s.key ? 'text-primary' : 'text-foreground'}`}>{s.count}</p>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{s.label}</p>
-                </div>
-              </CardContent>
-            </Card>
+            />
           ))}
         </div>
+
 
         {/* Upload Zone */}
         <Card>
@@ -140,46 +183,79 @@ export default function DocumentVault() {
             <p className="text-[11px] text-muted-foreground">{filtered.length} documents</p>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-[10px] w-10"></TableHead>
                     <TableHead className="text-[10px]">Vault ID</TableHead>
                     <TableHead className="text-[10px]">Title</TableHead>
-                    <TableHead className="text-[10px] hidden md:table-cell">Category</TableHead>
+                    <TableHead className="text-[10px] hidden 2xl:table-cell">Category</TableHead>
                     <TableHead className="text-[10px] hidden lg:table-cell">Date</TableHead>
-                    <TableHead className="text-[10px] hidden md:table-cell">Type</TableHead>
-                    <TableHead className="text-[10px] hidden lg:table-cell">Size</TableHead>
+                    <TableHead className="text-[10px] hidden xl:table-cell">Type</TableHead>
+                    <TableHead className="text-[10px]">Linked Compliance</TableHead>
+                    <TableHead className="text-[10px]">Risk</TableHead>
                     {section === 'sebi-notices' && <TableHead className="text-[10px]">Status</TableHead>}
                     <TableHead className="text-[10px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paged.map(doc => (
-                    <TableRow key={doc.id} className="hover:bg-muted/50">
+                  {paged.map(doc => {
+                    const item = linkedItem(doc);
+                    const risk = docRisk(doc);
+                    return (
+                    <TableRow key={doc.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => openDoc(doc)}>
                       <TableCell>{sectionIcon(doc.section)}</TableCell>
-                      <TableCell className="text-[11px] font-mono text-muted-foreground">{doc.vaultId.slice(0, 20)}…</TableCell>
-                      <TableCell className="text-xs font-medium max-w-[200px] truncate">{doc.title}</TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{doc.category}</TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{doc.uploadedAt}</TableCell>
-                      <TableCell className="hidden md:table-cell"><Badge variant="outline" className="text-[10px]">{doc.fileType}</Badge></TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{doc.fileSize}</TableCell>
+                      <TableCell className="text-[11px] font-mono text-muted-foreground whitespace-nowrap max-w-[130px] truncate">{doc.vaultId}</TableCell>
+                      <TableCell className="text-xs font-medium max-w-[200px] truncate text-primary hover:underline">{doc.title}</TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground hidden 2xl:table-cell max-w-[120px] truncate">{doc.category}</TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell whitespace-nowrap">{doc.uploadedAt}</TableCell>
+                      <TableCell className="hidden xl:table-cell"><Badge variant="outline" className="text-[10px]">{doc.fileType}</Badge></TableCell>
+                      <TableCell className="text-[11px] max-w-[150px]">
+                        {item ? (
+                          <Link
+                            to={`/compliance/${item.id}`}
+                            onClick={e => e.stopPropagation()}
+                            className="text-primary hover:underline inline-flex items-center gap-1"
+                            title={item.filingName}
+                          >
+                            <span className="truncate max-w-[110px]">{item.filingName}</span>
+                            <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                          </Link>
+                        ) : <span className="text-muted-foreground">{doc.regulation}</span>}
+                      </TableCell>
+                      <TableCell>
+                        {risk.level ? (
+                          <Link
+                            to="/risk-assessment"
+                            onClick={e => e.stopPropagation()}
+                            className={`${badgeBase} bg-destructive/20 text-destructive border-destructive/40 gap-1 hover:bg-destructive/30`}
+                            title={`${risk.level} Risk — ${risk.reason}. Open the Risk Assessment module.`}
+                          >
+                            <ShieldAlert className="h-3 w-3 flex-shrink-0" />
+                            {risk.reason}
+                          </Link>
+                        ) : (
+                          <span className={`${badgeBase} bg-muted text-muted-foreground border-border`}>No Risk</span>
+                        )}
+                      </TableCell>
                       {section === 'sebi-notices' && (
                         <TableCell>
-                          {doc.status && <Badge variant="outline" className={`text-[10px] ${statusColor(doc.status)}`}>{doc.status}</Badge>}
+                          {doc.status && <span className={`${badgeBase} ${statusColor(doc.status)}`}>{doc.status}</span>}
                         </TableCell>
                       )}
-                      <TableCell>
+                      <TableCell onClick={e => e.stopPropagation()}>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-6 w-6" title="View" onClick={() => handleAction('View', doc)}><Eye className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6" title="View Details" onClick={() => openDoc(doc)}><Eye className="h-3.5 w-3.5" /></Button>
                           <Button variant="ghost" size="icon" className="h-6 w-6" title="Download" onClick={() => handleAction('Download', doc)}><Download className="h-3.5 w-3.5" /></Button>
                           <Button variant="ghost" size="icon" className="h-6 w-6" title="Email" onClick={() => handleAction('Email', doc)}><Mail className="h-3.5 w-3.5" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
+
               </Table>
             </div>
             {totalPages > 1 && (
@@ -202,7 +278,7 @@ export default function DocumentVault() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -211,26 +287,56 @@ export default function DocumentVault() {
                     <TableHead className="text-[10px] hidden md:table-cell">From</TableHead>
                     <TableHead className="text-[10px]">Response Due</TableHead>
                     <TableHead className="text-[10px]">Status</TableHead>
+                    <TableHead className="text-[10px]">Risk</TableHead>
+                    <TableHead className="text-[10px]">Linked Compliance</TableHead>
                     <TableHead className="text-[10px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {vaultDocuments.filter(d => d.section === 'sebi-notices').map(doc => (
-                    <TableRow key={doc.id} className="hover:bg-muted/50">
-                      <TableCell className="text-[11px] font-mono">{doc.noticeNo}</TableCell>
+                  {vaultDocuments.filter(d => d.section === 'sebi-notices').map(doc => {
+                    const item = linkedItem(doc);
+                    const risk = docRisk(doc);
+                    return (
+                    <TableRow key={doc.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/notices/${doc.id}`)}>
+                      <TableCell className="text-[11px] font-mono text-primary hover:underline">{doc.noticeNo}</TableCell>
                       <TableCell className="text-xs font-medium max-w-[200px] truncate">{doc.title}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{doc.issuedBy}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground">{doc.responseDue}</TableCell>
-                      <TableCell><Badge variant="outline" className={`text-[10px] ${statusColor(doc.status)}`}>{doc.status}</Badge></TableCell>
+                      <TableCell><span className={`${badgeBase} ${statusColor(doc.status)}`}>{doc.status}</span></TableCell>
                       <TableCell>
+                        {risk.level ? (
+                          <Link
+                            to="/risk-assessment"
+                            onClick={e => e.stopPropagation()}
+                            className={`${badgeBase} bg-destructive/20 text-destructive border-destructive/40 gap-1 hover:bg-destructive/30`}
+                            title={`${risk.level} Risk — ${risk.reason}. Open the Risk Assessment module.`}
+                          >
+                            <ShieldAlert className="h-3 w-3 flex-shrink-0" />
+                            {risk.reason}
+                          </Link>
+                        ) : (
+                          <span className={`${badgeBase} bg-muted text-muted-foreground border-border`}>No Risk</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-[11px]">
+                        {item ? (
+                          <Link to={`/compliance/${item.id}`} onClick={e => e.stopPropagation()} className="text-primary hover:underline inline-flex items-center gap-1" title={item.filingName}>
+                            <span className="truncate max-w-[110px]">{item.filingName}</span>
+                            <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                          </Link>
+                        ) : <span className="text-muted-foreground">{doc.regulation}</span>}
+                      </TableCell>
+                      <TableCell onClick={e => e.stopPropagation()}>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleAction('View', doc)}><Eye className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleAction('Download', doc)}><Download className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6" title="View Notice" onClick={() => navigate(`/notices/${doc.id}`)}><Eye className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6" title="Download" onClick={() => handleAction('Download', doc)}><Download className="h-3.5 w-3.5" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
+
               </Table>
             </div>
           </CardContent>

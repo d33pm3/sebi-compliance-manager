@@ -40,13 +40,13 @@ export function exportCategoryToPptx(category: string, items: ComplianceItem[]) 
   import('pptxgenjs').then((PptxGenJS) => {
     const pptx = new PptxGenJS.default();
     pptx.layout = 'LAYOUT_WIDE';
-    pptx.author = 'e-cxo Compliance Solutions';
+    pptx.author = 'deriskadvisory';
     pptx.title = `${category} — Compliance Register`;
 
     // Title slide
     const titleSlide = pptx.addSlide();
     titleSlide.background = { color: '1B2A4A' };
-    titleSlide.addText('e-cxo Compliance Solutions', {
+    titleSlide.addText('deriskadvisory', {
       x: 0.5, y: 0.4, w: 12.3, h: 0.5,
       fontSize: 14, color: '8EBBDC', fontFace: 'Arial',
     });
@@ -130,7 +130,7 @@ export function exportCategoryToPptx(category: string, items: ComplianceItem[]) 
       });
 
       // Footer
-      slide.addText('e-cxo Compliance Solutions', {
+      slide.addText('deriskadvisory', {
         x: 0.5, y: 7.0, w: 6, h: 0.3,
         fontSize: 8, color: '999999', fontFace: 'Arial',
       });

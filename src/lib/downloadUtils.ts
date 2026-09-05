@@ -64,6 +64,6 @@ export function downloadGenericCsv(headers: string[], rows: string[][], filename
 }
 
 export function downloadDocumentPlaceholder(title: string, vaultId: string) {
-  const content = `Document: ${title}\nVault ID: ${vaultId}\nGenerated: ${new Date().toISOString()}\n\nThis is a placeholder document export from e-cxo Compliance Solutions.\nIn a production environment, this would download the actual document file.`;
+  const content = `Document: ${title}\nVault ID: ${vaultId}\nGenerated: ${new Date().toISOString()}\n\nThis is a placeholder document export from deriskadvisory.\nIn a production environment, this would download the actual document file.`;
   downloadBlob(content, `${vaultId}_${title.replace(/[^a-zA-Z0-9]/g, '_')}.txt`, 'text/plain');
 }
