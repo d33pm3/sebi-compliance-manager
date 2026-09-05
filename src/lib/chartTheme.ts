@@ -51,7 +51,7 @@ export const RISK_TILE_COLORS: Record<string, TileColor> = {
 const ACRONYMS = new Set([
   'MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO',
   'RMC', 'ASCR', 'SAR', 'BRSR', 'GM', 'HVDLE', 'PIT', 'SAST', 'ESG', 'KMP', 'MD&A', 'RPT',
-  'ALL', 'TOP', 'IPO', 'OFS',
+  'ALL', 'TOP', 'IPO', 'OFS', 'KPI', 'MGT',
 ]);
 
 /** Title Case that preserves regulatory acronyms — never ALL CAPS labels */
