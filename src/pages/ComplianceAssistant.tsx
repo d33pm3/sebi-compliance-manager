@@ -122,7 +122,7 @@ We assure complete cooperation in this matter and request the withdrawal of the 
 
 Thanking you,
 
-For e-cxo Compliance Solutions Pvt. Ltd.
+For deriskadvisory Pvt. Ltd.
 
 ___________________________
 Company Secretary
@@ -343,7 +343,7 @@ Company Secretary
                 </div>
                 <div className="space-y-3">
                   <Input placeholder="Recipient emails (comma-separated)" className="h-8 text-xs" />
-                  <Input placeholder="Subject line" className="h-8 text-xs" defaultValue="SEBI Compliance Documents — e-cxo Compliance Solutions" />
+                  <Input placeholder="Subject line" className="h-8 text-xs" defaultValue="SEBI Compliance Documents — deriskadvisory" />
                   <Textarea placeholder="Optional message..." rows={3} className="text-xs" />
                   <Button onClick={() => toast.success('Email sent successfully')}><Mail className="h-4 w-4 mr-2" /> Send Email</Button>
                 </div>

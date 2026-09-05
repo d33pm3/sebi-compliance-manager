@@ -363,16 +363,16 @@ export interface ApprovalRequest {
 }
 
 export const approverDirectory: Record<string, string> = {
-  'Suresh Mehta (Director)': 'suresh.mehta@e-cxo.example',
-  'Kavita Rao (Audit Chair)': 'kavita.rao@e-cxo.example',
-  'Deepak Gupta (MD)': 'deepak.gupta@e-cxo.example',
-  'Ritu Agarwal (ID)': 'ritu.agarwal@e-cxo.example',
+  'Suresh Mehta (Director)': 'suresh.mehta@deriskadvisory.example',
+  'Kavita Rao (Audit Chair)': 'kavita.rao@deriskadvisory.example',
+  'Deepak Gupta (MD)': 'deepak.gupta@deriskadvisory.example',
+  'Ritu Agarwal (ID)': 'ritu.agarwal@deriskadvisory.example',
 };
 
 export function approverEmail(name: string): string {
   if (approverDirectory[name]) return approverDirectory[name];
   const slug = name.replace(/\(.*\)/, '').trim().toLowerCase().replace(/[^a-z]+/g, '.');
-  return `${slug || 'approver'}@e-cxo.example`;
+  return `${slug || 'approver'}@deriskadvisory.example`;
 }
 
 /* ------------------------------------------------------------------ */
