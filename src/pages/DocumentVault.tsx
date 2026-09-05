@@ -81,8 +81,8 @@ export default function DocumentVault() {
 
   const statusColor = (status?: string) => {
     switch (status) {
-      case 'Pending': return 'bg-warning/20 text-warning-foreground border-warning/40';
-      case 'Responded': return 'bg-success/20 text-success-foreground border-success/40';
+      case 'Pending': return 'bg-warning text-warning-foreground border-warning';
+      case 'Responded': return 'bg-success text-success-foreground border-success';
       case 'Closed': return 'bg-muted text-muted-foreground border-border';
       default: return 'bg-muted text-muted-foreground border-border';
     }
@@ -190,7 +190,7 @@ export default function DocumentVault() {
                     <TableHead className="text-[10px] w-10"></TableHead>
                     <TableHead className="text-[10px]">Vault ID</TableHead>
                     <TableHead className="text-[10px]">Title</TableHead>
-                    <TableHead className="text-[10px] hidden xl:table-cell">Category</TableHead>
+                    <TableHead className="text-[10px] hidden 2xl:table-cell">Category</TableHead>
                     <TableHead className="text-[10px] hidden lg:table-cell">Date</TableHead>
                     <TableHead className="text-[10px] hidden xl:table-cell">Type</TableHead>
                     <TableHead className="text-[10px]">Linked Compliance</TableHead>
@@ -208,7 +208,7 @@ export default function DocumentVault() {
                       <TableCell>{sectionIcon(doc.section)}</TableCell>
                       <TableCell className="text-[11px] font-mono text-muted-foreground whitespace-nowrap max-w-[130px] truncate">{doc.vaultId}</TableCell>
                       <TableCell className="text-xs font-medium max-w-[200px] truncate text-primary hover:underline">{doc.title}</TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden xl:table-cell max-w-[120px] truncate">{doc.category}</TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground hidden 2xl:table-cell max-w-[120px] truncate">{doc.category}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell whitespace-nowrap">{doc.uploadedAt}</TableCell>
                       <TableCell className="hidden xl:table-cell"><Badge variant="outline" className="text-[10px]">{doc.fileType}</Badge></TableCell>
                       <TableCell className="text-[11px] max-w-[150px]">
@@ -236,7 +236,7 @@ export default function DocumentVault() {
                             {risk.reason}
                           </Link>
                         ) : (
-                          <span className={`${badgeBase} bg-success/20 text-success-foreground border-success/40`}>No Risk</span>
+                          <span className={`${badgeBase} bg-muted text-muted-foreground border-border`}>No Risk</span>
                         )}
                       </TableCell>
                       {section === 'sebi-notices' && (
@@ -315,7 +315,7 @@ export default function DocumentVault() {
                             {risk.reason}
                           </Link>
                         ) : (
-                          <span className={`${badgeBase} bg-success/20 text-success-foreground border-success/40`}>No Risk</span>
+                          <span className={`${badgeBase} bg-muted text-muted-foreground border-border`}>No Risk</span>
                         )}
                       </TableCell>
                       <TableCell className="text-[11px]">
