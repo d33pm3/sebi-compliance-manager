@@ -431,10 +431,21 @@ export default function Dashboard() {
         </Card>
 
         {/* Filters + Master Register Table */}
-        <Card>
+        <Card ref={registerRef} className="scroll-mt-20">
           <CardHeader className="pb-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <CardTitle className="text-sm font-semibold">Master Compliance Register</CardTitle>
+              <div>
+                <CardTitle className="text-sm font-semibold">Master Compliance Register</CardTitle>
+                {activeDrill && (
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="text-[10px] font-medium text-muted-foreground">Filtered by:</span>
+                    <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      {activeDrill}
+                      <button onClick={resetFilters} className="ml-0.5 text-primary/70 hover:text-primary">×</button>
+                    </span>
+                  </div>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
