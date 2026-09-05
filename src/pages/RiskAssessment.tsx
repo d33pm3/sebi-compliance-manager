@@ -3,7 +3,7 @@ import { useComplianceStore } from '@/store/complianceStore';
 import { buildNoticeRisks, buildOverdueTaskRisks, effectiveRiskLevel, riskReasons } from '@/data/workflowData';
 import { CHART_COLORS, COMPARISON_COLORS, RISK_TILE_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
 import { StatTile } from '@/components/StatTile';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ComplianceDetailDrawer } from '@/components/ComplianceDetailDrawer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,7 @@ import { StatusBadge, RiskBadge, ApprovalBadge } from '@/components/StatusBadges
 import { categories, ComplianceItem, RiskLevel, ApprovalStatus } from '@/data/complianceData';
 import { Search, RotateCcw, CheckCircle2, XCircle, RotateCw, Upload, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, FileWarning, Clock, CircleDot, FileSpreadsheet, AlertTriangle, X, ExternalLink, ShieldQuestion } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 function exportRiskItemsToXlsx(title: string, riskItems: ComplianceItem[], flag: string) {
@@ -87,6 +87,20 @@ export default function RiskAssessment() {
   const scrollToRegister = () => {
     requestAnimationFrame(() => registerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
+
+  /* Deep link from the Response Tracker: /risk-assessment?noticeRisk=<RISK-ID>
+     scrolls to the notice risk table and highlights that exact row. The id is
+     derived from the notice number, so it stays valid as notices change. */
+  const noticeRiskSectionRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const focusedNoticeRisk = searchParams.get('noticeRisk');
+  useEffect(() => {
+    if (!focusedNoticeRisk) return;
+    const t = window.setTimeout(() => {
+      noticeRiskSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
+    return () => window.clearTimeout(t);
+  }, [focusedNoticeRisk]);
 
   /* One-click drill-down: every number on this page lands on the matching rows of
      the Master Compliance Register, read live from the shared compliance store. */
@@ -386,7 +400,7 @@ export default function RiskAssessment() {
             });
           };
           return (
-            <Card className="border-destructive/30">
+            <Card ref={noticeRiskSectionRef} className="border-destructive/30 scroll-mt-4">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <AlertTriangle className="h-4 w-4 text-destructive" />
@@ -399,6 +413,18 @@ export default function RiskAssessment() {
                   </Button>
                 </div>
                 <p className="text-[10px] text-muted-foreground">Each notice in the Response Tracker automatically creates a risk item here with its own status and deadline</p>
+                {focusedNoticeRisk && (
+                  <button
+                    type="button"
+                    onClick={() => { const next = new URLSearchParams(searchParams); next.delete('noticeRisk'); setSearchParams(next, { replace: true }); }}
+                    className="mt-1 inline-flex items-center gap-1.5 self-start rounded-full bg-primary/10 text-primary text-[10px] font-medium px-2.5 py-1 hover:bg-primary/20"
+                  >
+                    Highlighted: {focusedNoticeRisk} <X className="h-3 w-3" />
+                  </button>
+                )}
+                {focusedNoticeRisk && !noticeRisks.some(r => r.id === focusedNoticeRisk) && (
+                  <p className="text-[10px] text-muted-foreground">That notice risk is now closed, so it no longer appears in the open list.</p>
+                )}
               </CardHeader>
               <CardContent>
                 <div className="rounded-md border border-destructive/20 overflow-auto">
@@ -418,7 +444,12 @@ export default function RiskAssessment() {
                     </TableHeader>
                     <TableBody>
                       {noticeRisks.map(r => (
-                        <TableRow key={r.id} className="hover:bg-destructive/5 cursor-pointer" onClick={() => navigate(`/notices/${r.noticeId}`)}>
+                        <TableRow
+                          key={r.id}
+                          id={r.id}
+                          className={`hover:bg-destructive/5 cursor-pointer ${focusedNoticeRisk === r.id ? 'bg-secondary/15 ring-2 ring-secondary/50' : ''}`}
+                          onClick={() => navigate(`/notices/${r.noticeId}`)}
+                        >
                           <TableCell className="text-[11px] font-mono">{r.noticeNo}</TableCell>
                           <TableCell className="text-xs font-medium max-w-[220px] truncate" title={r.subject}>{r.subject}</TableCell>
                           <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{r.source}</TableCell>

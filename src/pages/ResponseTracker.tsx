@@ -245,12 +245,29 @@ export default function ResponseTracker() {
                     <TableHead className="text-[10px]">Deadline</TableHead>
                     <TableHead className="text-[10px] hidden md:table-cell">Days Left</TableHead>
                     <TableHead className="text-[10px] hidden lg:table-cell">Owner</TableHead>
+                    <TableHead className="text-[10px]">Open</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {risks.map(r => (
-                    <TableRow key={r.id} className="hover:bg-destructive/5">
-                      <TableCell className="text-[10px] font-mono text-muted-foreground max-w-[160px] truncate">{r.id}</TableCell>
+                    <TableRow
+                      key={r.id}
+                      className="hover:bg-destructive/5 cursor-pointer"
+                      onClick={e => {
+                        const target = e.target as HTMLElement;
+                        if (target.closest('a, button')) return;
+                        navigate(`/notices/${r.noticeId}`);
+                      }}
+                    >
+                      <TableCell className="text-[10px] font-mono text-muted-foreground max-w-[160px] truncate" title={r.id}>
+                        <Link
+                          to={`/risk-assessment?noticeRisk=${encodeURIComponent(r.id)}`}
+                          onClick={e => e.stopPropagation()}
+                          className="text-secondary hover:underline"
+                        >
+                          {r.id}
+                        </Link>
+                      </TableCell>
                       <TableCell className="text-xs font-medium max-w-[240px] truncate" title={r.subject}>{r.subject}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{r.source}</TableCell>
                       <TableCell>
@@ -262,6 +279,14 @@ export default function ResponseTracker() {
                         {r.riskStatus === 'Closed' ? '—' : r.daysToDeadline < 0 ? `${Math.abs(r.daysToDeadline)} days overdue` : `${r.daysToDeadline} days`}
                       </TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{r.owner}</TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        <div className="flex flex-col gap-0.5">
+                          <Link to={`/notices/${r.noticeId}`} onClick={e => e.stopPropagation()} className="text-[10px] font-medium text-secondary hover:underline">View Notice</Link>
+                          {r.riskStatus !== 'Closed' && (
+                            <Link to={`/risk-assessment?noticeRisk=${encodeURIComponent(r.id)}`} onClick={e => e.stopPropagation()} className="text-[10px] font-medium text-secondary hover:underline">In Risk Assessment</Link>
+                          )}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
