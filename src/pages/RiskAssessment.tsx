@@ -1,7 +1,7 @@
 import { AppLayout } from '@/components/AppLayout';
 import { useComplianceStore } from '@/store/complianceStore';
 import { buildNoticeRisks, buildOverdueTaskRisks, effectiveRiskLevel, riskReasons } from '@/data/workflowData';
-import { CHART_COLORS, RISK_TILE_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
+import { CHART_COLORS, COMPARISON_COLORS, RISK_TILE_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
 import { StatTile } from '@/components/StatTile';
 import { Link } from 'react-router-dom';
 import { ComplianceDetailDrawer } from '@/components/ComplianceDetailDrawer';
@@ -239,10 +239,10 @@ export default function RiskAssessment() {
                   wrapperStyle={{ fontSize: '11px', paddingTop: '4px' }}
                   formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
                 />
-                <Bar dataKey="completed" fill={CHART_COLORS.Completed} name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                <Bar dataKey="completed" fill={COMPARISON_COLORS.completed} name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
                   <LabelList dataKey="completedPct" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${v}%`} />
                 </Bar>
-                <Bar dataKey="nonCompliant" fill={CHART_COLORS.Overdue} name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                <Bar dataKey="nonCompliant" fill={COMPARISON_COLORS.nonCompliant} name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
                   <LabelList dataKey="nonCompliantPct" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${v}%`} />
                 </Bar>
               </BarChart>
