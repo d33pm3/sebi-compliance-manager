@@ -18,31 +18,8 @@ import { deriveComplianceState } from '@/data/workflowData';
 import { Link } from 'react-router-dom';
 import { exportCategoryToXlsx, exportCategoryToPptx } from '@/lib/categoryExportUtils';
 import { toast } from 'sonner';
-
-const CHART_COLORS = {
-  Completed: 'hsl(145, 63%, 62%)',
-  'Due Soon': 'hsl(38, 80%, 52%)',
-  Overdue: 'hsl(350, 80%, 72%)',
-  'Not Due': 'hsl(220, 8%, 46%)',
-  'In Progress': 'hsl(197, 78%, 54%)',
-  'Not Started': 'hsl(220, 8%, 64%)',
-};
-
-const RISK_COLORS = {
-  Critical: 'hsl(350, 80%, 72%)',
-  High: 'hsl(38, 80%, 52%)',
-  Medium: 'hsl(197, 78%, 54%)',
-  Low: 'hsl(145, 63%, 62%)',
-};
-
-// Stat tiles reuse the exact donut-chart palette so numbers and colours reconcile visually
-const STAT_COLORS = {
-  total: { bg: 'hsl(220, 26%, 22%)', fg: 'hsl(0, 0%, 100%)' },
-  dueSoon: { bg: CHART_COLORS['Due Soon'], fg: 'hsl(30, 60%, 12%)' },
-  overdue: { bg: CHART_COLORS.Overdue, fg: 'hsl(350, 60%, 18%)' },
-  completed: { bg: CHART_COLORS.Completed, fg: 'hsl(150, 60%, 14%)' },
-  upcoming: { bg: CHART_COLORS['Not Due'], fg: 'hsl(0, 0%, 100%)' },
-};
+import { CHART_COLORS, RISK_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
+import { StatTile } from '@/components/StatTile';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -100,15 +77,6 @@ export default function Dashboard() {
   const filtered = filteredItems();
   const [page, setPage] = useState(0);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const toTitleCaseLabel = (s: string) => {
-    const ACRONYMS = new Set(['MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO', 'RMC', 'ASCR', 'SAR', 'BRSR', 'GM', 'HVDLE', 'PIT', 'SAST', 'ESG', 'KMP', 'MD&A', 'RPT', 'ALL', 'TOP', 'IPO']);
-    return s.split(/(\s+|\/)/).map(w => {
-      if (/^\s+$/.test(w) || w === '/') return w;
-      const bare = w.replace(/[^A-Za-z&]/g, '');
-      if (ACRONYMS.has(bare.toUpperCase())) return w.toUpperCase();
-      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-    }).join('');
-  };
   const perPage = 15;
   const registerRef = useRef<HTMLDivElement>(null);
 
@@ -214,11 +182,11 @@ export default function Dashboard() {
       <div className="space-y-4">
         {/* Quick Stats — clickable, drill straight into the Master Compliance Register */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <StatCard icon={<FileText className="h-4 w-4" />} label="Total Items" value={stats.total} bg={STAT_COLORS.total} active={filters.status === ''} onClick={() => drillTo('')} />
-          <StatCard icon={<Clock className="h-4 w-4" />} label="Due Soon" value={stats.dueSoon} bg={STAT_COLORS.dueSoon} active={filters.status === 'Due Soon'} onClick={() => drillTo('Due Soon')} />
-          <StatCard icon={<AlertTriangle className="h-4 w-4" />} label="Overdue" value={stats.overdue} bg={STAT_COLORS.overdue} active={filters.status === 'Overdue'} onClick={() => drillTo('Overdue')} />
-          <StatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Completed" value={stats.completed} bg={STAT_COLORS.completed} active={filters.status === 'Completed'} onClick={() => drillTo('Completed')} />
-          <StatCard icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming} bg={STAT_COLORS.upcoming} active={filters.status === 'Not Due'} onClick={() => drillTo('Not Due')} />
+          <StatTile icon={<FileText className="h-4 w-4" />} label="Total Items" value={stats.total} bg={STAT_COLORS.total} active={filters.status === ''} onClick={() => drillTo('')} />
+          <StatTile icon={<Clock className="h-4 w-4" />} label="Due Soon" value={stats.dueSoon} bg={STAT_COLORS.dueSoon} active={filters.status === 'Due Soon'} onClick={() => drillTo('Due Soon')} />
+          <StatTile icon={<AlertTriangle className="h-4 w-4" />} label="Overdue" value={stats.overdue} bg={STAT_COLORS.overdue} active={filters.status === 'Overdue'} onClick={() => drillTo('Overdue')} />
+          <StatTile icon={<CheckCircle2 className="h-4 w-4" />} label="Completed" value={stats.completed} bg={STAT_COLORS.completed} active={filters.status === 'Completed'} onClick={() => drillTo('Completed')} />
+          <StatTile icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming} bg={STAT_COLORS.upcoming} active={filters.status === 'Not Due'} onClick={() => drillTo('Not Due')} />
         </div>
 
         {/* Charts Row — Status + Filings */}
@@ -647,40 +615,5 @@ export default function Dashboard() {
         <ComplianceDetailDrawer />
       </div>
     </AppLayout>
-  );
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  bg,
-  active,
-  onClick,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  bg: { bg: string; fg: string };
-  active?: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`group w-full rounded-lg text-left transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${active ? 'ring-2 ring-offset-2 ring-ring' : ''}`}
-      style={{ backgroundColor: bg.bg, color: bg.fg }}
-      title={`View ${label} in the Master Compliance Register`}
-    >
-      <div className="p-3 flex items-center gap-3">
-        <div className="opacity-80" style={{ color: bg.fg }}>{icon}</div>
-        <div className="min-w-0">
-          <p className="text-xl font-bold leading-none" style={{ color: bg.fg }}>{value}</p>
-          <p className="text-[10px] font-medium mt-1 truncate opacity-80" style={{ color: bg.fg }}>{label}</p>
-        </div>
-      </div>
-    </button>
   );
 }

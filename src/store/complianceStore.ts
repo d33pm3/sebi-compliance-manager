@@ -10,6 +10,7 @@ import {
   NoticeResponseStatus,
   TaskStatus,
   approverEmail,
+  effectiveRiskLevel,
   noticeResponses as seedNotices,
   seedTasks,
 } from '@/data/workflowData';
@@ -37,6 +38,7 @@ interface Filters {
   category: string;
   status: string;
   riskLevel: string;
+  approvalStatus: string;
   complianceNature: string;
   obligorTier: string;
 }
@@ -104,6 +106,7 @@ const defaultFilters: Filters = {
   category: '',
   status: '',
   riskLevel: '',
+  approvalStatus: '',
   complianceNature: '',
   obligorTier: '',
 };
@@ -383,7 +386,8 @@ export const useComplianceStore = create<ComplianceStore>((set, get) => ({
       if (filters.search && !item.filingName.toLowerCase().includes(filters.search.toLowerCase()) && !item.category.toLowerCase().includes(filters.search.toLowerCase()) && !item.regReference.toLowerCase().includes(filters.search.toLowerCase())) return false;
       if (filters.category && item.category !== filters.category) return false;
       if (filters.status && item.status !== filters.status) return false;
-      if (filters.riskLevel && item.riskLevel !== filters.riskLevel) return false;
+      if (filters.riskLevel && effectiveRiskLevel(item) !== filters.riskLevel) return false;
+      if (filters.approvalStatus && item.approvalStatus !== filters.approvalStatus) return false;
       if (filters.complianceNature && item.complianceNature !== filters.complianceNature) return false;
       if (filters.obligorTier && item.obligorTier !== filters.obligorTier) return false;
       return true;

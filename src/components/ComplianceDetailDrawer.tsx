@@ -1,5 +1,7 @@
 import { useComplianceStore } from '@/store/complianceStore';
 import { ComplianceItem } from '@/data/complianceData';
+import { effectiveRiskLevel, riskReasons } from '@/data/workflowData';
+import { toTitleCaseLabel } from '@/lib/chartTheme';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { StatusBadge, RiskBadge, NatureBadge, ApprovalBadge } from '@/components/StatusBadges';
 import { Badge } from '@/components/ui/badge';
@@ -36,10 +38,10 @@ export function ComplianceDetailDrawer() {
             <Badge variant="outline" className="text-[10px]">#{item.sNo}</Badge>
             <NatureBadge nature={item.complianceNature} />
             <StatusBadge status={item.status} />
-            <RiskBadge level={item.riskLevel} />
+            <RiskBadge level={effectiveRiskLevel(item)} />
           </div>
           <SheetTitle className="text-base leading-snug">{item.filingName}</SheetTitle>
-          <SheetDescription className="text-xs">{item.category}</SheetDescription>
+          <SheetDescription className="text-xs">{toTitleCaseLabel(item.category)}</SheetDescription>
         </SheetHeader>
 
         <div className="mt-3">
@@ -51,6 +53,22 @@ export function ComplianceDetailDrawer() {
             <FileText className="h-3 w-3" /> Open Full Detail Page
           </Link>
         </div>
+
+        <div className="mt-4 rounded-md border border-border bg-muted/40 p-3">
+          <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+            <AlertTriangle className="h-3 w-3 text-warning flex-shrink-0" />
+            Why This Carries {effectiveRiskLevel(item)} Risk
+          </p>
+          <ul className="mt-1.5 space-y-1">
+            {riskReasons(item).map((r, i) => (
+              <li key={i} className="text-[11px] text-muted-foreground flex gap-1.5">
+                <span className="text-warning">•</span>
+                <span>{r}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
 
         <div className="mt-4 space-y-4">
           <div className="grid grid-cols-2 gap-3 text-xs">

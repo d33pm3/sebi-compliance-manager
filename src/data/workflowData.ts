@@ -1,4 +1,4 @@
-import { ComplianceItem } from '@/data/complianceData';
+import { ComplianceItem, RiskLevel } from '@/data/complianceData';
 
 /* ------------------------------------------------------------------ */
 /* Filing submissions                                                  */
@@ -213,6 +213,32 @@ export function deriveComplianceState(item: ComplianceItem): ComplianceState {
   if (item.approvalStatus === 'Doc Missing' || !item.evidenceUploaded) return 'Documents Missing';
   return 'On Track';
 }
+
+/**
+ * The effective risk level of a compliance item, used everywhere (tiles, register,
+ * filters, exports) so the numbers always reconcile with the Master Register.
+ * Overdue items and items with missing documents are automatically elevated.
+ */
+export function effectiveRiskLevel(item: ComplianceItem): RiskLevel {
+  if (item.status === 'Overdue') return 'Critical';
+  if (item.approvalStatus === 'Doc Missing') return 'High';
+  return item.riskLevel;
+}
+
+/** Plain-language reasons why an item currently carries risk */
+export function riskReasons(item: ComplianceItem): string[] {
+  const reasons: string[] = [];
+  if (item.status === 'Overdue') reasons.push(`Past its due date of ${item.dueDate} — statutory deadline missed`);
+  if (item.approvalStatus === 'Doc Missing') reasons.push('Supporting documents have not been provided to the approver');
+  if (!item.evidenceUploaded) reasons.push('No evidence uploaded to the Document Vault');
+  if (item.approvalStatus === 'Rejected') reasons.push('Approver rejected the submission — rework required');
+  if (item.approvalStatus === 'Pending') reasons.push(`Awaiting approval from ${item.owner}`);
+  if (item.approvalStatus === 'Not Started') reasons.push('Work has not started on this filing');
+  if (item.riskLevel === 'Critical' || item.riskLevel === 'High') reasons.push(`Inherent risk rating of the filing is ${item.riskLevel}`);
+  if (reasons.length === 0) reasons.push('No open risk — filing is complete and approved');
+  return reasons;
+}
+
 
 /* ------------------------------------------------------------------ */
 /* Approval requests + email notifications                             */
