@@ -95,6 +95,11 @@ interface ComplianceStore {
   addComment: (id: number, comment: Comment) => void;
   toggleEvidence: (id: number) => void;
 
+  // Direct Master Compliance Register maintenance
+  addItem: (input: MasterEntryInput) => number;
+  updateItem: (id: number, input: MasterEntryInput) => void;
+  deleteItem: (id: number) => void;
+
   // Filing workflow — one submission updates Register, Risk and Vault together
   submitFiling: (id: number, input: FilingSubmissionInput) => void;
   approveFiling: (filingId: string, approve: boolean) => void;
