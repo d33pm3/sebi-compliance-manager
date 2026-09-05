@@ -12,6 +12,8 @@ import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, Rot
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useRef, useState } from 'react';
 import { MaterialEventsSection } from '@/components/MaterialEventsSection';
+import { deriveComplianceState } from '@/data/workflowData';
+import { Link } from 'react-router-dom';
 import { exportCategoryToXlsx, exportCategoryToPptx } from '@/lib/categoryExportUtils';
 import { toast } from 'sonner';
 
@@ -75,6 +77,21 @@ const CategoryYAxisTick = ({ x, y, payload, textAnchor }: any) => (
     {payload.value}
   </text>
 );
+
+const STATE_STYLE: Record<string, string> = {
+  Completed: 'bg-success text-success-foreground',
+  Overdue: 'bg-destructive text-destructive-foreground',
+  'Documents Missing': 'bg-warning text-warning-foreground',
+  'On Track': 'bg-secondary text-secondary-foreground',
+};
+
+function ComplianceStateBadge({ state }: { state: string }) {
+  return (
+    <span className={`inline-flex items-center justify-center rounded-full text-[10px] font-semibold whitespace-nowrap min-w-[104px] h-5 px-2.5 leading-none ${STATE_STYLE[state]}`}>
+      {state}
+    </span>
+  );
+}
 
 export default function Dashboard() {
   const { items, filters, setFilter, resetFilters, selectItem, filteredItems } = useComplianceStore();
@@ -173,10 +190,10 @@ export default function Dashboard() {
       .filter(i => (i.complianceNature === '[P]' || i.complianceNature === '[P+E]'))
       .filter(i => {
         const d = new Date(i.dueDate);
-        return d >= today && d <= in15Days;
+        return (d >= today && d <= in15Days) || i.status === 'Overdue';
       })
       .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-      .slice(0, 8);
+      .slice(0, 10);
   }, [items]);
 
   const paged = filtered.slice(page * perPage, (page + 1) * perPage);
@@ -337,19 +354,33 @@ export default function Dashboard() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-semibold">Filing Calendar (Next 15 Days)</CardTitle>
+              <CardTitle className="text-xs font-semibold">Filing Calendar (Next 15 Days & Overdue)</CardTitle>
+              <p className="text-[10px] text-muted-foreground">Each filing shows its compliance state — the same state drives the Risk Assessment module</p>
             </CardHeader>
-            <CardContent className="space-y-1.5 max-h-52 overflow-auto">
+            <CardContent className="max-h-52 overflow-auto p-0">
               {filingCalendar.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No filings due in the next 15 days.</p>
+                <p className="text-xs text-muted-foreground p-4">No filings due in the next 15 days.</p>
               ) : (
-                filingCalendar.map(item => (
-                  <div key={item.id} className="flex items-center gap-2 text-xs cursor-pointer hover:bg-muted/50 p-1.5 rounded" onClick={() => selectItem(item.id)}>
-                    <span className="text-muted-foreground flex-shrink-0 w-16">{new Date(item.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
-                    <span className="truncate flex-1">{item.filingName}</span>
-                    <StatusBadge status={item.status} />
-                  </div>
-                ))
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-[10px] w-20">Due</TableHead>
+                      <TableHead className="text-[10px]">Filing Name</TableHead>
+                      <TableHead className="text-[10px]">Status</TableHead>
+                      <TableHead className="text-[10px]">Compliance State</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filingCalendar.map(item => (
+                      <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50" onClick={() => selectItem(item.id)}>
+                        <TableCell className="text-[11px] text-muted-foreground">{new Date(item.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</TableCell>
+                        <TableCell className="text-xs font-medium max-w-[220px] truncate" title={item.filingName}>{item.filingName}</TableCell>
+                        <TableCell><StatusBadge status={item.status} /></TableCell>
+                        <TableCell><ComplianceStateBadge state={deriveComplianceState(item)} /></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
             </CardContent>
           </Card>
@@ -369,7 +400,7 @@ export default function Dashboard() {
                 return (
                   <button
                     key={cat}
-                    onClick={() => setExpandedCategory(isActive ? null : cat)}
+                    onClick={() => { if (isActive) { setExpandedCategory(null); resetFilters(); } else { setExpandedCategory(cat); drillToCategory(cat); } }}
                     className={`text-left p-2.5 rounded-md border text-xs transition-all ${isActive ? 'border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary/20' : 'border-border hover:border-primary/30 hover:bg-muted/50'}`}
                   >
                     <div className="font-medium truncate">{toTitleCaseLabel(cat)}</div>
@@ -549,6 +580,7 @@ export default function Dashboard() {
                     <TableHead className="text-[10px] hidden md:table-cell">Risk</TableHead>
                     <TableHead className="text-[10px] hidden lg:table-cell">Due Date</TableHead>
                     <TableHead className="text-[10px] hidden lg:table-cell">Tier</TableHead>
+                    <TableHead className="text-[10px]">Detail</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -566,6 +598,9 @@ export default function Dashboard() {
                       <TableCell className="hidden md:table-cell"><RiskBadge level={item.riskLevel} /></TableCell>
                       <TableCell className="text-xs text-muted-foreground hidden lg:table-cell">{item.dueDate}</TableCell>
                       <TableCell className="text-[10px] text-muted-foreground hidden lg:table-cell">{toTitleCaseLabel(item.obligorTier)}</TableCell>
+                      <TableCell onClick={e => e.stopPropagation()}>
+                        <Link to={`/compliance/${item.id}`} className="text-[10px] font-medium text-secondary hover:underline whitespace-nowrap">Full Detail</Link>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
