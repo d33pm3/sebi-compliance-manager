@@ -34,6 +34,8 @@ const App = () => (
           <Route path="/assistant" element={<ComplianceAssistant />} />
           <Route path="/response-tracker" element={<ResponseTracker />} />
           <Route path="/tasks" element={<TaskManager />} />
+          <Route path="/timeline" element={<ComplianceTimeline />} />
+
           <Route path="/compliance/:id" element={<ComplianceItemDetail />} />
           <Route path="/admin" element={<AdminModule />} />
           <Route path="*" element={<NotFound />} />
