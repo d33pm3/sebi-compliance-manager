@@ -61,6 +61,12 @@ const PieTooltip = ({ active, payload }: any) => {
   );
 };
 
+const CategoryYAxisTick = ({ x, y, payload, textAnchor }: any) => (
+  <text x={x} y={y} dy={3} textAnchor={textAnchor} fill="hsl(var(--foreground))" fontSize={9}>
+    {payload.value}
+  </text>
+);
+
 export default function Dashboard() {
   const { items, filters, setFilter, resetFilters, selectItem, filteredItems } = useComplianceStore();
   const filtered = filteredItems();
