@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { ExternalLink, Calendar, Building2, FileText, AlertTriangle, Upload, Send } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export function ComplianceDetailDrawer() {
   const { items, drawerOpen, selectedItemId, setDrawerOpen, addComment, updateItemStatus, updateApprovalStatus } = useComplianceStore();
@@ -40,6 +41,16 @@ export function ComplianceDetailDrawer() {
           <SheetTitle className="text-base leading-snug">{item.filingName}</SheetTitle>
           <SheetDescription className="text-xs">{item.category}</SheetDescription>
         </SheetHeader>
+
+        <div className="mt-3">
+          <Link
+            to={`/compliance/${item.id}`}
+            onClick={() => setDrawerOpen(false)}
+            className="inline-flex items-center gap-1 rounded-md border border-secondary/40 bg-secondary/10 px-2.5 py-1 text-[11px] font-medium text-secondary hover:bg-secondary/20"
+          >
+            <FileText className="h-3 w-3" /> Open Full Detail Page
+          </Link>
+        </div>
 
         <div className="mt-4 space-y-4">
           <div className="grid grid-cols-2 gap-3 text-xs">
