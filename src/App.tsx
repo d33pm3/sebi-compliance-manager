@@ -10,6 +10,9 @@ import DocumentVault from "./pages/DocumentVault.tsx";
 import ComplianceChatbot from "./pages/ComplianceChatbot.tsx";
 import ComplianceAssistant from "./pages/ComplianceAssistant.tsx";
 import AdminModule from "./pages/AdminModule.tsx";
+import ResponseTracker from "./pages/ResponseTracker.tsx";
+import TaskManager from "./pages/TaskManager.tsx";
+import ComplianceItemDetail from "./pages/ComplianceItemDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -27,6 +30,9 @@ const App = () => (
           <Route path="/doc-vault" element={<DocumentVault />} />
           <Route path="/chatbot" element={<ComplianceChatbot />} />
           <Route path="/assistant" element={<ComplianceAssistant />} />
+          <Route path="/response-tracker" element={<ResponseTracker />} />
+          <Route path="/tasks" element={<TaskManager />} />
+          <Route path="/compliance/:id" element={<ComplianceItemDetail />} />
           <Route path="/admin" element={<AdminModule />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

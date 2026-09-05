@@ -6,13 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { vaultDocuments, vaultCategories, VaultDocument } from '@/data/vaultData';
+import { vaultCategories, VaultDocument } from '@/data/vaultData';
+import { useComplianceStore } from '@/store/complianceStore';
 import { Search, Download, Mail, FileText, AlertTriangle, BookOpen, Bot, Upload, Eye, ChevronLeft, ChevronRight, FolderArchive } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { downloadDocumentPlaceholder } from '@/lib/downloadUtils';
 
 export default function DocumentVault() {
+  const vaultDocuments = useComplianceStore(s => s.vaultDocs);
   const [search, setSearch] = useState('');
   const [section, setSection] = useState('all');
   const [category, setCategory] = useState('all');
@@ -28,7 +30,7 @@ export default function DocumentVault() {
       if (year !== 'all' && doc.fiscalYear !== year) return false;
       return true;
     });
-  }, [search, section, category, year]);
+  }, [vaultDocuments, search, section, category, year]);
 
   const paged = filtered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.ceil(filtered.length / perPage);
@@ -58,7 +60,7 @@ export default function DocumentVault() {
     'sebi-notices': vaultDocuments.filter(d => d.section === 'sebi-notices').length,
     'regulatory-docs': vaultDocuments.filter(d => d.section === 'regulatory-docs').length,
     'agent-outputs': vaultDocuments.filter(d => d.section === 'agent-outputs').length,
-  }), []);
+  }), [vaultDocuments]);
 
   const handleAction = (action: string, doc: VaultDocument) => {
     if (action === 'Download') {

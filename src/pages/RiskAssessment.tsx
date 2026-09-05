@@ -1,6 +1,7 @@
 import { AppLayout } from '@/components/AppLayout';
 import { useComplianceStore } from '@/store/complianceStore';
-import { vaultDocuments } from '@/data/vaultData';
+import { buildNoticeRisks } from '@/data/workflowData';
+import { Link } from 'react-router-dom';
 import { ComplianceDetailDrawer } from '@/components/ComplianceDetailDrawer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -55,7 +56,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function RiskAssessment() {
-  const { items, filters, setFilter, resetFilters, selectItem, filteredItems, updateApprovalStatus, toggleEvidence } = useComplianceStore();
+  const { items, filters, setFilter, resetFilters, selectItem, filteredItems, updateApprovalStatus, toggleEvidence, notices } = useComplianceStore();
   const filtered = filteredItems();
   const [page, setPage] = useState(0);
   const [tab, setTab] = useState('all');
@@ -270,65 +271,72 @@ export default function RiskAssessment() {
           </Card>
         )}
 
-        {/* SEBI Notices — Pending Response = High Risk */}
+        {/* SEBI Notices — auto-created risk items from the Response Tracker */}
         {(() => {
-          const pendingNotices = vaultDocuments.filter(d => d.section === 'sebi-notices' && d.status === 'Pending');
-          if (pendingNotices.length === 0) return null;
+          const noticeRisks = buildNoticeRisks(notices).filter(r => r.riskStatus !== 'Closed');
+          if (noticeRisks.length === 0) return null;
+          const exportNoticeRisks = () => {
+            import('xlsx').then((XLSX) => {
+              const wsData = [
+                ['Risk ID', 'Notice No.', 'Subject', 'Source', 'Regulation', 'Risk Level', 'Risk Status', 'Response Status', 'Deadline', 'Days To Deadline', 'Owner'],
+                ...noticeRisks.map(r => [r.id, r.noticeNo, r.subject, r.source, r.regulation, r.riskLevel, r.riskStatus, r.responseStatus, r.deadline, r.daysToDeadline, r.owner]),
+              ];
+              const wb = XLSX.utils.book_new();
+              const ws = XLSX.utils.aoa_to_sheet(wsData);
+              ws['!cols'] = [{ wch: 34 }, { wch: 22 }, { wch: 50 }, { wch: 10 }, { wch: 14 }, { wch: 11 }, { wch: 12 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 22 }];
+              XLSX.utils.book_append_sheet(wb, ws, 'Notice Risks');
+              XLSX.writeFile(wb, 'SEBI_Notice_Risk_Items.xlsx');
+              toast.success('Downloaded SEBI_Notice_Risk_Items.xlsx');
+            });
+          };
           return (
             <Card className="border-destructive/30">
               <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <AlertTriangle className="h-4 w-4 text-destructive" />
                   <CardTitle className="text-sm font-semibold text-destructive">
-                    Open High Risks — SEBI Notices Pending Response ({pendingNotices.length})
+                    Open High Risks — SEBI Notices & Inquiries ({noticeRisks.length})
                   </CardTitle>
-                  <Button variant="outline" size="sm" className="ml-auto text-[10px] h-7 px-2.5 gap-1" onClick={() => {
-                    import('xlsx').then((XLSX) => {
-                      const wsData = [
-                        ['Notice No.', 'Subject', 'Issued By', 'Response Due', 'Status', 'Risk Level', 'Regulation', 'Document Type', 'Uploaded'],
-                        ...pendingNotices.map(d => [d.noticeNo, d.title, d.issuedBy, d.responseDue, d.status, 'High', d.regulation, d.documentType, d.uploadedAt]),
-                      ];
-                      const wb = XLSX.utils.book_new();
-                      const ws = XLSX.utils.aoa_to_sheet(wsData);
-                      ws['!cols'] = [{ wch: 22 }, { wch: 45 }, { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 18 }, { wch: 12 }];
-                      XLSX.utils.book_append_sheet(wb, ws, 'Pending SEBI Notices');
-                      XLSX.writeFile(wb, 'SEBI_Notices_Pending_High_Risks.xlsx');
-                      toast.success('Downloaded SEBI_Notices_Pending_High_Risks.xlsx');
-                    });
-                  }}>
-                    <FileSpreadsheet className="h-3 w-3" /> Export .xlsx
+                  <Link to="/response-tracker" className="text-[10px] font-medium text-secondary hover:underline">Open Response Tracker</Link>
+                  <Button variant="outline" size="sm" className="ml-auto text-[10px] h-7 px-2.5 gap-1" onClick={exportNoticeRisks}>
+                    <FileSpreadsheet className="h-3 w-3 flex-shrink-0" /> Export .xlsx
                   </Button>
                 </div>
-                <p className="text-[10px] text-muted-foreground">SEBI notices & inquiries with pending responses are automatically flagged as High Risk</p>
+                <p className="text-[10px] text-muted-foreground">Each notice in the Response Tracker automatically creates a risk item here with its own status and deadline</p>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border border-destructive/20">
+                <div className="rounded-md border border-destructive/20 overflow-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead className="text-[10px]">Notice No.</TableHead>
                         <TableHead className="text-[10px]">Subject</TableHead>
-                        <TableHead className="text-[10px] hidden md:table-cell">Issued By</TableHead>
-                        <TableHead className="text-[10px]">Response Due</TableHead>
+                        <TableHead className="text-[10px] hidden md:table-cell">Source</TableHead>
                         <TableHead className="text-[10px]">Risk</TableHead>
-                        <TableHead className="text-[10px]">Flag</TableHead>
-                        <TableHead className="text-[10px] hidden md:table-cell">Regulation</TableHead>
+                        <TableHead className="text-[10px]">Risk Status</TableHead>
+                        <TableHead className="text-[10px]">Response</TableHead>
+                        <TableHead className="text-[10px]">Deadline</TableHead>
+                        <TableHead className="text-[10px] hidden lg:table-cell">Owner</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {pendingNotices.map(doc => (
-                        <TableRow key={doc.id} className="hover:bg-destructive/5">
-                          <TableCell className="text-[11px] font-mono">{doc.noticeNo}</TableCell>
-                          <TableCell className="text-xs font-medium max-w-[200px] truncate">{doc.title}</TableCell>
-                          <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{doc.issuedBy}</TableCell>
-                          <TableCell className="text-xs text-destructive font-semibold">{doc.responseDue}</TableCell>
-                          <TableCell><RiskBadge level="High" /></TableCell>
+                      {noticeRisks.map(r => (
+                        <TableRow key={r.id} className="hover:bg-destructive/5">
+                          <TableCell className="text-[11px] font-mono">{r.noticeNo}</TableCell>
+                          <TableCell className="text-xs font-medium max-w-[220px] truncate" title={r.subject}>{r.subject}</TableCell>
+                          <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{r.source}</TableCell>
+                          <TableCell><RiskBadge level={r.riskLevel} /></TableCell>
                           <TableCell>
-                            <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 text-destructive border border-destructive/30 text-[10px] font-semibold px-2 py-0.5 whitespace-nowrap">
-                              <AlertTriangle className="h-2.5 w-2.5" /> Response Pending
+                            <span className={`inline-flex items-center justify-center rounded-full text-[10px] font-semibold whitespace-nowrap min-w-[76px] h-5 px-2.5 leading-none ${r.riskStatus === 'Open' ? 'bg-destructive text-destructive-foreground' : 'bg-warning text-warning-foreground'}`}>{r.riskStatus}</span>
+                          </TableCell>
+                          <TableCell className="text-[11px] text-muted-foreground">{r.responseStatus}</TableCell>
+                          <TableCell className={`text-xs font-semibold ${r.daysToDeadline < 0 ? 'text-destructive' : ''}`}>
+                            {r.deadline}
+                            <span className="block text-[10px] font-normal text-muted-foreground">
+                              {r.daysToDeadline < 0 ? `${Math.abs(r.daysToDeadline)} days overdue` : `${r.daysToDeadline} days left`}
                             </span>
                           </TableCell>
-                          <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{doc.regulation}</TableCell>
+                          <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{r.owner}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
