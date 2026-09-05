@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { buildNoticeRisks, NoticeResponse } from '@/data/workflowData';
-import { AlertTriangle, CheckCircle2, Clock, FileSpreadsheet, FileText, Send, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, Clock, FileSpreadsheet, FileText, Send, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -112,6 +112,11 @@ export default function ResponseTracker() {
                     <SelectItem value="Closed">Closed</SelectItem>
                   </SelectContent>
                 </Select>
+                <Link to="/doc-vault">
+                  <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
+                    <ArrowLeft className="h-3.5 w-3.5 flex-shrink-0" /> Back to Document Vault
+                  </Button>
+                </Link>
                 <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={exportXlsx}>
                   <FileSpreadsheet className="h-3.5 w-3.5 flex-shrink-0" /> Export .xlsx
                 </Button>
