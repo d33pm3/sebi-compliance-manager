@@ -98,7 +98,15 @@ export default function Dashboard() {
   const filtered = filteredItems();
   const [page, setPage] = useState(0);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const toTitleCaseLabel = (s: string) => s.toLowerCase().replace(/(?:^|\s|\/)\w/g, c => c.toUpperCase());
+  const toTitleCaseLabel = (s: string) => {
+    const ACRONYMS = new Set(['MCA', 'AGM', 'EGM', 'SEBI', 'XBRL', 'LODR', 'NSE', 'BSE', 'RTA', 'PCS', 'CEO', 'CFO', 'RMC', 'ASCR', 'SAR', 'BRSR', 'GM', 'HVDLE', 'PIT', 'SAST', 'ESG', 'KMP', 'MD&A', 'RPT', 'ALL', 'TOP', 'IPO']);
+    return s.split(/(\s+|\/)/).map(w => {
+      if (/^\s+$/.test(w) || w === '/') return w;
+      const bare = w.replace(/[^A-Za-z&]/g, '');
+      if (ACRONYMS.has(bare.toUpperCase())) return w.toUpperCase();
+      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    }).join('');
+  };
   const perPage = 15;
   const registerRef = useRef<HTMLDivElement>(null);
 
@@ -366,17 +374,15 @@ export default function Dashboard() {
                     <TableRow>
                       <TableHead className="text-[10px] w-20">Due</TableHead>
                       <TableHead className="text-[10px]">Filing Name</TableHead>
-                      <TableHead className="text-[10px]">Status</TableHead>
-                      <TableHead className="text-[10px]">Compliance State</TableHead>
+                      <TableHead className="text-[10px] text-right">Compliance State</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filingCalendar.map(item => (
                       <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50" onClick={() => selectItem(item.id)}>
                         <TableCell className="text-[11px] text-muted-foreground">{new Date(item.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</TableCell>
-                        <TableCell className="text-xs font-medium max-w-[220px] truncate" title={item.filingName}>{item.filingName}</TableCell>
-                        <TableCell><StatusBadge status={item.status} /></TableCell>
-                        <TableCell><ComplianceStateBadge state={deriveComplianceState(item)} /></TableCell>
+                        <TableCell className="text-xs font-medium max-w-[190px] truncate" title={item.filingName}>{item.filingName}</TableCell>
+                        <TableCell className="text-right"><ComplianceStateBadge state={deriveComplianceState(item)} /></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
