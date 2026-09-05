@@ -10,6 +10,7 @@ import { Upload, X, FileUp, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useComplianceStore } from '@/store/complianceStore';
 import { VaultDocument } from '@/data/vaultData';
+import { toTitleCaseLabel } from '@/lib/chartTheme';
 
 const FISCAL_YEARS = ['FY2025-26', 'FY2024-25'];
 const DOC_TYPES = ['Filing', 'Report', 'Disclosure', 'Statement', 'Certificate', 'Board Minutes', 'Notice Response', 'Supporting Evidence'];
@@ -151,7 +152,7 @@ export function DocumentUploadForm() {
             {selected && (
               <p className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
                 <Link2 className="h-3 w-3 flex-shrink-0" />
-                {selected.category} · Due {selected.dueDate} · Owner {selected.owner}
+                {toTitleCaseLabel(selected.category)} · Due {selected.dueDate} · Owner {selected.owner}
               </p>
             )}
           </div>
