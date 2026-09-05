@@ -91,7 +91,12 @@ export function MaterialEventsSection() {
                 const cfg = urgencyConfig[event.urgency];
                 const Icon = cfg.icon;
                 return (
-                  <TableRow key={event.id}>
+                  <TableRow
+                    key={event.id}
+                    onClick={() => setSelectedEvent(event)}
+                    className="cursor-pointer hover:bg-muted/50"
+                    aria-label={`View details for ${event.disclosureName}`}
+                  >
                     <TableCell className="text-xs font-semibold whitespace-nowrap">{event.timeline}</TableCell>
                     <TableCell className="text-xs max-w-[240px]">
                       <div className="font-medium truncate">{event.disclosureName}</div>
@@ -115,6 +120,63 @@ export function MaterialEventsSection() {
           </Table>
         </div>
       </CardContent>
+
+      <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+        {selectedEvent && (
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <div className="flex items-center gap-2">
+                {(() => {
+                  const Icon = urgencyConfig[selectedEvent.urgency].icon;
+                  return <Icon className="h-4 w-4 text-muted-foreground" />;
+                })()}
+                <DialogTitle className="text-base leading-snug">{selectedEvent.disclosureName}</DialogTitle>
+              </div>
+              <DialogDescription>
+                Material event disclosure obligation under {selectedEvent.regulation}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 pt-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg border p-3 space-y-1">
+                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground uppercase tracking-wider">
+                    <Calendar className="h-3 w-3" />
+                    Response Timeline
+                  </div>
+                  <div className="text-sm font-semibold">{selectedEvent.timeline}</div>
+                </div>
+                <div className="rounded-lg border p-3 space-y-1">
+                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground uppercase tracking-wider">
+                    <Bell className="h-3 w-3" />
+                    Urgency
+                  </div>
+                  <Badge variant="outline" className={`text-[10px] font-semibold ${urgencyConfig[selectedEvent.urgency].className}`}>
+                    {urgencyConfig[selectedEvent.urgency].label}
+                  </Badge>
+                </div>
+              </div>
+              <div className="rounded-lg border p-3 space-y-2">
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground uppercase tracking-wider">
+                  <FileText className="h-3 w-3" />
+                  Trigger Event
+                </div>
+                <p className="text-sm text-foreground">{selectedEvent.triggerEvent}</p>
+              </div>
+              <div className="rounded-lg border p-3 space-y-2">
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground uppercase tracking-wider">
+                  <FileText className="h-3 w-3" />
+                  Response / Action Required
+                </div>
+                <p className="text-sm text-foreground">{selectedEvent.responseTime}</p>
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1">
+                <span>S.No. {selectedEvent.sNo}</span>
+                <span>{selectedEvent.regulation}</span>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
     </Card>
   );
 }
