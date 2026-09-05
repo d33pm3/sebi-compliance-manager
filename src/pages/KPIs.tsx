@@ -293,8 +293,8 @@ export default function KPIs() {
                       data={riskData}
                       dataKey="value"
                       nameKey="name"
-                      innerRadius={55}
-                      outerRadius={85}
+                      innerRadius={48}
+                      outerRadius={72}
                       paddingAngle={2}
                       label={({ value, percent }: any) => (value > 0 ? `${value} (${Math.round(percent * 100)}%)` : '')}
                       labelLine={false}
