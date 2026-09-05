@@ -12,6 +12,8 @@ import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, Rot
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useMemo, useRef, useState } from 'react';
 import { MaterialEventsSection } from '@/components/MaterialEventsSection';
+import { MonthlyComplianceCalendar } from '@/components/MonthlyComplianceCalendar';
+
 import { deriveComplianceState } from '@/data/workflowData';
 import { Link } from 'react-router-dom';
 import { exportCategoryToXlsx, exportCategoryToPptx } from '@/lib/categoryExportUtils';
