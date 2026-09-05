@@ -88,6 +88,20 @@ export default function RiskAssessment() {
     requestAnimationFrame(() => registerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
 
+  /* Deep link from the Response Tracker: /risk-assessment?noticeRisk=<RISK-ID>
+     scrolls to the notice risk table and highlights that exact row. The id is
+     derived from the notice number, so it stays valid as notices change. */
+  const noticeRiskSectionRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const focusedNoticeRisk = searchParams.get('noticeRisk');
+  useEffect(() => {
+    if (!focusedNoticeRisk) return;
+    const t = window.setTimeout(() => {
+      noticeRiskSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
+    return () => window.clearTimeout(t);
+  }, [focusedNoticeRisk]);
+
   /* One-click drill-down: every number on this page lands on the matching rows of
      the Master Compliance Register, read live from the shared compliance store. */
   const drillTo = (key: 'approvalStatus' | 'status' | 'riskLevel', value: string) => {
