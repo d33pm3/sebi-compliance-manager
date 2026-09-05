@@ -15,7 +15,9 @@ import { downloadDocumentPlaceholder } from '@/lib/downloadUtils';
 import { StatTile } from '@/components/StatTile';
 import { STAT_COLORS } from '@/lib/chartTheme';
 import { ComplianceItem } from '@/data/complianceData';
-import { deriveComplianceState, effectiveRiskLevel, linkedComplianceItems } from '@/data/workflowData';
+import { resolveVaultDoc } from '@/data/workflowData';
+import { DocumentUploadForm } from '@/components/DocumentUploadForm';
+
 
 export default function DocumentVault() {
   const vaultDocuments = useComplianceStore(s => s.vaultDocs);
