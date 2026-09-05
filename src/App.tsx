@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import NoticeDetail from "./pages/NoticeDetail";
 import Index from "./pages/Index.tsx";
 import RegisterAgent from "./pages/RegisterAgent.tsx";
 import RiskAssessment from "./pages/RiskAssessment.tsx";
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/doc-vault" element={<DocumentVault />} />
           <Route path="/chatbot" element={<ComplianceChatbot />} />
           <Route path="/assistant" element={<ComplianceAssistant />} />
+          <Route path="/notices/:noticeId" element={<NoticeDetail />} />
           <Route path="/response-tracker" element={<ResponseTracker />} />
           <Route path="/tasks" element={<TaskManager />} />
           <Route path="/timeline" element={<ComplianceTimeline />} />

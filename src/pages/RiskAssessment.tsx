@@ -1,9 +1,9 @@
 import { AppLayout } from '@/components/AppLayout';
 import { useComplianceStore } from '@/store/complianceStore';
 import { buildNoticeRisks, buildOverdueTaskRisks, effectiveRiskLevel, riskReasons } from '@/data/workflowData';
-import { CHART_COLORS, RISK_TILE_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
+import { CHART_COLORS, COMPARISON_COLORS, RISK_TILE_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
 import { StatTile } from '@/components/StatTile';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ComplianceDetailDrawer } from '@/components/ComplianceDetailDrawer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -58,6 +58,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function RiskAssessment() {
+  const navigate = useNavigate();
   const { items, filters, setFilter, resetFilters, selectItem, filteredItems, updateApprovalStatus, toggleEvidence, notices, tasks } = useComplianceStore();
   const filtered = filteredItems();
 
@@ -239,10 +240,10 @@ export default function RiskAssessment() {
                   wrapperStyle={{ fontSize: '11px', paddingTop: '4px' }}
                   formatter={(value: string) => <span className="text-muted-foreground ml-1">{value}</span>}
                 />
-                <Bar dataKey="completed" fill={CHART_COLORS.Completed} name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                <Bar dataKey="completed" fill={COMPARISON_COLORS.completed} name="Completed" radius={[4, 4, 0, 0]} maxBarSize={32}>
                   <LabelList dataKey="completedPct" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${v}%`} />
                 </Bar>
-                <Bar dataKey="nonCompliant" fill={CHART_COLORS.Overdue} name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                <Bar dataKey="nonCompliant" fill={COMPARISON_COLORS.nonCompliant} name="Non-Compliant" radius={[4, 4, 0, 0]} maxBarSize={32}>
                   <LabelList dataKey="nonCompliantPct" position="top" style={{ fontSize: '9px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }} formatter={(v: number) => v === 0 ? '' : `${v}%`} />
                 </Bar>
               </BarChart>
@@ -412,11 +413,12 @@ export default function RiskAssessment() {
                         <TableHead className="text-[10px]">Response</TableHead>
                         <TableHead className="text-[10px]">Deadline</TableHead>
                         <TableHead className="text-[10px] hidden lg:table-cell">Owner</TableHead>
+                        <TableHead className="text-[10px]">Open</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {noticeRisks.map(r => (
-                        <TableRow key={r.id} className="hover:bg-destructive/5">
+                        <TableRow key={r.id} className="hover:bg-destructive/5 cursor-pointer" onClick={() => navigate(`/notices/${r.noticeId}`)}>
                           <TableCell className="text-[11px] font-mono">{r.noticeNo}</TableCell>
                           <TableCell className="text-xs font-medium max-w-[220px] truncate" title={r.subject}>{r.subject}</TableCell>
                           <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{r.source}</TableCell>
@@ -432,6 +434,9 @@ export default function RiskAssessment() {
                             </span>
                           </TableCell>
                           <TableCell className="text-[11px] text-muted-foreground hidden lg:table-cell">{r.owner}</TableCell>
+                          <TableCell>
+                            <Link to={`/notices/${r.noticeId}`} onClick={e => e.stopPropagation()} className="text-[10px] font-medium text-secondary hover:underline">View Notice</Link>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

@@ -66,3 +66,12 @@ export function toTitleCaseLabel(s: string): string {
     })
     .join('');
 }
+
+/**
+ * Comparison series palette (Completed vs Non-Compliant) — brand blues.
+ * Light blue = Completed, dark navy blue = Non-Compliant.
+ */
+export const COMPARISON_COLORS = {
+  completed: 'hsl(199, 76%, 62%)',
+  nonCompliant: 'hsl(205, 62%, 29%)',
+};
