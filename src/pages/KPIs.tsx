@@ -328,10 +328,10 @@ export default function KPIs() {
             <CardContent>
               <div className="h-[220px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryData} layout="vertical" margin={{ top: 8, right: 24, bottom: 8, left: 120 }}>
+                  <BarChart data={categoryData} layout="vertical" margin={{ top: 8, right: 24, bottom: 8, left: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
                     <XAxis type="number" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                    <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={110} interval={0} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: 'hsl(var(--foreground))' }} width={150} interval={0} axisLine={false} tickLine={false} />
                     <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
                     <Bar dataKey="value" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} maxBarSize={20} />
                   </BarChart>
@@ -364,10 +364,19 @@ export default function KPIs() {
             </div>
             <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2">
               {stateDistribution.map(d => (
-                <div key={d.name} className="rounded-lg border p-2 text-center">
-                  <p className="text-[10px] text-muted-foreground">{d.name}</p>
+                <button
+                  key={d.name}
+                  type="button"
+                  onClick={() => drillToState(d.name)}
+                  title={`View ${d.name} items in the Master Compliance Register`}
+                  className="rounded-lg border p-2 text-center transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <p className="text-[10px] text-muted-foreground flex items-center justify-center gap-1.5">
+                    <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: d.fill }} />
+                    {d.name}
+                  </p>
                   <p className="text-lg font-bold">{d.value}</p>
-                </div>
+                </button>
               ))}
             </div>
           </CardContent>
