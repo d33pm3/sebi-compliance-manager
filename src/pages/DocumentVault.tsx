@@ -136,16 +136,9 @@ export default function DocumentVault() {
         </div>
 
 
-        {/* Upload Zone */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer" onClick={() => toast.info('Upload simulation — no backend connected')}>
-              <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm font-medium">Drag & drop files or click to browse</p>
-              <p className="text-[11px] text-muted-foreground mt-1">Supported: PDF, XLSX, DOCX, PPTX, XML, XBRL, CSV, ZIP</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Upload Form — writes back to the Master Compliance Register */}
+        <DocumentUploadForm />
+
 
         {/* Filters + Document Table */}
         <Card>
