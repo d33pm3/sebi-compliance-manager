@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { buildItemTimeline, MilestoneKind, TimelineMilestone } from '@/data/workflowData';
+import { toTitleCaseLabel } from '@/lib/chartTheme';
 import { CalendarClock, CheckCircle2, Circle, FileCheck2, FileText, ListTodo, Search, Stamp, TriangleAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
