@@ -6,6 +6,8 @@ import {
   MessageSquare,
   MailWarning,
   ListTodo,
+  CalendarClock,
+
   BarChart3,
   Settings,
   Shield,
