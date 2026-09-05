@@ -14,7 +14,7 @@ import { TaskStatus, deriveComplianceState, effectiveRiskLevel, riskReasons } fr
 import { RISK_TILE_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
 import { ExternalLink, FileSpreadsheet, Plus, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const badge = 'inline-flex items-center justify-center rounded-full border text-[10px] font-semibold whitespace-nowrap h-5 min-w-[80px] px-2 leading-none';
