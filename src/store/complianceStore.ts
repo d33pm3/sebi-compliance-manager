@@ -2,14 +2,26 @@ import { create } from 'zustand';
 import { complianceItems, ComplianceItem, ComplianceStatus, ApprovalStatus, Comment, RiskLevel } from '@/data/complianceData';
 import { vaultDocuments, VaultDocument } from '@/data/vaultData';
 import {
+  ApprovalRequest,
   ComplianceTask,
+  EmailNotification,
   FilingSubmission,
   NoticeResponse,
   NoticeResponseStatus,
   TaskStatus,
+  approverEmail,
   noticeResponses as seedNotices,
   seedTasks,
 } from '@/data/workflowData';
+
+export interface ApprovalRequestInput {
+  approver: string;
+  requestedBy: string;
+  dueBy: string;
+  note: string;
+  filingId?: string | null;
+}
+
 
 export interface FilingSubmissionInput {
   filingDate: string;
