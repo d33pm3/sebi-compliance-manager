@@ -147,7 +147,6 @@ export default function RiskAssessment() {
       if (i.status === 'Completed') catMap[i.category].completed++;
       if (i.status === 'Overdue' || i.approvalStatus === 'Doc Missing') catMap[i.category].nonCompliant++;
     });
-    const totalItems = items.length;
     return Object.entries(catMap)
       .map(([name, d]) => {
         const label = toTitleCaseLabel(name);
@@ -211,7 +210,7 @@ export default function RiskAssessment() {
         <Card className="overflow-hidden">
           <CardHeader className="pb-1 pt-4 px-5">
             <CardTitle className="text-xs font-semibold tracking-wide text-muted-foreground">Executive Summary</CardTitle>
-            <p className="text-[10px] text-muted-foreground/70">Completed vs Non-Compliant by Category</p>
+            <p className="text-[10px] text-muted-foreground/70">Completed vs Non-Compliant by Category (% of each category)</p>
           </CardHeader>
           <CardContent className="px-3 pb-4">
             <ResponsiveContainer width="100%" height={260}>
