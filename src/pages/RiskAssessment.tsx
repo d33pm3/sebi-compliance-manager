@@ -56,8 +56,26 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function RiskAssessment() {
-  const { items, filters, setFilter, resetFilters, selectItem, filteredItems, updateApprovalStatus, toggleEvidence, notices } = useComplianceStore();
+  const { items, filters, setFilter, resetFilters, selectItem, filteredItems, updateApprovalStatus, toggleEvidence, notices, tasks } = useComplianceStore();
   const filtered = filteredItems();
+
+  const overdueTaskRisks = useMemo(() => buildOverdueTaskRisks(tasks, items), [tasks, items]);
+
+  const exportOverdueTaskRisks = () => {
+    import('xlsx').then(XLSX => {
+      const wsData = [
+        ['Task ID', 'Task', 'Compliance Item', 'Category', 'Risk Level', 'Flag', 'Task Status', 'Deadline', 'Days Overdue', 'Owner'],
+        ...overdueTaskRisks.map(r => [r.taskId, r.title, r.filingName, r.category, r.riskLevel, 'Task Overdue', r.status, r.deadline, Math.abs(r.daysLeft), r.owner]),
+      ];
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      ws['!cols'] = [{ wch: 20 }, { wch: 40 }, { wch: 45 }, { wch: 25 }, { wch: 11 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 13 }, { wch: 24 }];
+      XLSX.utils.book_append_sheet(wb, ws, 'Overdue Task Risks');
+      XLSX.writeFile(wb, 'Overdue_Task_High_Risks.xlsx');
+      toast.success('Downloaded Overdue_Task_High_Risks.xlsx');
+    });
+  };
+
   const [page, setPage] = useState(0);
   const [tab, setTab] = useState('all');
   const perPage = 12;
