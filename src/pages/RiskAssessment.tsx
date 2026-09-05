@@ -3,7 +3,7 @@ import { useComplianceStore } from '@/store/complianceStore';
 import { buildNoticeRisks, buildOverdueTaskRisks, effectiveRiskLevel, riskReasons } from '@/data/workflowData';
 import { CHART_COLORS, COMPARISON_COLORS, RISK_TILE_COLORS, STAT_COLORS, toTitleCaseLabel } from '@/lib/chartTheme';
 import { StatTile } from '@/components/StatTile';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ComplianceDetailDrawer } from '@/components/ComplianceDetailDrawer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -58,6 +58,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function RiskAssessment() {
+  const navigate = useNavigate();
   const { items, filters, setFilter, resetFilters, selectItem, filteredItems, updateApprovalStatus, toggleEvidence, notices, tasks } = useComplianceStore();
   const filtered = filteredItems();
 
