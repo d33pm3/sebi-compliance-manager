@@ -208,10 +208,8 @@ export function buildNoticeRisks(responses: NoticeResponse[], today = new Date()
 export type ComplianceState = 'Completed' | 'Overdue' | 'Documents Missing' | 'On Track';
 
 export function deriveComplianceState(item: ComplianceItem): ComplianceState {
-  if (item.status === 'Overdue') return 'Overdue';
-  if (item.approvalStatus === 'Doc Missing' || (item.status !== 'Completed' && !item.evidenceUploaded && item.status === 'Due Soon' && item.approvalStatus === 'Not Started')) {
-    return item.approvalStatus === 'Doc Missing' ? 'Documents Missing' : 'On Track';
-  }
   if (item.status === 'Completed') return 'Completed';
+  if (item.status === 'Overdue') return 'Overdue';
+  if (item.approvalStatus === 'Doc Missing' || !item.evidenceUploaded) return 'Documents Missing';
   return 'On Track';
 }
