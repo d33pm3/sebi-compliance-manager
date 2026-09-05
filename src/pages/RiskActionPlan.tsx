@@ -131,9 +131,8 @@ export default function RiskActionPlan() {
               label={`${level} Risk Items`}
               value={counts[level]}
               bg={RISK_TILE_COLORS[level]}
-              active={levelFilter === level}
-              onClick={() => setLevelFilter(f => (f === level ? 'all' : level))}
-              title={`List every ${level} risk item`}
+              onClick={() => openInRiskAssessment(level)}
+              title={`See every ${level} risk item in Risk Assessment`}
             />
           ))}
         </div>
