@@ -187,6 +187,8 @@ export default function TaskManager() {
                     <TableHead className="text-[10px]">Compliance Item</TableHead>
                     <TableHead className="text-[10px] hidden lg:table-cell">Owner</TableHead>
                     <TableHead className="text-[10px]">Deadline</TableHead>
+                    <TableHead className="text-[10px]">Days Left</TableHead>
+
                     <TableHead className="text-[10px]">Status</TableHead>
                     <TableHead className="text-[10px]">Update</TableHead>
                     <TableHead className="text-[10px] w-10" />
