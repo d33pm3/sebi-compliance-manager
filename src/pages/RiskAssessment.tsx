@@ -400,7 +400,7 @@ export default function RiskAssessment() {
             });
           };
           return (
-            <Card className="border-destructive/30">
+            <Card ref={noticeRiskSectionRef} className="border-destructive/30 scroll-mt-4">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <AlertTriangle className="h-4 w-4 text-destructive" />
