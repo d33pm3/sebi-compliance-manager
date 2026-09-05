@@ -287,26 +287,56 @@ export default function DocumentVault() {
                     <TableHead className="text-[10px] hidden md:table-cell">From</TableHead>
                     <TableHead className="text-[10px]">Response Due</TableHead>
                     <TableHead className="text-[10px]">Status</TableHead>
+                    <TableHead className="text-[10px]">Risk</TableHead>
+                    <TableHead className="text-[10px]">Linked Compliance</TableHead>
                     <TableHead className="text-[10px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {vaultDocuments.filter(d => d.section === 'sebi-notices').map(doc => (
-                    <TableRow key={doc.id} className="hover:bg-muted/50">
-                      <TableCell className="text-[11px] font-mono">{doc.noticeNo}</TableCell>
+                  {vaultDocuments.filter(d => d.section === 'sebi-notices').map(doc => {
+                    const item = linkedItem(doc);
+                    const risk = docRisk(doc);
+                    return (
+                    <TableRow key={doc.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/notices/${doc.id}`)}>
+                      <TableCell className="text-[11px] font-mono text-primary hover:underline">{doc.noticeNo}</TableCell>
                       <TableCell className="text-xs font-medium max-w-[200px] truncate">{doc.title}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell">{doc.issuedBy}</TableCell>
                       <TableCell className="text-[11px] text-muted-foreground">{doc.responseDue}</TableCell>
-                      <TableCell><Badge variant="outline" className={`text-[10px] ${statusColor(doc.status)}`}>{doc.status}</Badge></TableCell>
+                      <TableCell><span className={`${badgeBase} ${statusColor(doc.status)}`}>{doc.status}</span></TableCell>
                       <TableCell>
+                        {risk.level ? (
+                          <Link
+                            to="/risk-assessment"
+                            onClick={e => e.stopPropagation()}
+                            className={`${badgeBase} bg-destructive/20 text-destructive border-destructive/40 gap-1 hover:bg-destructive/30`}
+                            title={`${risk.level} Risk — ${risk.reason}. Open the Risk Assessment module.`}
+                          >
+                            <ShieldAlert className="h-3 w-3 flex-shrink-0" />
+                            {risk.reason}
+                          </Link>
+                        ) : (
+                          <span className={`${badgeBase} bg-success/20 text-success-foreground border-success/40`}>No Risk</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-[11px]">
+                        {item ? (
+                          <Link to={`/compliance/${item.id}`} onClick={e => e.stopPropagation()} className="text-primary hover:underline inline-flex items-center gap-1" title={item.filingName}>
+                            <span className="truncate max-w-[110px]">{item.filingName}</span>
+                            <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                          </Link>
+                        ) : <span className="text-muted-foreground">{doc.regulation}</span>}
+                      </TableCell>
+                      <TableCell onClick={e => e.stopPropagation()}>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleAction('View', doc)}><Eye className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleAction('Download', doc)}><Download className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6" title="View Notice" onClick={() => navigate(`/notices/${doc.id}`)}><Eye className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6" title="Download" onClick={() => handleAction('Download', doc)}><Download className="h-3.5 w-3.5" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
+
               </Table>
             </div>
           </CardContent>
