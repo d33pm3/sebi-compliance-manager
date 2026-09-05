@@ -7,7 +7,7 @@ import { CheckCircle2, AlertTriangle, Clock, ListTodo, ShieldAlert, FileCheck, M
 import { useMemo } from 'react';
 import { deriveComplianceState } from '@/data/workflowData';
 import { toTitleCaseLabel } from '@/lib/chartTheme';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CHART_COLORS = {
   Completed: 'hsl(145, 63%, 62%)',
@@ -65,6 +65,10 @@ function KpiCard({
 
 export default function KPIs() {
   const { items, tasks, filings, notices } = useComplianceStore();
+  const navigate = useNavigate();
+
+  // Clicking a state tile drills into the Master Compliance Register filtered to that state
+  const drillToState = (state: string) => navigate(`/?state=${encodeURIComponent(state)}`);
 
   const complianceStats = useMemo(() => {
     const total = items.length;
