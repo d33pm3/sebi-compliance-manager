@@ -43,7 +43,7 @@ export function MaterialEventsSection() {
               {(Object.entries(counts) as [keyof typeof urgencyConfig, number][]).map(([key, count]) => {
                 const cfg = urgencyConfig[key];
                 return (
-                  <Badge key={key} variant="outline" className={`text-[10px] px-1.5 py-0.5 ${cfg.className}`}>
+                  <Badge key={key} variant="outline" className={`inline-flex items-center justify-center whitespace-nowrap leading-none text-[10px] font-semibold h-6 min-w-[64px] px-2.5 flex-shrink-0 ${cfg.className}`}>
                     {cfg.label}: {count}
                   </Badge>
                 );
