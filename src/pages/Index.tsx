@@ -262,8 +262,9 @@ export default function Dashboard() {
                 <YAxis
                   type="category"
                   dataKey="name"
-                  tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
-                  width={120}
+                  tick={{ fontSize: 10, fill: 'hsl(var(--foreground))' }}
+                  width={150}
+                  interval={0}
                   axisLine={false}
                   tickLine={false}
                 />
