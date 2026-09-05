@@ -5,13 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { vaultCategories, VaultDocument } from '@/data/vaultData';
 import { useComplianceStore } from '@/store/complianceStore';
-import { Search, Download, Mail, FileText, AlertTriangle, BookOpen, Bot, Upload, Eye, ChevronLeft, ChevronRight, FolderArchive } from 'lucide-react';
+import { Search, Download, FileText, AlertTriangle, BookOpen, Bot, Upload, Eye, ChevronLeft, ChevronRight, FolderArchive, ShieldAlert, ExternalLink } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { downloadDocumentPlaceholder } from '@/lib/downloadUtils';
+import { StatTile } from '@/components/StatTile';
+import { STAT_COLORS } from '@/lib/chartTheme';
+import { ComplianceItem } from '@/data/complianceData';
+import { deriveComplianceState, effectiveRiskLevel, linkedComplianceItems } from '@/data/workflowData';
 
 export default function DocumentVault() {
   const vaultDocuments = useComplianceStore(s => s.vaultDocs);
