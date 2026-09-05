@@ -10,7 +10,7 @@ import { StatusBadge, RiskBadge, NatureBadge } from '@/components/StatusBadges';
 import { categories } from '@/data/complianceData';
 import { Search, FileText, AlertTriangle, CheckCircle2, Clock, CalendarDays, RotateCcw, ChevronLeft, ChevronRight, FileSpreadsheet, Presentation } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { MaterialEventsSection } from '@/components/MaterialEventsSection';
 import { exportCategoryToXlsx, exportCategoryToPptx } from '@/lib/categoryExportUtils';
 import { toast } from 'sonner';
@@ -29,6 +29,15 @@ const RISK_COLORS = {
   High: 'hsl(38, 80%, 52%)',
   Medium: 'hsl(197, 78%, 54%)',
   Low: 'hsl(145, 63%, 62%)',
+};
+
+// Stat tiles reuse the exact donut-chart palette so numbers and colours reconcile visually
+const STAT_COLORS = {
+  total: { bg: 'hsl(220, 26%, 22%)', fg: 'hsl(0, 0%, 100%)' },
+  dueSoon: { bg: CHART_COLORS['Due Soon'], fg: 'hsl(30, 60%, 12%)' },
+  overdue: { bg: CHART_COLORS.Overdue, fg: 'hsl(350, 60%, 18%)' },
+  completed: { bg: CHART_COLORS.Completed, fg: 'hsl(150, 60%, 14%)' },
+  upcoming: { bg: CHART_COLORS['Not Due'], fg: 'hsl(0, 0%, 100%)' },
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -74,6 +83,32 @@ export default function Dashboard() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const toTitleCaseLabel = (s: string) => s.toLowerCase().replace(/(?:^|\s|\/)\w/g, c => c.toUpperCase());
   const perPage = 15;
+  const registerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToRegister = () => {
+    requestAnimationFrame(() => registerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  };
+
+  // One-click drill-down: any dashboard number lands on the matching rows of the Master Register
+  const drillTo = (status: string) => {
+    resetFilters();
+    if (status) setFilter('status', status);
+    setPage(0);
+    scrollToRegister();
+  };
+
+  const drillToCategory = (category: string) => {
+    resetFilters();
+    setFilter('category', category);
+    setPage(0);
+    scrollToRegister();
+  };
+
+  const activeDrill = filters.status
+    ? filters.status
+    : filters.category
+      ? toTitleCaseLabel(filters.category)
+      : '';
 
   const stats = useMemo(() => ({
     total: items.length,
@@ -150,13 +185,13 @@ export default function Dashboard() {
   return (
     <AppLayout title="Compliance Dashboard" subtitle="Module 2 — SEBI / NSE / BSE Unified Register">
       <div className="space-y-4">
-        {/* Quick Stats */}
+        {/* Quick Stats — clickable, drill straight into the Master Compliance Register */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <StatCard icon={<FileText className="h-4 w-4" />} label="Total Items" value={stats.total} color="text-foreground" />
-          <StatCard icon={<Clock className="h-4 w-4" />} label="Due Soon" value={stats.dueSoon} color="text-warning" />
-          <StatCard icon={<AlertTriangle className="h-4 w-4" />} label="Overdue" value={stats.overdue} color="text-destructive" />
-          <StatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Completed" value={stats.completed} color="text-success" />
-          <StatCard icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming} color="text-muted-foreground" />
+          <StatCard icon={<FileText className="h-4 w-4" />} label="Total Items" value={stats.total} bg={STAT_COLORS.total} active={filters.status === ''} onClick={() => drillTo('')} />
+          <StatCard icon={<Clock className="h-4 w-4" />} label="Due Soon" value={stats.dueSoon} bg={STAT_COLORS.dueSoon} active={filters.status === 'Due Soon'} onClick={() => drillTo('Due Soon')} />
+          <StatCard icon={<AlertTriangle className="h-4 w-4" />} label="Overdue" value={stats.overdue} bg={STAT_COLORS.overdue} active={filters.status === 'Overdue'} onClick={() => drillTo('Overdue')} />
+          <StatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Completed" value={stats.completed} bg={STAT_COLORS.completed} active={filters.status === 'Completed'} onClick={() => drillTo('Completed')} />
+          <StatCard icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming} bg={STAT_COLORS.upcoming} active={filters.status === 'Not Due'} onClick={() => drillTo('Not Due')} />
         </div>
 
         {/* Charts Row — Status + Filings */}
@@ -353,6 +388,15 @@ export default function Dashboard() {
                     <h3 className="text-xs font-semibold text-primary">{toTitleCaseLabel(expandedCategory)} — {catItems.length} Compliance Items</h3>
                     <div className="flex items-center gap-1.5">
                       <Button
+                        variant="secondary"
+                        size="sm"
+                        className="text-[10px] h-7 px-2.5 gap-1"
+                        onClick={() => drillToCategory(expandedCategory)}
+                      >
+                        <FileText className="h-3 w-3 flex-shrink-0" />
+                        View in Master Register
+                      </Button>
+                      <Button
                         variant="outline"
                         size="sm"
                         className="text-[10px] h-7 px-2.5 gap-1"
@@ -422,10 +466,21 @@ export default function Dashboard() {
         </Card>
 
         {/* Filters + Master Register Table */}
-        <Card>
+        <Card ref={registerRef} className="scroll-mt-20">
           <CardHeader className="pb-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <CardTitle className="text-sm font-semibold">Master Compliance Register</CardTitle>
+              <div>
+                <CardTitle className="text-sm font-semibold">Master Compliance Register</CardTitle>
+                {activeDrill && (
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="text-[10px] font-medium text-muted-foreground">Filtered by:</span>
+                    <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      {activeDrill}
+                      <button onClick={resetFilters} className="ml-0.5 text-primary/70 hover:text-primary">×</button>
+                    </span>
+                  </div>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -505,12 +560,12 @@ export default function Dashboard() {
                     >
                       <TableCell className="text-xs text-muted-foreground">{item.sNo}</TableCell>
                       <TableCell className="text-xs font-medium max-w-[200px] truncate">{item.filingName}</TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{item.category}</TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground hidden md:table-cell max-w-[120px] truncate">{toTitleCaseLabel(item.category)}</TableCell>
                       <TableCell className="hidden lg:table-cell"><NatureBadge nature={item.complianceNature} /></TableCell>
                       <TableCell><StatusBadge status={item.status} /></TableCell>
                       <TableCell className="hidden md:table-cell"><RiskBadge level={item.riskLevel} /></TableCell>
                       <TableCell className="text-xs text-muted-foreground hidden lg:table-cell">{item.dueDate}</TableCell>
-                      <TableCell className="text-[10px] text-muted-foreground hidden lg:table-cell">{item.obligorTier}</TableCell>
+                      <TableCell className="text-[10px] text-muted-foreground hidden lg:table-cell">{toTitleCaseLabel(item.obligorTier)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -538,16 +593,37 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function StatCard({
+  icon,
+  label,
+  value,
+  bg,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  bg: { bg: string; fg: string };
+  active?: boolean;
+  onClick?: () => void;
+}) {
   return (
-    <Card>
-      <CardContent className="p-3 flex items-center gap-3">
-        <div className={`${color}`}>{icon}</div>
-        <div>
-          <p className={`text-xl font-bold ${color}`}>{value}</p>
-          <p className="text-[10px] text-muted-foreground tracking-wider">{label}</p>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`group w-full rounded-lg text-left transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${active ? 'ring-2 ring-offset-2 ring-ring' : ''}`}
+      style={{ backgroundColor: bg.bg, color: bg.fg }}
+      title={`View ${label} in the Master Compliance Register`}
+    >
+      <div className="p-3 flex items-center gap-3">
+        <div className="opacity-80" style={{ color: bg.fg }}>{icon}</div>
+        <div className="min-w-0">
+          <p className="text-xl font-bold leading-none" style={{ color: bg.fg }}>{value}</p>
+          <p className="text-[10px] font-medium mt-1 truncate opacity-80" style={{ color: bg.fg }}>{label}</p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </button>
   );
 }
