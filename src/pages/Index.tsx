@@ -150,13 +150,13 @@ export default function Dashboard() {
   return (
     <AppLayout title="Compliance Dashboard" subtitle="Module 2 — SEBI / NSE / BSE Unified Register">
       <div className="space-y-4">
-        {/* Quick Stats */}
+        {/* Quick Stats — clickable, drill straight into the Master Compliance Register */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <StatCard icon={<FileText className="h-4 w-4" />} label="Total Items" value={stats.total} color="text-foreground" />
-          <StatCard icon={<Clock className="h-4 w-4" />} label="Due Soon" value={stats.dueSoon} color="text-warning" />
-          <StatCard icon={<AlertTriangle className="h-4 w-4" />} label="Overdue" value={stats.overdue} color="text-destructive" />
-          <StatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Completed" value={stats.completed} color="text-success" />
-          <StatCard icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming} color="text-muted-foreground" />
+          <StatCard icon={<FileText className="h-4 w-4" />} label="Total Items" value={stats.total} bg={STAT_COLORS.total} active={filters.status === ''} onClick={() => drillTo('')} />
+          <StatCard icon={<Clock className="h-4 w-4" />} label="Due Soon" value={stats.dueSoon} bg={STAT_COLORS.dueSoon} active={filters.status === 'Due Soon'} onClick={() => drillTo('Due Soon')} />
+          <StatCard icon={<AlertTriangle className="h-4 w-4" />} label="Overdue" value={stats.overdue} bg={STAT_COLORS.overdue} active={filters.status === 'Overdue'} onClick={() => drillTo('Overdue')} />
+          <StatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Completed" value={stats.completed} bg={STAT_COLORS.completed} active={filters.status === 'Completed'} onClick={() => drillTo('Completed')} />
+          <StatCard icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming} bg={STAT_COLORS.upcoming} active={filters.status === 'Not Due'} onClick={() => drillTo('Not Due')} />
         </div>
 
         {/* Charts Row — Status + Filings */}
