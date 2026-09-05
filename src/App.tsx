@@ -15,6 +15,11 @@ import ResponseTracker from "./pages/ResponseTracker.tsx";
 import TaskManager from "./pages/TaskManager.tsx";
 import ComplianceTimeline from "./pages/ComplianceTimeline.tsx";
 import KPIs from "./pages/KPIs.tsx";
+import AgentOutputDetail from "./pages/AgentOutputDetail.tsx";
+import ComplianceCalendar from "./pages/ComplianceCalendar.tsx";
+import RiskActionPlan from "./pages/RiskActionPlan.tsx";
+import RegisterManager from "./pages/RegisterManager.tsx";
+
 
 import ComplianceItemDetail from "./pages/ComplianceItemDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
