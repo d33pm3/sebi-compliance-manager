@@ -33,6 +33,27 @@ export interface FilingSubmissionInput {
   remarks: string;
 }
 
+export interface UploadedFileMeta {
+  name: string;
+  sizeBytes: number;
+  extension: string;
+  url: string;
+}
+
+export interface DocumentUploadInput {
+  /** Master Compliance Register item this evidence belongs to */
+  itemId: number | null;
+  section: VaultDocument['section'];
+  documentType: string;
+  fiscalYear: string;
+  uploadedBy: string;
+  /** Uploaded → evidence on record, Filed → obligation discharged */
+  docStatus: 'Uploaded' | 'Filed';
+  remarks: string;
+  files: UploadedFileMeta[];
+}
+
+
 interface Filters {
   search: string;
   category: string;
