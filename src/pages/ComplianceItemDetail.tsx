@@ -330,29 +330,131 @@ export default function ComplianceItemDetail() {
                 <CardTitle className="text-sm font-semibold">Approval Trail</CardTitle>
                 <p className="text-[10px] text-muted-foreground">Current approval status: {item.approvalStatus} · Approver: {item.approver}</p>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {itemFilings.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No filing is awaiting approval. Submit a filing first.</p>
-                ) : itemFilings.map(f => (
-                  <div key={f.id} className="rounded-md border p-3 text-xs flex flex-wrap items-center gap-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold truncate">{f.referenceNo}</p>
-                      <p className="text-muted-foreground">Filed {f.filingDate} · {f.approver}{f.approvedOn ? ` · Decided ${f.approvedOn}` : ''}</p>
-                    </div>
-                    <ApprovalBadge status={f.approvalStatus as ApprovalStatus} />
-                    {f.approvalStatus === 'Pending' && (
-                      <div className="flex gap-1">
-                        <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => { approveFiling(f.id, true); toast.success('Filing approved'); }}>
-                          <CheckCircle2 className="h-3 w-3 text-success" /> Approve
-                        </Button>
-                        <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => { approveFiling(f.id, false); toast.success('Filing rejected'); }}>
-                          <XCircle className="h-3 w-3 text-destructive" /> Reject
-                        </Button>
-                      </div>
-                    )}
+              <CardContent className="space-y-4">
+                {/* Approval request form */}
+                <div className="rounded-md border p-3 space-y-3 bg-muted/20">
+                  <div className="flex items-center gap-2">
+                    <Stamp className="h-3.5 w-3.5 text-secondary flex-shrink-0" />
+                    <p className="text-xs font-semibold">Request An Approval</p>
                   </div>
-                ))}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Approver</Label>
+                      <Select value={approvalForm.approver} onValueChange={v => setApprovalForm({ ...approvalForm, approver: v })}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>{approvers.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}</SelectContent>
+                      </Select>
+                      <p className="text-[10px] text-muted-foreground">{approverEmail(approvalForm.approver)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Requested By</Label>
+                      <Select value={approvalForm.requestedBy} onValueChange={v => setApprovalForm({ ...approvalForm, requestedBy: v })}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>{owners.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Decision Due By</Label>
+                      <Input type="date" className="h-8 text-xs" value={approvalForm.dueBy} onChange={e => setApprovalForm({ ...approvalForm, dueBy: e.target.value })} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Linked Filing</Label>
+                      <Select value={approvalForm.filingId} onValueChange={v => setApprovalForm({ ...approvalForm, filingId: v })}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="None" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          {itemFilings.map(f => <SelectItem key={f.id} value={f.id}>{f.referenceNo}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Note To Approver</Label>
+                    <Textarea className="text-xs min-h-[60px]" value={approvalForm.note} onChange={e => setApprovalForm({ ...approvalForm, note: e.target.value })} placeholder="Context for the approver..." />
+                  </div>
+                  <Button size="sm" className="h-8 text-xs gap-1.5" onClick={handleRequestApproval}>
+                    <Send className="h-3.5 w-3.5 flex-shrink-0" /> Send Approval Request
+                  </Button>
+                </div>
+
+                {/* Approval requests */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold">Approval Requests ({itemApprovals.length})</p>
+                  {itemApprovals.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No approval has been requested yet.</p>
+                  ) : itemApprovals.map(a => (
+                    <div key={a.id} className="rounded-md border p-3 text-xs space-y-2">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold">{a.approver}</p>
+                          <p className="text-muted-foreground">
+                            Requested {a.requestedOn} by {a.requestedBy} · Due by {a.dueBy}
+                            {a.decidedOn ? ` · Decided ${a.decidedOn}` : ''}
+                          </p>
+                          {a.note && <p className="text-muted-foreground mt-1">Note: {a.note}</p>}
+                          {a.decisionNote && <p className="text-muted-foreground mt-1">Remarks: {a.decisionNote}</p>}
+                        </div>
+                        <span className={`inline-flex items-center justify-center rounded-full text-[10px] font-semibold whitespace-nowrap min-w-[70px] h-5 px-2.5 leading-none ${a.status === 'Approved' ? 'bg-success text-success-foreground' : a.status === 'Declined' ? 'bg-destructive text-destructive-foreground' : 'bg-warning text-warning-foreground'}`}>
+                          {a.status}
+                        </span>
+                      </div>
+                      {a.status === 'Pending' && (
+                        <div className="flex flex-wrap items-end gap-2">
+                          <Input
+                            className="h-7 text-[11px] flex-1 min-w-[180px]"
+                            placeholder="Decision remarks (optional)"
+                            value={decisionNotes[a.id] ?? ''}
+                            onChange={e => setDecisionNotes({ ...decisionNotes, [a.id]: e.target.value })}
+                          />
+                          <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => handleDecision(a.id, true)}>
+                            <CheckCircle2 className="h-3 w-3 text-success" /> Approve
+                          </Button>
+                          <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => handleDecision(a.id, false)}>
+                            <XCircle className="h-3 w-3 text-destructive" /> Decline
+                          </Button>
+                        </div>
+                      )}
+                      <div className="rounded-sm bg-muted/40 p-2 space-y-1">
+                        {a.notifications.map(n => (
+                          <p key={n.id} className="text-[10px] text-muted-foreground flex items-start gap-1.5">
+                            <Mail className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                            <span><span className="font-medium">{n.sentAt}</span> — email to {n.to}: {n.subject}</span>
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Separator />
+
+                {/* Filing approvals */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold">Filing Approvals</p>
+                  {itemFilings.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No filing is awaiting approval. Submit a filing first.</p>
+                  ) : itemFilings.map(f => (
+                    <div key={f.id} className="rounded-md border p-3 text-xs flex flex-wrap items-center gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold truncate">{f.referenceNo}</p>
+                        <p className="text-muted-foreground">Filed {f.filingDate} · {f.approver}{f.approvedOn ? ` · Decided ${f.approvedOn}` : ''}</p>
+                      </div>
+                      <ApprovalBadge status={f.approvalStatus as ApprovalStatus} />
+                      {f.approvalStatus === 'Pending' && (
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => { approveFiling(f.id, true); toast.success('Filing approved'); }}>
+                            <CheckCircle2 className="h-3 w-3 text-success" /> Approve
+                          </Button>
+                          <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => { approveFiling(f.id, false); toast.success('Filing rejected'); }}>
+                            <XCircle className="h-3 w-3 text-destructive" /> Reject
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </CardContent>
+
             </Card>
           </TabsContent>
 
