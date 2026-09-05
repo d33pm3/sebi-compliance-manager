@@ -114,9 +114,11 @@ export default function Dashboard() {
 
   const activeDrill = filters.status
     ? filters.status
-    : filters.category
-      ? toTitleCaseLabel(filters.category)
-      : '';
+    : filters.state
+      ? filters.state
+      : filters.category
+        ? toTitleCaseLabel(filters.category)
+        : '';
 
   const stats = useMemo(() => ({
     total: items.length,
