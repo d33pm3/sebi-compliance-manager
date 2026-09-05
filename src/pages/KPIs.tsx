@@ -237,16 +237,32 @@ export default function KPIs() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[200px]">
+              <div className="h-[220px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={taskData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
+                    <Pie
+                      data={taskData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      label={({ value, percent }: any) => (value > 0 ? `${value} (${Math.round(percent * 100)}%)` : '')}
+                      labelLine={false}
+                      fontSize={10}
+                    >
                       {taskData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
                       ))}
                     </Pie>
                     <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
-                    <Legend verticalAlign="bottom" height={24} iconType="circle" wrapperStyle={{ fontSize: 11 }} />
+                    <Legend
+                      verticalAlign="bottom"
+                      height={24}
+                      iconType="circle"
+                      wrapperStyle={{ fontSize: 11 }}
+                      formatter={(value: string, entry: any) => `${value} (${entry.payload.value})`}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -270,16 +286,32 @@ export default function KPIs() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[220px]">
+              <div className="h-[240px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={riskData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={85} paddingAngle={2}>
+                    <Pie
+                      data={riskData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={55}
+                      outerRadius={85}
+                      paddingAngle={2}
+                      label={({ value, percent }: any) => (value > 0 ? `${value} (${Math.round(percent * 100)}%)` : '')}
+                      labelLine={false}
+                      fontSize={10}
+                    >
                       {riskData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
                       ))}
                     </Pie>
                     <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
-                    <Legend verticalAlign="bottom" height={24} iconType="circle" wrapperStyle={{ fontSize: 11 }} />
+                    <Legend
+                      verticalAlign="bottom"
+                      height={24}
+                      iconType="circle"
+                      wrapperStyle={{ fontSize: 11 }}
+                      formatter={(value: string, entry: any) => `${value} (${entry.payload.value})`}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
