@@ -71,9 +71,9 @@ export default function RiskActionPlan() {
     .sort((a, b) => (a.level === b.level ? a.item.dueDate.localeCompare(b.item.dueDate) : a.level === 'Critical' ? -1 : 1)), [plans]);
 
   const visible = useMemo(() => plans
-    .filter(p => levelFilter === 'all' ? p.level === 'Critical' || p.level === 'High' : p.level === levelFilter)
+    .filter(p => p.level === 'Critical' || p.level === 'High')
     .filter(p => planFilter === 'all' ? true : planFilter === 'with' ? p.tasks.length > 0 : p.tasks.length === 0)
-    .sort((a, b) => a.item.dueDate.localeCompare(b.item.dueDate)), [plans, levelFilter, planFilter]);
+    .sort((a, b) => a.item.dueDate.localeCompare(b.item.dueDate)), [plans, planFilter]);
 
   const counts = useMemo(() => ({
     Critical: plans.filter(p => p.level === 'Critical').length,
