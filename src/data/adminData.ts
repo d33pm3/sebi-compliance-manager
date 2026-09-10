@@ -30,14 +30,14 @@ export interface SystemHealth {
 }
 
 export const mockUsers: User[] = [
-  { id: '1', name: 'Priya Mehta', email: 'priya.mehta@deriskadvisory.com', role: 'Compliance Officer', department: 'Legal & Compliance', lastLogin: '2026-03-29 09:15', status: 'Active', assignedOwner: 28, assignedApprover: 0 },
-  { id: '2', name: 'Rajesh Kumar', email: 'rajesh.kumar@deriskadvisory.com', role: 'Company Secretary', department: 'Corporate Secretarial', lastLogin: '2026-03-29 08:30', status: 'Active', assignedOwner: 35, assignedApprover: 15 },
-  { id: '3', name: 'Anjali Desai', email: 'anjali.desai@deriskadvisory.com', role: 'Compliance Officer', department: 'Legal & Compliance', lastLogin: '2026-03-28 17:45', status: 'Active', assignedOwner: 20, assignedApprover: 0 },
-  { id: '4', name: 'Vikram Singh', email: 'vikram.singh@deriskadvisory.com', role: 'Administrator', department: 'IT', lastLogin: '2026-03-29 10:00', status: 'Active', assignedOwner: 0, assignedApprover: 0 },
-  { id: '5', name: 'Neha Sharma', email: 'neha.sharma@deriskadvisory.com', role: 'Board Member', department: 'Board', lastLogin: '2026-03-25 14:00', status: 'Active', assignedOwner: 0, assignedApprover: 25 },
-  { id: '6', name: 'Arjun Patel', email: 'arjun.patel@deriskadvisory.com', role: 'Auditor', department: 'Internal Audit', lastLogin: '2026-03-27 11:30', status: 'Active', assignedOwner: 10, assignedApprover: 18 },
-  { id: '7', name: 'Sunita Rao', email: 'sunita.rao@deriskadvisory.com', role: 'Legal Counsel', department: 'Legal', lastLogin: '2026-03-28 16:20', status: 'Active', assignedOwner: 0, assignedApprover: 35 },
-  { id: '8', name: 'Amit Gupta', email: 'amit.gupta@deriskadvisory.com', role: 'Viewer', department: 'Finance', lastLogin: '2026-03-20 09:00', status: 'Inactive', assignedOwner: 0, assignedApprover: 0 },
+  { id: '1', name: 'Priya Mehta', email: 'priya.mehta@example.com', role: 'Compliance Officer', department: 'Legal & Compliance', lastLogin: '2026-03-29 09:15', status: 'Active', assignedOwner: 28, assignedApprover: 0 },
+  { id: '2', name: 'Rajesh Kumar', email: 'rajesh.kumar@example.com', role: 'Company Secretary', department: 'Corporate Secretarial', lastLogin: '2026-03-29 08:30', status: 'Active', assignedOwner: 35, assignedApprover: 15 },
+  { id: '3', name: 'Anjali Desai', email: 'anjali.desai@example.com', role: 'Compliance Officer', department: 'Legal & Compliance', lastLogin: '2026-03-28 17:45', status: 'Active', assignedOwner: 20, assignedApprover: 0 },
+  { id: '4', name: 'Vikram Singh', email: 'vikram.singh@example.com', role: 'Administrator', department: 'IT', lastLogin: '2026-03-29 10:00', status: 'Active', assignedOwner: 0, assignedApprover: 0 },
+  { id: '5', name: 'Neha Sharma', email: 'neha.sharma@example.com', role: 'Board Member', department: 'Board', lastLogin: '2026-03-25 14:00', status: 'Active', assignedOwner: 0, assignedApprover: 25 },
+  { id: '6', name: 'Arjun Patel', email: 'arjun.patel@example.com', role: 'Auditor', department: 'Internal Audit', lastLogin: '2026-03-27 11:30', status: 'Active', assignedOwner: 10, assignedApprover: 18 },
+  { id: '7', name: 'Sunita Rao', email: 'sunita.rao@example.com', role: 'Legal Counsel', department: 'Legal', lastLogin: '2026-03-28 16:20', status: 'Active', assignedOwner: 0, assignedApprover: 35 },
+  { id: '8', name: 'Amit Gupta', email: 'amit.gupta@example.com', role: 'Viewer', department: 'Finance', lastLogin: '2026-03-20 09:00', status: 'Inactive', assignedOwner: 0, assignedApprover: 0 },
 ];
 
 export const mockAuditLogs: AuditLog[] = [
@@ -78,13 +78,13 @@ export const last24hStats = {
 };
 
 export const companySettings = {
-  companyName: 'deriskadvisory Pvt. Ltd.',
+  companyName: 'Demo Listed Company Pvt. Ltd.',
   companyPAN: 'AABCE1234F',
   companyISIN: 'INE123A01016',
   listedNSE: true,
   listedBSE: true,
   marketCapCategory: 'Top 500',
   fiscalYearStart: 'April',
-  complianceEmail: 'compliance@deriskadvisory.com',
+  complianceEmail: 'compliance@example.com',
   cin: 'L12345MH2020PLC123456',
 };

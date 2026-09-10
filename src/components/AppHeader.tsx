@@ -28,8 +28,8 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
 
       <div className="flex items-center gap-3">
         <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground">
-          <img src={ecxoLogo} alt="deriskadvisory logo" className="h-6 w-6 rounded-full" />
-          <span className="font-medium">deriskadvisory</span>
+          <img src={ecxoLogo} alt="Demo listed company logo" className="h-6 w-6 rounded-full" />
+          <span className="font-medium">Demo Listed Co.</span>
         </div>
 
         <Button variant="ghost" size="icon" className="relative">
