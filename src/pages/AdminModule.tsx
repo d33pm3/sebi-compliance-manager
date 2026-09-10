@@ -49,7 +49,6 @@ export default function AdminModule() {
           <TabsTrigger value="health" className="text-xs"><Activity className="h-3.5 w-3.5 mr-1" /> Health</TabsTrigger>
         </TabsList>
 
-        {/* Page 1: User Management */}
         <TabsContent value="users">
           <Card>
             <CardHeader className="pb-3">
@@ -114,7 +113,6 @@ export default function AdminModule() {
           </Card>
         </TabsContent>
 
-        {/* Page 2: Company Settings */}
         <TabsContent value="company">
           <Card>
             <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold">Company Settings</CardTitle></CardHeader>
@@ -158,7 +156,6 @@ export default function AdminModule() {
           </Card>
         </TabsContent>
 
-        {/* Page 3: Email / SMTP */}
         <TabsContent value="email">
           <Card>
             <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold">Email / SMTP Configuration</CardTitle></CardHeader>
@@ -166,10 +163,10 @@ export default function AdminModule() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5"><Label className="text-xs">SMTP Host</Label><Input defaultValue="smtp.gmail.com" className="h-8 text-xs" /></div>
                 <div className="space-y-1.5"><Label className="text-xs">SMTP Port</Label><Input defaultValue="587" className="h-8 text-xs" /></div>
-                <div className="space-y-1.5"><Label className="text-xs">Username</Label><Input defaultValue="compliance@deriskadvisory.com" className="h-8 text-xs" /></div>
+                <div className="space-y-1.5"><Label className="text-xs">Username</Label><Input defaultValue="compliance@example.com" className="h-8 text-xs" /></div>
                 <div className="space-y-1.5"><Label className="text-xs">Password</Label><Input type="password" defaultValue="••••••••" className="h-8 text-xs" /></div>
-                <div className="space-y-1.5"><Label className="text-xs">From Name</Label><Input defaultValue="deriskadvisory" className="h-8 text-xs" /></div>
-                <div className="space-y-1.5"><Label className="text-xs">From Email</Label><Input defaultValue="compliance@deriskadvisory.com" className="h-8 text-xs" /></div>
+                <div className="space-y-1.5"><Label className="text-xs">From Name</Label><Input defaultValue="Demo Listed Co." className="h-8 text-xs" /></div>
+                <div className="space-y-1.5"><Label className="text-xs">From Email</Label><Input defaultValue="compliance@example.com" className="h-8 text-xs" /></div>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="text-xs" onClick={() => toast.success('Connection successful')}>Test Connection</Button>
@@ -179,7 +176,6 @@ export default function AdminModule() {
           </Card>
         </TabsContent>
 
-        {/* Page 4: Agent Configuration */}
         <TabsContent value="agent">
           <Card>
             <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold">Agent Configuration</CardTitle></CardHeader>
@@ -188,7 +184,7 @@ export default function AdminModule() {
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">API Keys</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5"><Label className="text-xs">Anthropic API Key</Label><Input type="password" defaultValue="••••••••" className="h-8 text-xs" /></div>
-                  <div className="space-y-1.5"><Label className="text-xs">AWS S3 Bucket</Label><Input defaultValue="deriskadvisory-vault" className="h-8 text-xs" /></div>
+                  <div className="space-y-1.5"><Label className="text-xs">AWS S3 Bucket</Label><Input defaultValue="demo-listed-vault" className="h-8 text-xs" /></div>
                   <div className="space-y-1.5"><Label className="text-xs">AWS Access Key ID</Label><Input type="password" defaultValue="••••••••" className="h-8 text-xs" /></div>
                   <div className="space-y-1.5"><Label className="text-xs">AWS Secret Access Key</Label><Input type="password" defaultValue="••••••••" className="h-8 text-xs" /></div>
                   <div className="space-y-1.5"><Label className="text-xs">AWS Region</Label><Input defaultValue="ap-south-1" className="h-8 text-xs" /></div>
@@ -207,7 +203,6 @@ export default function AdminModule() {
           </Card>
         </TabsContent>
 
-        {/* Page 5: Register Management */}
         <TabsContent value="register">
           <Card>
             <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold">Compliance Register Management</CardTitle></CardHeader>
@@ -248,7 +243,6 @@ export default function AdminModule() {
           </Card>
         </TabsContent>
 
-        {/* Page 6: Audit Logs */}
         <TabsContent value="audit">
           <Card>
             <CardHeader className="pb-3">
@@ -303,7 +297,6 @@ export default function AdminModule() {
           </Card>
         </TabsContent>
 
-        {/* Page 7: System Health */}
         <TabsContent value="health">
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -326,7 +319,6 @@ export default function AdminModule() {
                   ))}
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader className="pb-2"><CardTitle className="text-xs font-semibold">Queue Statistics</CardTitle></CardHeader>
                 <CardContent className="space-y-2">
@@ -342,7 +334,6 @@ export default function AdminModule() {
                 </CardContent>
               </Card>
             </div>
-
             <Card>
               <CardHeader className="pb-2"><CardTitle className="text-xs font-semibold">Last 24 Hours</CardTitle></CardHeader>
               <CardContent>
